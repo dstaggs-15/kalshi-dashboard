@@ -84,13 +84,18 @@ def fetch_settlements_last_n_days(portfolio_api: PortfolioApi, days_back: int):
     cursor = None
 
     while True:
-        resp = portfolio_api.get_settlements(
-            limit=200,
-            cursor=cursor,
-            min_ts=min_ts,
-            max_ts=max_ts,
-        )
-        settlements.extend(getattr(resp, "settlements", []))
+                resp = portfolio_api.get_settlements(limit=200, cursor=cursor)
+
+                for s in getattr(resp, "settlements", []):
+            ts_val = getattr(s, "ts", None)
+            if ts_val is None:
+                continue
+            # Convert ms to seconds if needed
+            if ts_val > 10_000_000_000:
+                ts_val = ts_val / 1000
+            if ts_val < min_ts or ts_val > max_ts:
+                continue
+            settlements.append(s)
 
         cursor = getattr(resp, "cursor", None)
         if not cursor:
