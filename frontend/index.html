@@ -1,1 +1,105 @@
-index
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Kalshi Momentum Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="background">
+    <div class="bubble bubble-1"></div>
+    <div class="bubble bubble-2"></div>
+    <div class="bubble bubble-3"></div>
+    <div class="bubble bubble-4"></div>
+  </div>
+
+  <main class="app">
+    <header class="app-header">
+      <div>
+        <h1>Kalshi Momentum Dashboard</h1>
+        <p class="subtitle">Track fills & settlements in near-real-time</p>
+      </div>
+      <div class="status-pill" id="status-pill">
+        <span class="dot"></span>
+        <span id="status-text">Loading…</span>
+      </div>
+    </header>
+
+    <section class="top-row">
+      <div class="card primary">
+        <h2>Last Updated</h2>
+        <p class="big-number" id="last-updated">—</p>
+        <p class="hint">Based on <code>generated_at</code> from kalshi_summary.json</p>
+      </div>
+
+      <div class="card">
+        <h2>Fills (Last 24h)</h2>
+        <p class="big-number" id="fills-count">—</p>
+        <p class="hint">Number of fills returned by the API</p>
+      </div>
+
+      <div class="card">
+        <h2>Settlements (Last 24h)</h2>
+        <p class="big-number" id="settlements-count">—</p>
+        <p class="hint">Closed outcomes in the last day</p>
+      </div>
+    </section>
+
+    <section class="cards-grid">
+      <div class="card">
+        <div class="card-header">
+          <h2>Recent Fills</h2>
+          <span class="pill" id="fills-pill">—</span>
+        </div>
+        <div class="table-wrapper" id="fills-table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>Market</th>
+                <th>Side</th>
+                <th>Size</th>
+                <th>Price</th>
+              </tr>
+            </thead>
+            <tbody id="fills-table-body">
+              <tr><td colspan="5" class="placeholder">Loading…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h2>Recent Settlements</h2>
+          <span class="pill" id="settlements-pill">—</span>
+        </div>
+        <div class="table-wrapper" id="settlements-table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>Market</th>
+                <th>Outcome</th>
+                <th>Cash Change</th>
+              </tr>
+            </thead>
+            <tbody id="settlements-table-body">
+              <tr><td colspan="4" class="placeholder">Loading…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <footer class="app-footer">
+      <span>Auto-refreshing every <span id="refresh-interval-label">60</span>s</span>
+      <button id="refresh-button" class="refresh-button">Refresh now</button>
+    </footer>
+  </main>
+
+  <script src="app.js" defer></script>
+</body>
+</html>
