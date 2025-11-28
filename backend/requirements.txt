@@ -1,2 +1,3 @@
 kalshi-python
 python-dotenv
+cryptography
