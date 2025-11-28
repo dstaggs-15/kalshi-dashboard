@@ -3,6 +3,14 @@ name: Update Kalshi Summary
 on:
   workflow_dispatch:  # lets you run it manually from the Actions tab
 
+name: Update Kalshi Summary
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
 jobs:
   update:
     runs-on: ubuntu-latest
