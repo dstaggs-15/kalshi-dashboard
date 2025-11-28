@@ -22,7 +22,7 @@
     <header class="app-header">
       <div>
         <h1>Kalshi Momentum Dashboard</h1>
-        <p class="subtitle">See how much money is flowing in and out of your account.</p>
+        <p class="subtitle">Government-grade view of money in, money out, and your edge.</p>
       </div>
       <div class="status-pill" id="status-pill">
         <span class="dot"></span>
@@ -30,14 +30,14 @@
       </div>
     </header>
 
-    <!-- OVERVIEW ROW: key money stats -->
+    <!-- ROW 1: MONEY OVERVIEW -->
     <section class="overview-row">
       <div class="card primary overview-card">
         <h2>Realized P&amp;L (Last 24h)</h2>
         <p class="big-number" id="realized-pnl">$—</p>
         <p class="hint">
           Sum of all settlement cash changes in the last 24 hours.<br />
-          Roughly: profit − losses, and already includes returned stake &amp; fees.
+          Only includes <strong>markets that fully closed</strong>.
         </p>
       </div>
 
@@ -61,12 +61,12 @@
         <h2>Win Rate</h2>
         <p class="big-number" id="win-rate">—</p>
         <p class="hint">
-          % of settlements where cash change &gt; 0. Helps you see how often bets end green.
+          % of settled markets where your cash change was &gt; 0.
         </p>
       </div>
     </section>
 
-    <!-- SECOND ROW: last updated + counts -->
+    <!-- ROW 2: LAST UPDATED + TRADING ACTIVITY SUMMARY -->
     <section class="top-row">
       <div class="card">
         <h2>Last Updated</h2>
@@ -74,89 +74,77 @@
         <p class="hint">
           Based on <code>generated_at</code> from <code>kalshi_summary.json</code>.
         </p>
+        <p class="micro-hint" id="no-settlements-note" style="display:none;">
+          No settlements in the last 24 hours, so P&amp;L numbers will show $0.00 until a
+          market actually closes and hits your cash balance.
+        </p>
       </div>
 
-      <div class="card">
-        <h2>Fills (Last 24h)</h2>
-        <p class="big-number" id="fills-count">—</p>
-        <p class="hint">
-          Number of orders that actually traded. Think: how many times you got filled.
+      <div class="card activity-card">
+        <div class="card-header">
+          <h2>Trading Activity (Last 24h)</h2>
+          <span class="pill" id="activity-pill">—</span>
+        </div>
+        <p class="micro-hint">
+          Based on <strong>fills</strong> (orders that traded), even if the market hasn’t settled yet.
         </p>
+
+        <div class="activity-grid">
+          <div class="activity-item">
+            <span class="label">Trades executed</span>
+            <span class="value" id="trades-count">—</span>
+            <span class="explain">Number of fills today.</span>
+          </div>
+          <div class="activity-item">
+            <span class="label">Markets traded</span>
+            <span class="value" id="markets-count">—</span>
+            <span class="explain">Distinct tickers you touched.</span>
+          </div>
+          <div class="activity-item">
+            <span class="label">Contracts traded</span>
+            <span class="value" id="contracts-traded">—</span>
+            <span class="explain">Total size (buys + sells).</span>
+          </div>
+          <div class="activity-item">
+            <span class="label">Gross volume</span>
+            <span class="value" id="gross-volume">$—</span>
+            <span class="explain">Sum of |price × size| across all fills.</span>
+          </div>
+          <div class="activity-item">
+            <span class="label">Avg stake / trade</span>
+            <span class="value" id="avg-stake">$—</span>
+            <span class="explain">Rough average dollar risk per move.</span>
+          </div>
+          <div class="activity-item">
+            <span class="label">Yes vs No</span>
+            <span class="value" id="yes-no-breakdown">—</span>
+            <span class="explain">How often you took each side.</span>
+          </div>
+        </div>
       </div>
 
       <div class="card">
         <h2>Settlements (Last 24h)</h2>
         <p class="big-number" id="settlements-count">—</p>
         <p class="hint">
-          Markets that fully resolved and hit your cash balance.
+          Number of markets that fully resolved and changed your cash balance.
         </p>
       </div>
     </section>
 
-    <!-- TABLES: recent fills & settlements -->
-    <section class="cards-grid">
-      <div class="card">
-        <div class="card-header">
-          <h2>Recent Fills</h2>
-          <span class="pill" id="fills-pill">—</span>
-        </div>
-        <p class="micro-hint">
-          Time = when the order filled. Side = yes/no. Price is in dollars (e.g., 0.35 ≈ 35¢).
-        </p>
-        <div class="table-wrapper">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th title="Time of fill">Time</th>
-                <th title="Kalshi market ticker">Market</th>
-                <th title="yes/no side you took">Side</th>
-                <th title="Number of contracts in this fill">Size</th>
-                <th title="Fill price per contract in dollars">Price</th>
-              </tr>
-            </thead>
-            <tbody id="fills-table-body">
-              <tr><td colspan="5" class="placeholder">Loading…</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-header">
-          <h2>Recent Settlements</h2>
-          <span class="pill" id="settlements-pill">—</span>
-        </div>
-        <p class="micro-hint">
-          Cash Change ≈ how much your balance moved on that market after fees.
-        </p>
-        <div class="table-wrapper">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th title="Time settlement hit your account">Time</th>
-                <th title="Kalshi market ticker">Market</th>
-                <th title="Outcome that resolved">Outcome</th>
-                <th title="Change in your cash balance (approx. net of fees)">Cash Change</th>
-              </tr>
-            </thead>
-            <tbody id="settlements-table-body">
-              <tr><td colspan="4" class="placeholder">Loading…</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <!-- CHARTS / SUMMARY -->
+    <!-- ROW 3: CHARTS -->
     <section class="charts-grid">
       <div class="card">
         <div class="card-header">
           <h2>P&amp;L by Market (Last 24h)</h2>
           <span class="micro-hint-inline">
-            Bars &gt; 0 are winning markets. &lt; 0 are losing.
+            Bars &gt; 0 are net winning markets. &lt; 0 are net losing.
           </span>
         </div>
         <canvas id="pnl-by-market-chart"></canvas>
+        <p class="placeholder" id="pnl-by-market-placeholder" style="display:none;">
+          No settled markets in the last 24 hours, so there’s nothing to chart yet.
+        </p>
       </div>
 
       <div class="card">
@@ -167,6 +155,39 @@
           </span>
         </div>
         <canvas id="pnl-over-time-chart"></canvas>
+        <p class="placeholder" id="pnl-over-time-placeholder" style="display:none;">
+          Once you have at least one settlement, this line will show how your balance
+          changed trade by trade.
+        </p>
+      </div>
+    </section>
+
+    <!-- ROW 4: RECENT SETTLEMENTS (CLEAN TABLE) -->
+    <section class="cards-grid single">
+      <div class="card">
+        <div class="card-header">
+          <h2>Recent Settlements (Money Actually Hit)</h2>
+          <span class="pill" id="settlements-pill">—</span>
+        </div>
+        <p class="micro-hint">
+          <strong>Cash Change</strong> ≈ how much your balance moved on that market (after fees).
+          Green = money in, red = money out.
+        </p>
+        <div class="table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>Market</th>
+                <th>Outcome</th>
+                <th>Cash Change</th>
+              </tr>
+            </thead>
+            <tbody id="settlements-table-body">
+              <tr><td colspan="4" class="placeholder">Loading…</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </section>
 
