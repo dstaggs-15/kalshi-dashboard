@@ -106,19 +106,51 @@ def fetch_settlements_last_n_days(client, days=1):
 
 
 # -------------------------
-# Safely convert SDK objects to plain dicts
+# JSON cleaning helpers
 # -------------------------
-def to_dict(obj):
-    if obj is None:
-        return None
+def _clean_for_json(obj):
+    """
+    Recursively convert Kalshi SDK objects (and nested stuff)
+    into JSON-serializable types.
 
+    - datetime -> ISO string
+    - objects with .to_dict() -> dict, then cleaned
+    - objects with __dict__ -> dict, then cleaned
+    - lists/tuples -> clean each element
+    - dicts -> clean each value
+    - everything else -> str(obj) as a fallback
+    """
+    # Basic JSON types
+    if obj is None or isinstance(obj, (str, int, float, bool)):
+        return obj
+
+    # Datetime -> ISO string
+    if isinstance(obj, datetime):
+        return obj.isoformat()
+
+    # Lists / tuples
+    if isinstance(obj, (list, tuple)):
+        return [_clean_for_json(x) for x in obj]
+
+    # Dicts
+    if isinstance(obj, dict):
+        return {k: _clean_for_json(v) for k, v in obj.items()}
+
+    # Kalshi / pydantic style objects
     if hasattr(obj, "to_dict"):
-        return obj.to_dict()
+        return _clean_for_json(obj.to_dict())
 
+    # Generic Python objects with __dict__
     try:
-        return vars(obj)
+        return _clean_for_json(vars(obj))
     except Exception:
+        # Last resort: string representation
         return str(obj)
+
+
+def to_dict(obj):
+    """Public helper that just calls the cleaner."""
+    return _clean_for_json(obj)
 
 
 # -------------------------
