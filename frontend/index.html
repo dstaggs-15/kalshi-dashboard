@@ -6,6 +6,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <link rel="stylesheet" href="styles.css" />
+
+  <!-- Chart.js for graphs -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
   <div class="background">
@@ -19,7 +22,7 @@
     <header class="app-header">
       <div>
         <h1>Kalshi Momentum Dashboard</h1>
-        <p class="subtitle">Track fills & settlements in near-real-time</p>
+        <p class="subtitle">See how much money is flowing in and out of your account.</p>
       </div>
       <div class="status-pill" id="status-pill">
         <span class="dot"></span>
@@ -27,41 +30,88 @@
       </div>
     </header>
 
+    <!-- OVERVIEW ROW: key money stats -->
+    <section class="overview-row">
+      <div class="card primary overview-card">
+        <h2>Realized P&amp;L (Last 24h)</h2>
+        <p class="big-number" id="realized-pnl">$—</p>
+        <p class="hint">
+          Sum of all settlement cash changes in the last 24 hours.<br />
+          Roughly: profit − losses, and already includes returned stake &amp; fees.
+        </p>
+      </div>
+
+      <div class="card overview-card">
+        <h2>Cash In</h2>
+        <p class="big-number positive" id="cash-in">$—</p>
+        <p class="hint">
+          Total positive cash movement from settlements (payouts &amp; winning trades).
+        </p>
+      </div>
+
+      <div class="card overview-card">
+        <h2>Cash Out</h2>
+        <p class="big-number negative" id="cash-out">$—</p>
+        <p class="hint">
+          Total negative cash movement from settlements (losing trades).
+        </p>
+      </div>
+
+      <div class="card overview-card">
+        <h2>Win Rate</h2>
+        <p class="big-number" id="win-rate">—</p>
+        <p class="hint">
+          % of settlements where cash change &gt; 0. Helps you see how often bets end green.
+        </p>
+      </div>
+    </section>
+
+    <!-- SECOND ROW: last updated + counts -->
     <section class="top-row">
-      <div class="card primary">
+      <div class="card">
         <h2>Last Updated</h2>
         <p class="big-number" id="last-updated">—</p>
-        <p class="hint">Based on <code>generated_at</code> from kalshi_summary.json</p>
+        <p class="hint">
+          Based on <code>generated_at</code> from <code>kalshi_summary.json</code>.
+        </p>
       </div>
 
       <div class="card">
         <h2>Fills (Last 24h)</h2>
         <p class="big-number" id="fills-count">—</p>
-        <p class="hint">Number of fills returned by the API</p>
+        <p class="hint">
+          Number of orders that actually traded. Think: how many times you got filled.
+        </p>
       </div>
 
       <div class="card">
         <h2>Settlements (Last 24h)</h2>
         <p class="big-number" id="settlements-count">—</p>
-        <p class="hint">Closed outcomes in the last day</p>
+        <p class="hint">
+          Markets that fully resolved and hit your cash balance.
+        </p>
       </div>
     </section>
 
+    <!-- TABLES: recent fills & settlements -->
     <section class="cards-grid">
       <div class="card">
         <div class="card-header">
           <h2>Recent Fills</h2>
           <span class="pill" id="fills-pill">—</span>
         </div>
-        <div class="table-wrapper" id="fills-table-wrapper">
+        <p class="micro-hint">
+          Time = when the order filled. Side = yes/no. Price is in dollars (e.g., 0.35 ≈ 35¢).
+        </p>
+        <div class="table-wrapper">
           <table class="data-table">
             <thead>
               <tr>
-                <th>Time</th>
-                <th>Market</th>
-                <th>Side</th>
-                <th>Size</th>
-                <th>Price</th>
+                <th title="Time of fill">Time</th>
+                <th title="Kalshi market ticker">Market</th>
+                <th title="yes/no side you took">Side</th>
+                <th title="Number of contracts in this fill">Size</th>
+                <th title="Fill price per contract in dollars">Price</th>
               </tr>
             </thead>
             <tbody id="fills-table-body">
@@ -76,14 +126,17 @@
           <h2>Recent Settlements</h2>
           <span class="pill" id="settlements-pill">—</span>
         </div>
-        <div class="table-wrapper" id="settlements-table-wrapper">
+        <p class="micro-hint">
+          Cash Change ≈ how much your balance moved on that market after fees.
+        </p>
+        <div class="table-wrapper">
           <table class="data-table">
             <thead>
               <tr>
-                <th>Time</th>
-                <th>Market</th>
-                <th>Outcome</th>
-                <th>Cash Change</th>
+                <th title="Time settlement hit your account">Time</th>
+                <th title="Kalshi market ticker">Market</th>
+                <th title="Outcome that resolved">Outcome</th>
+                <th title="Change in your cash balance (approx. net of fees)">Cash Change</th>
               </tr>
             </thead>
             <tbody id="settlements-table-body">
@@ -94,8 +147,31 @@
       </div>
     </section>
 
+    <!-- CHARTS / SUMMARY -->
+    <section class="charts-grid">
+      <div class="card">
+        <div class="card-header">
+          <h2>P&amp;L by Market (Last 24h)</h2>
+          <span class="micro-hint-inline">
+            Bars &gt; 0 are winning markets. &lt; 0 are losing.
+          </span>
+        </div>
+        <canvas id="pnl-by-market-chart"></canvas>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h2>Cumulative P&amp;L Over Time</h2>
+          <span class="micro-hint-inline">
+            Adds each settlement in time order to show how your day evolved.
+          </span>
+        </div>
+        <canvas id="pnl-over-time-chart"></canvas>
+      </div>
+    </section>
+
     <footer class="app-footer">
-      <span>Auto-refreshing every <span id="refresh-interval-label">60</span>s</span>
+      <span>Auto-refreshing every <span id="refresh-interval-label">60</span>s from GitHub JSON.</span>
       <button id="refresh-button" class="refresh-button">Refresh now</button>
     </footer>
   </main>
