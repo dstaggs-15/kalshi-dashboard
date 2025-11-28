@@ -1,0 +1,7 @@
+# Python junk
+__pycache__/
+*.pyc
+
+# Secrets for Kalshi
+backend/.env
+backend/secrets/
