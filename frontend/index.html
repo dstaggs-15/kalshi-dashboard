@@ -1,202 +1,127 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Kalshi Momentum Dashboard</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <link rel="stylesheet" href="styles.css" />
-
-  <!-- Chart.js for graphs -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kalshi Analytics Dashboard</title>
+    <!-- Chart.js for graphs -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <div class="background">
-    <div class="bubble bubble-1"></div>
-    <div class="bubble bubble-2"></div>
-    <div class="bubble bubble-3"></div>
-    <div class="bubble bubble-4"></div>
-  </div>
-
-  <main class="app">
-    <header class="app-header">
-      <div>
-        <h1>Kalshi Momentum Dashboard</h1>
-        <p class="subtitle">Government-grade view of money in, money out, and your edge.</p>
-      </div>
-      <div class="status-pill" id="status-pill">
-        <span class="dot"></span>
-        <span id="status-text">Loading…</span>
-      </div>
+    <!-- Top navigation / header -->
+    <header class="navbar">
+        <h1 class="app-title">Kalshi Analytics Dashboard</h1>
+        <div class="nav-metrics">
+            <div class="nav-metric">
+                <span id="nav-portfolio-value" class="metric-value">$0</span>
+                <span class="metric-label">Portfolio</span>
+            </div>
+            <div class="nav-metric">
+                <span id="nav-total-invested" class="metric-value">$0</span>
+                <span class="metric-label">Invested</span>
+            </div>
+            <div class="nav-metric">
+                <span id="nav-realized-pnl" class="metric-value">$0</span>
+                <span class="metric-label">Realized P&amp;L</span>
+            </div>
+        </div>
     </header>
 
-    <!-- ROW 1: MONEY OVERVIEW -->
-    <section class="overview-row">
-      <div class="card primary overview-card">
-        <h2>Realized P&amp;L (Last 24h)</h2>
-        <p class="big-number" id="realized-pnl">$—</p>
-        <p class="hint">
-          Sum of all settlement cash changes in the last 24 hours.<br />
-          Only includes <strong>markets that fully closed</strong>.
-        </p>
-      </div>
+    <!-- Main app content -->
+    <main>
+        <!-- Overview cards -->
+        <section class="cards-grid">
+            <div class="card">
+                <h2>Summary</h2>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <span id="portfolio-value" class="metric-value">$0</span>
+                        <span class="metric-label">Portfolio Value</span>
+                    </div>
+                    <div class="metric-card">
+                        <span id="total-invested" class="metric-value">$0</span>
+                        <span class="metric-label">Total Invested</span>
+                    </div>
+                    <div class="metric-card">
+                        <span id="cash-invested" class="metric-value">$0</span>
+                        <span class="metric-label">Cash Invested</span>
+                    </div>
+                    <div class="metric-card">
+                        <span id="reinvested" class="metric-value">$0</span>
+                        <span class="metric-label">Reinvested</span>
+                    </div>
+                    <div class="metric-card">
+                        <span id="realized-pnl" class="metric-value">$0</span>
+                        <span class="metric-label">Realized P&amp;L</span>
+                    </div>
+                    <div class="metric-card">
+                        <span id="return-rate" class="metric-value">0%</span>
+                        <span class="metric-label">Return Rate</span>
+                    </div>
+                </div>
+            </div>
+            <!-- Donut chart for investment breakdown -->
+            <div class="card chart-card">
+                <h2>Investment Breakdown</h2>
+                <canvas id="investment-breakdown-chart"></canvas>
+            </div>
+            <!-- Line chart for performance over time -->
+            <div class="card chart-card">
+                <h2>Performance Over Time</h2>
+                <canvas id="performance-chart"></canvas>
+            </div>
+        </section>
 
-      <div class="card overview-card">
-        <h2>Cash In</h2>
-        <p class="big-number positive" id="cash-in">$—</p>
-        <p class="hint">
-          Total positive cash movement from settlements (payouts &amp; winning trades).
-        </p>
-      </div>
+        <!-- Table of recent trades -->
+        <section class="table-section">
+            <h2>Recent Fills</h2>
+            <div class="table-wrapper">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Ticker</th>
+                            <th>Action</th>
+                            <th>Size</th>
+                            <th>Price</th>
+                            <th>Cost</th>
+                        </tr>
+                    </thead>
+                    <tbody id="fills-table-body">
+                        <tr><td colspan="6" class="placeholder">Loading…</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
 
-      <div class="card overview-card">
-        <h2>Cash Out</h2>
-        <p class="big-number negative" id="cash-out">$—</p>
-        <p class="hint">
-          Total negative cash movement from settlements (losing trades).
-        </p>
-      </div>
+        <!-- Table of settlements / closed trades -->
+        <section class="table-section">
+            <h2>Recent Settlements</h2>
+            <div class="table-wrapper">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Ticker</th>
+                            <th>Outcome</th>
+                            <th>Cash Change</th>
+                        </tr>
+                    </thead>
+                    <tbody id="settlements-table-body">
+                        <tr><td colspan="4" class="placeholder">Loading…</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
 
-      <div class="card overview-card">
-        <h2>Win Rate</h2>
-        <p class="big-number" id="win-rate">—</p>
-        <p class="hint">
-          % of settled markets where your cash change was &gt; 0.
-        </p>
-      </div>
-    </section>
-
-    <!-- ROW 2: LAST UPDATED + TRADING ACTIVITY SUMMARY -->
-    <section class="top-row">
-      <div class="card">
-        <h2>Last Updated</h2>
-        <p class="big-number" id="last-updated">—</p>
-        <p class="hint">
-          Based on <code>generated_at</code> from <code>kalshi_summary.json</code>.
-        </p>
-        <p class="micro-hint" id="no-settlements-note" style="display:none;">
-          No settlements in the last 24 hours, so P&amp;L numbers will show $0.00 until a
-          market actually closes and hits your cash balance.
-        </p>
-      </div>
-
-      <div class="card activity-card">
-        <div class="card-header">
-          <h2>Trading Activity (Last 24h)</h2>
-          <span class="pill" id="activity-pill">—</span>
-        </div>
-        <p class="micro-hint">
-          Based on <strong>fills</strong> (orders that traded), even if the market hasn’t settled yet.
-        </p>
-
-        <div class="activity-grid">
-          <div class="activity-item">
-            <span class="label">Trades executed</span>
-            <span class="value" id="trades-count">—</span>
-            <span class="explain">Number of fills today.</span>
-          </div>
-          <div class="activity-item">
-            <span class="label">Markets traded</span>
-            <span class="value" id="markets-count">—</span>
-            <span class="explain">Distinct tickers you touched.</span>
-          </div>
-          <div class="activity-item">
-            <span class="label">Contracts traded</span>
-            <span class="value" id="contracts-traded">—</span>
-            <span class="explain">Total size (buys + sells).</span>
-          </div>
-          <div class="activity-item">
-            <span class="label">Gross volume</span>
-            <span class="value" id="gross-volume">$—</span>
-            <span class="explain">Sum of |price × size| across all fills.</span>
-          </div>
-          <div class="activity-item">
-            <span class="label">Avg stake / trade</span>
-            <span class="value" id="avg-stake">$—</span>
-            <span class="explain">Rough average dollar risk per move.</span>
-          </div>
-          <div class="activity-item">
-            <span class="label">Yes vs No</span>
-            <span class="value" id="yes-no-breakdown">—</span>
-            <span class="explain">How often you took each side.</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="card">
-        <h2>Settlements (Last 24h)</h2>
-        <p class="big-number" id="settlements-count">—</p>
-        <p class="hint">
-          Number of markets that fully resolved and changed your cash balance.
-        </p>
-      </div>
-    </section>
-
-    <!-- ROW 3: CHARTS -->
-    <section class="charts-grid">
-      <div class="card">
-        <div class="card-header">
-          <h2>P&amp;L by Market (Last 24h)</h2>
-          <span class="micro-hint-inline">
-            Bars &gt; 0 are net winning markets. &lt; 0 are net losing.
-          </span>
-        </div>
-        <canvas id="pnl-by-market-chart"></canvas>
-        <p class="placeholder" id="pnl-by-market-placeholder" style="display:none;">
-          No settled markets in the last 24 hours, so there’s nothing to chart yet.
-        </p>
-      </div>
-
-      <div class="card">
-        <div class="card-header">
-          <h2>Cumulative P&amp;L Over Time</h2>
-          <span class="micro-hint-inline">
-            Adds each settlement in time order to show how your day evolved.
-          </span>
-        </div>
-        <canvas id="pnl-over-time-chart"></canvas>
-        <p class="placeholder" id="pnl-over-time-placeholder" style="display:none;">
-          Once you have at least one settlement, this line will show how your balance
-          changed trade by trade.
-        </p>
-      </div>
-    </section>
-
-    <!-- ROW 4: RECENT SETTLEMENTS (CLEAN TABLE) -->
-    <section class="cards-grid single">
-      <div class="card">
-        <div class="card-header">
-          <h2>Recent Settlements (Money Actually Hit)</h2>
-          <span class="pill" id="settlements-pill">—</span>
-        </div>
-        <p class="micro-hint">
-          <strong>Cash Change</strong> ≈ how much your balance moved on that market (after fees).
-          Green = money in, red = money out.
-        </p>
-        <div class="table-wrapper">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Time</th>
-                <th>Market</th>
-                <th>Outcome</th>
-                <th>Cash Change</th>
-              </tr>
-            </thead>
-            <tbody id="settlements-table-body">
-              <tr><td colspan="4" class="placeholder">Loading…</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
+    <!-- Footer -->
     <footer class="app-footer">
-      <span>Auto-refreshing every <span id="refresh-interval-label">60</span>s from GitHub JSON.</span>
-      <button id="refresh-button" class="refresh-button">Refresh now</button>
+        <p>Auto-refreshes every <span id="refresh-interval-label">60</span>s.</p>
+        <button id="refresh-button">Refresh now</button>
     </footer>
-  </main>
 
-  <script src="app.js" defer></script>
+    <script src="app.js"></script>
 </body>
 </html>
