@@ -1,219 +1,210 @@
-/*
- * Dark theme styling for the Kalshi Analytics Dashboard.
- * The design aims for a clean, modern look with subtle shadows and
- * soft contrasts. Colours are defined using CSS variables for easy
- * theming.
- */
+/* Dark theme for the Kalshi Portfolio Tracker */
 
 :root {
-    --color-bg: #0e1624;
-    --color-surface: #1b2b40;
-    --color-accent: #2ecc71;
-    --color-danger: #e74c3c;
-    --color-text-primary: #e6eaf1;
-    --color-text-secondary: #9faecb;
-    --color-border: #2f415c;
-    --radius-sm: 6px;
-    --radius-md: 12px;
-    --radius-lg: 20px;
-    --shadow-soft: 0 2px 6px rgba(0, 0, 0, 0.3);
-    --transition-speed: 0.25s ease;
+  --color-bg: #0e1624;
+  --color-surface: #1b2b40;
+  --color-surface-alt: #162337;
+  --color-border: #28364a;
+  --color-text: #e6eaf1;
+  --color-muted: #8f9bb3;
+  --color-accent: #2ecc71;
+  --color-danger: #e74c3c;
+  --radius-lg: 18px;
+  --shadow-soft: 0 16px 30px rgba(0, 0, 0, 0.45);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
 html,
 body {
-    margin: 0;
-    padding: 0;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
-    background: var(--color-bg);
-    color: var(--color-text-primary);
-    height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  background-color: var(--color-bg);
+  color: var(--color-text);
 }
 
 /* Navbar */
+
 .navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem 2rem;
-    background: var(--color-surface);
-    box-shadow: var(--shadow-soft);
-    position: sticky;
-    top: 0;
-    z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 24px;
+  background: linear-gradient(90deg, #0f1b2d, #15223a);
+  border-bottom: 1px solid var(--color-border);
 }
 
 .app-title {
-    margin: 0;
-    font-size: 1.5rem;
-    font-weight: 600;
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
 }
 
 .nav-metrics {
-    display: flex;
-    gap: 2rem;
+  display: flex;
+  gap: 18px;
 }
 
 .nav-metric {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    text-align: right;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
 }
 
-.nav-metric .metric-value {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: var(--color-accent);
+.nav-metric .label {
+  font-size: 0.75rem;
+  color: var(--color-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
 }
 
-.nav-metric .metric-label {
-    font-size: 0.75rem;
-    color: var(--color-text-secondary);
+.nav-metric .value {
+  font-size: 0.95rem;
+  font-weight: 600;
 }
 
-main {
-    padding: 2rem;
-    max-width: 1200px;
-    margin: 0 auto;
-}
+/* Layout */
 
-/* Grid for cards and charts */
-.cards-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    grid-gap: 1.5rem;
+.main {
+  max-width: 1100px;
+  margin: 18px auto 32px;
+  padding: 0 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
 }
 
 .card {
-    background: var(--color-surface);
-    border-radius: var(--radius-md);
-    padding: 1.5rem;
-    box-shadow: var(--shadow-soft);
-    display: flex;
-    flex-direction: column;
+  background-color: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+  padding: 16px 18px 20px;
 }
 
-.card h2 {
-    margin-top: 0;
-    margin-bottom: 1rem;
-    font-size: 1.2rem;
-    font-weight: 600;
-    color: var(--color-text-primary);
+/* Card header */
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
 }
 
-/* Metrics grid */
-.metrics-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: 1rem;
+.card-header h2 {
+  margin: 0;
+  font-size: 1rem;
 }
 
-.metric-card {
-    background: var(--color-bg);
-    border-radius: var(--radius-sm);
-    padding: 0.75rem;
-    box-shadow: var(--shadow-soft);
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
+.card-header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
-.metric-card .metric-value {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: var(--color-accent);
+.timestamp {
+  font-size: 0.8rem;
+  color: var(--color-muted);
 }
 
-.metric-card .metric-label {
-    font-size: 0.75rem;
-    color: var(--color-text-secondary);
-    margin-top: 0.25rem;
+/* Buttons */
+
+.btn {
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--color-border);
+  background-color: var(--color-surface-alt);
+  color: var(--color-text);
+  font-size: 0.78rem;
+  cursor: pointer;
 }
 
-/* Chart containers */
-.chart-card {
-    min-height: 300px;
+.btn:hover {
+  border-color: var(--color-accent);
 }
 
-.chart-card canvas {
-    width: 100% !important;
-    height: 300px !important;
+/* Tables */
+
+table {
+  width: 100%;
+  border-collapse: collapse;
 }
 
-/* Table styling */
-.table-section {
-    margin-top: 2rem;
-}
-
-.table-section h2 {
-    margin-bottom: 0.5rem;
-    font-size: 1.25rem;
-}
-
-.table-wrapper {
-    overflow-x: auto;
-}
-
-.data-table {
-    width: 100%;
-    border-collapse: collapse;
-    border-spacing: 0;
-    min-width: 600px;
-}
-
+.summary-table th,
+.summary-table td,
 .data-table th,
 .data-table td {
-    padding: 0.75rem 1rem;
-    text-align: left;
-    border-bottom: 1px solid var(--color-border);
+  padding: 8px 10px;
+  font-size: 0.85rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.summary-table thead th {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-muted);
 }
 
 .data-table thead th {
-    position: sticky;
-    top: 0;
-    background: var(--color-surface);
-    z-index: 1;
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--color-text-secondary);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-muted);
 }
 
-.data-table tbody tr:hover {
-    background: rgba(255, 255, 255, 0.05);
+.summary-table tbody tr:nth-child(even),
+.data-table tbody tr:nth-child(even) {
+  background-color: var(--color-surface-alt);
 }
 
-.data-table .placeholder {
-    color: var(--color-text-secondary);
-    text-align: center;
+.summary-table td:nth-child(1) {
+  color: var(--color-muted);
 }
 
-/* Footer */
-.app-footer {
-    margin-top: 3rem;
-    padding: 1rem 2rem;
-    background: var(--color-surface);
-    color: var(--color-text-secondary);
-    text-align: center;
-    font-size: 0.8rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 1rem;
+.placeholder {
+  text-align: center;
+  padding: 14px 0;
+  color: var(--color-muted);
 }
 
-.app-footer button {
-    padding: 0.5rem 1rem;
-    border: none;
-    border-radius: var(--radius-sm);
-    background: var(--color-accent);
-    color: #ffffff;
-    font-size: 0.8rem;
-    cursor: pointer;
-    transition: background var(--transition-speed);
+/* Positive / negative coloring */
+
+#cell-realized-pnl,
+#cell-unrealized-pnl,
+#cell-net-profit,
+#metric-net-profit {
+  font-weight: 600;
 }
 
-.app-footer button:hover {
-    background: #27ae60;
+#cell-realized-pnl,
+#cell-unrealized-pnl,
+#cell-net-profit {
+  min-width: 80px;
+}
+
+/* Responsive */
+
+@media (max-width: 720px) {
+  .navbar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .nav-metrics {
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 10px 18px;
+  }
+
+  .nav-metric {
+    align-items: flex-start;
+  }
 }
