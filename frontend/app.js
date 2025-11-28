@@ -44,6 +44,55 @@ function formatTime(obj) {
   return new Date(ts).toLocaleString();
 }
 
+// Rough ticker cleaner: turn
+//   KXNFLGAME-25NOV27CINBAL-CIN
+// into
+//   NFL Game • 25NOV27CINBAL • CIN
+function formatTickerReadable(ticker) {
+  if (!ticker || typeof ticker !== "string") return "";
+
+  const parts = ticker.split("-");
+  if (parts.length === 1) return ticker;
+
+  const prefix = parts[0];
+  const rest = parts.slice(1).join("-");
+
+  let label;
+  switch (prefix) {
+    case "KXNFLGAME":
+      label = "NFL Game";
+      break;
+    case "KXNCAAFGAME":
+      label = "NCAA Football";
+      break;
+    case "KXHEISMAN":
+      label = "Heisman";
+      break;
+    case "KXZELENSKYYPUTINMEET":
+      label = "Zelenskyy–Putin Meet";
+      break;
+    default:
+      label = prefix.replace(/^KX/, "");
+      break;
+  }
+
+  // Split remaining components for readability
+  const restPretty = rest.split("-").join(" • ");
+  return `${label} • ${restPretty}`;
+}
+
+// apply sign + color class
+function setSignedCell(id, value) {
+  const el = document.getElementById(id);
+  if (!el) return;
+
+  el.textContent = formatCurrency(value, true);
+  el.classList.remove("pos", "neg", "zero");
+  if (value > 0) el.classList.add("pos");
+  else if (value < 0) el.classList.add("neg");
+  else el.classList.add("zero");
+}
+
 // --------------------------------------------------
 // Rendering summary
 // --------------------------------------------------
@@ -60,6 +109,7 @@ function renderSummary(data) {
   const realizedPnl = Number(stats.realized_pnl || 0);
   const unrealizedPnl = Number(stats.unrealized_pnl || 0);
   const netProfit = Number(stats.net_profit || 0);
+  const housePct = Number(stats.house_money_pct || 0);
 
   const roi =
     totalDeposits > 0 ? (netProfit / totalDeposits) * 100.0 : 0.0;
@@ -71,8 +121,7 @@ function renderSummary(data) {
     formatCurrency(cash);
   document.getElementById("metric-deposits").textContent =
     formatCurrency(totalDeposits);
-  document.getElementById("metric-net-profit").textContent =
-    formatCurrency(netProfit, true);
+  setSignedCell("metric-net-profit", netProfit);
 
   // Summary table
   document.getElementById("cell-total-deposits").textContent =
@@ -83,18 +132,17 @@ function renderSummary(data) {
     formatCurrency(positionsValue);
   document.getElementById("cell-account-value").textContent =
     formatCurrency(accountValue);
-  document.getElementById("cell-realized-pnl").textContent =
-    formatCurrency(realizedPnl, true);
-  document.getElementById("cell-unrealized-pnl").textContent =
-    formatCurrency(unrealizedPnl, true);
-  document.getElementById("cell-net-profit").textContent =
-    formatCurrency(netProfit, true);
+  setSignedCell("cell-realized-pnl", realizedPnl);
+  setSignedCell("cell-unrealized-pnl", unrealizedPnl);
+  setSignedCell("cell-net-profit", netProfit);
   document.getElementById("cell-roi").textContent = toPercent(roi);
 
   const genEl = document.getElementById("summary-generated-at");
   if (genEl && data.generated_at) {
     const d = new Date(data.generated_at);
-    genEl.textContent = `Updated: ${d.toLocaleString()}`;
+    genEl.textContent = `Updated: ${d.toLocaleString()}  |  House money: ${toPercent(
+      housePct
+    )} of portfolio`;
   }
 }
 
@@ -137,7 +185,7 @@ function renderFillsTable(fills) {
 
     tr.innerHTML = `
       <td>${formatTime(f)}</td>
-      <td>${f.ticker || f.market || ""}</td>
+      <td>${formatTickerReadable(f.ticker || f.market || "")}</td>
       <td>${(f.action || "").toUpperCase()}</td>
       <td>${size}</td>
       <td>${price.toFixed(2)}</td>
@@ -173,12 +221,18 @@ function renderSettlementsTable(settlements) {
       Number(s.cash_change ?? s.cashChange ?? 0);
 
     const tr = document.createElement("tr");
+    const cashCell = document.createElement("td");
+    cashCell.textContent = formatCurrency(cashChange, true);
+    cashCell.classList.add(
+      cashChange > 0 ? "pos" : cashChange < 0 ? "neg" : "zero"
+    );
+
     tr.innerHTML = `
       <td>${formatTime(s)}</td>
-      <td>${s.ticker || s.market || ""}</td>
+      <td>${formatTickerReadable(s.ticker || s.market || "")}</td>
       <td>${s.outcome || s.final_position || s.finalPosition || ""}</td>
-      <td>${formatCurrency(cashChange, true)}</td>
     `;
+    tr.appendChild(cashCell);
 
     tbody.appendChild(tr);
   }
