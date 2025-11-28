@@ -1,5 +1,5 @@
 {
-    "generated_at": "2025-11-28T23:38:28.482808",
+    "generated_at": "2025-11-28T23:47:38.751381",
     "lookback_days": 365,
     "account": {
         "cash_cents": 5484,
@@ -373,9 +373,10 @@
         "cash_in": 0.0,
         "cash_out": 0.0,
         "cumulative_series": [],
-        "total_deposits": 0.0,
+        "total_deposits": 40.0,
         "account_value": 0.0,
-        "unrealized_pnl": 0.0,
-        "net_profit": 0.0
+        "unrealized_pnl": -40.0,
+        "net_profit": -40.0,
+        "house_money_pct": 0.0
     }
 }
