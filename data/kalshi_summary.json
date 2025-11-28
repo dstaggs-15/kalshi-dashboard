@@ -1,12 +1,12 @@
 {
-    "generated_at": "2025-11-28T23:24:07.369564",
+    "generated_at": "2025-11-28T23:36:39.044197",
     "lookback_days": 365,
     "account": {
         "cash_cents": 5484,
         "positions_cents": 0,
         "cash": 54.84,
         "positions_value": 0.0,
-        "portfolio_total": 54.84,
+        "portfolio_total": 0.0,
         "updated_ts": null
     },
     "fills_last_n_days": [
@@ -369,10 +369,13 @@
         "reinvested": 155.01,
         "cash_invested": 0.0,
         "realized_pnl": 0.0,
-        "portfolio_value": 155.01,
         "return_rate": 0.0,
         "cash_in": 0.0,
         "cash_out": 0.0,
-        "cumulative_series": []
+        "cumulative_series": [],
+        "total_deposits": 0.0,
+        "account_value": 0.0,
+        "unrealized_pnl": 0.0,
+        "net_profit": 0.0
     }
 }
