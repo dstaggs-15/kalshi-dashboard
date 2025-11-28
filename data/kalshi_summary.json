@@ -1,1 +1,226 @@
-txt
+{
+    "generated_at": "2025-11-28T18:32:50.512964",
+    "fills_last_1_day": [
+        {
+            "fill_id": "402665ce-5268-6432-9e2e-57e9ca9e8da0",
+            "order_id": "2ccab0ae-ee89-4a8b-8fcf-bb638f12a841",
+            "ticker": "KXNFLGAME-25NOV28CHIPHI-CHI",
+            "side": "yes",
+            "action": "buy",
+            "count": 36,
+            "price": 0.26,
+            "is_taker": true,
+            "created_time": "2025-11-28T17:02:24.325077+00:00"
+        },
+        {
+            "fill_id": "dd9b6b41-6d96-756f-b838-2e748c86d3e1",
+            "order_id": "615eb7a1-9cf3-4cd8-8673-86f429a191a2",
+            "ticker": "KXNFLGAME-25NOV27CINBAL-CIN",
+            "side": "no",
+            "action": "sell",
+            "count": 56,
+            "price": 0.9,
+            "is_taker": true,
+            "created_time": "2025-11-28T04:04:38.396853+00:00"
+        },
+        {
+            "fill_id": "31bd91f4-956b-71dc-49cd-50977b4f9d40",
+            "order_id": "a38faba0-b7cb-4fea-bf1d-5cd062c7e44a",
+            "ticker": "KXNFLGAME-25NOV27CINBAL-CIN",
+            "side": "yes",
+            "action": "buy",
+            "count": 56,
+            "price": 0.87,
+            "is_taker": true,
+            "created_time": "2025-11-28T04:00:45.219963+00:00"
+        },
+        {
+            "fill_id": "d4505986-5265-6768-d405-59dc9d667334",
+            "order_id": "94d1e84e-3cb2-4bd9-9f55-4ac399a5e06b",
+            "ticker": "KXNFLGAME-25NOV27CINBAL-BAL",
+            "side": "no",
+            "action": "sell",
+            "count": 16,
+            "price": 0.12,
+            "is_taker": true,
+            "created_time": "2025-11-28T03:59:14.380169+00:00"
+        },
+        {
+            "fill_id": "69707c77-4f95-7a94-8223-81de202cffa3",
+            "order_id": "804f1d44-3f38-4f42-8ded-9a051fbbe3ff",
+            "ticker": "KXNFLGAME-25NOV27CINBAL-BAL",
+            "side": "yes",
+            "action": "buy",
+            "count": 16,
+            "price": 0.31,
+            "is_taker": true,
+            "created_time": "2025-11-28T03:45:41.116022+00:00"
+        },
+        {
+            "fill_id": "0e2ff3de-c616-61cb-75a3-1691897aeef7",
+            "order_id": "aac6bda2-4553-4912-bb32-ae6c7999aa60",
+            "ticker": "KXNFLGAME-25NOV27CINBAL-BAL",
+            "side": "no",
+            "action": "sell",
+            "count": 10,
+            "price": 0.43,
+            "is_taker": true,
+            "created_time": "2025-11-28T03:45:14.095041+00:00"
+        },
+        {
+            "fill_id": "6145b0df-1e79-7483-e6b3-1a78f837218e",
+            "order_id": "a7dbd232-3f04-4ed9-94c3-a96216d477cb",
+            "ticker": "KXNFLGAME-25NOV27CINBAL-BAL",
+            "side": "yes",
+            "action": "buy",
+            "count": 10,
+            "price": 0.45,
+            "is_taker": true,
+            "created_time": "2025-11-28T03:26:44.959173+00:00"
+        },
+        {
+            "fill_id": "f6e72bdd-b3d6-75a7-cdbe-b896fa7091ce",
+            "order_id": "7238b644-8454-4e78-9fb9-f47fb8a44277",
+            "ticker": "KXNFLGAME-25NOV27CINBAL-CIN",
+            "side": "no",
+            "action": "sell",
+            "count": 61,
+            "price": 0.55,
+            "is_taker": true,
+            "created_time": "2025-11-28T03:24:47.367796+00:00"
+        },
+        {
+            "fill_id": "f05ee402-11ec-73bf-4d61-8ec55b8d4c86",
+            "order_id": "f45ea9c1-ec1e-4dcf-b0c1-1623bd4624a6",
+            "ticker": "KXNFLGAME-25NOV27CINBAL-CIN",
+            "side": "yes",
+            "action": "buy",
+            "count": 61,
+            "price": 0.31,
+            "is_taker": true,
+            "created_time": "2025-11-28T01:29:50.351649+00:00"
+        },
+        {
+            "fill_id": "5ee7f88a-89cb-5f79-494d-1abbdc404b0c",
+            "order_id": "e2335c33-832a-4480-b32e-35c8af0ed4eb",
+            "ticker": "KXNFLGAME-25NOV27CINBAL-CIN",
+            "side": "no",
+            "action": "sell",
+            "count": 20,
+            "price": 0.32,
+            "is_taker": true,
+            "created_time": "2025-11-28T01:29:34.990498+00:00"
+        },
+        {
+            "fill_id": "dfb7fa7f-0863-7bee-94d5-05077286b9e7",
+            "order_id": "1e98d58e-c34d-4db5-8512-36e193433d84",
+            "ticker": "KXNFLGAME-25NOV27CINBAL-CIN",
+            "side": "yes",
+            "action": "buy",
+            "count": 20,
+            "price": 0.23,
+            "is_taker": true,
+            "created_time": "2025-11-28T01:00:40.475852+00:00"
+        },
+        {
+            "fill_id": "82d23de0-a3c2-4d68-6ce5-3bbb7000f2b5",
+            "order_id": "c4a09c32-2006-41e6-b21f-604585b04a50",
+            "ticker": "KXNFLGAME-25NOV27KCDAL-KC",
+            "side": "no",
+            "action": "sell",
+            "count": 7,
+            "price": 0.15,
+            "is_taker": true,
+            "created_time": "2025-11-28T00:35:09.560656+00:00"
+        },
+        {
+            "fill_id": "d78812e0-7653-53b3-be91-c7ca8ac731e9",
+            "order_id": "2031c581-8c7a-45d3-82bb-ef26ba08b210",
+            "ticker": "KXNFLGAME-25NOV27KCDAL-KC",
+            "side": "yes",
+            "action": "buy",
+            "count": 7,
+            "price": 0.26,
+            "is_taker": true,
+            "created_time": "2025-11-28T00:31:17.504684+00:00"
+        },
+        {
+            "fill_id": "1ba211cd-0922-54ee-0a59-ff9a30bff56f",
+            "order_id": "fa130a00-5798-45cc-afdc-7303ffbb8d4a",
+            "ticker": "KXNFLGAME-25NOV27KCDAL-DAL",
+            "side": "no",
+            "action": "sell",
+            "count": 11,
+            "price": 0.75,
+            "is_taker": true,
+            "created_time": "2025-11-28T00:30:26.661602+00:00"
+        },
+        {
+            "fill_id": "32dcc2eb-ce2d-6b04-289c-d1501001c2dd",
+            "order_id": "6226fa8b-12d0-4831-a798-8d7309883328",
+            "ticker": "KXNFLGAME-25NOV27KCDAL-DAL",
+            "side": "yes",
+            "action": "buy",
+            "count": 11,
+            "price": 0.43,
+            "is_taker": true,
+            "created_time": "2025-11-28T00:09:16.121810+00:00"
+        },
+        {
+            "fill_id": "4020d3d6-e0a2-4797-0117-34aa0adfffaa",
+            "order_id": "57723181-1581-40b2-a1c3-85e1aee81a93",
+            "ticker": "KXNFLGAME-25NOV27KCDAL-KC",
+            "side": "no",
+            "action": "sell",
+            "count": 16,
+            "price": 0.57,
+            "is_taker": true,
+            "created_time": "2025-11-28T00:08:53.379465+00:00"
+        },
+        {
+            "fill_id": "08d4af54-becd-668d-855a-16a610ffdd3f",
+            "order_id": "0dc97a05-9eac-4b81-834d-9e303edffed8",
+            "ticker": "KXNFLGAME-25NOV27KCDAL-KC",
+            "side": "yes",
+            "action": "buy",
+            "count": 16,
+            "price": 0.29,
+            "is_taker": true,
+            "created_time": "2025-11-27T23:49:25.829229+00:00"
+        },
+        {
+            "fill_id": "89be5e6c-8b8a-7661-b2de-4490407455ba",
+            "order_id": "e0ca0443-838a-4c77-8499-71019a549296",
+            "ticker": "KXNFLGAME-25NOV27KCDAL-DAL",
+            "side": "no",
+            "action": "sell",
+            "count": 12,
+            "price": 0.71,
+            "is_taker": true,
+            "created_time": "2025-11-27T23:49:04.151506+00:00"
+        },
+        {
+            "fill_id": "6181e5c0-f60b-7b91-2e86-27db7fb613a9",
+            "order_id": "f297754e-e600-4f9d-af68-0fb51cc63f18",
+            "ticker": "KXNFLGAME-25NOV27KCDAL-DAL",
+            "side": "yes",
+            "action": "buy",
+            "count": 12,
+            "price": 0.38,
+            "is_taker": true,
+            "created_time": "2025-11-27T21:01:59.389914+00:00"
+        },
+        {
+            "fill_id": "27ff2d51-e144-6718-665b-f108ff58c96c",
+            "order_id": "bfe1e8be-2985-4a42-b225-9877b2e86ee6",
+            "ticker": "KXNFLGAME-25NOV27GBDET-GB",
+            "side": "no",
+            "action": "sell",
+            "count": 24,
+            "price": 0.9,
+            "is_taker": true,
+            "created_time": "2025-11-27T20:58:21.786990+00:00"
+        }
+    ],
+    "settlements_last_1_day": []
+}
