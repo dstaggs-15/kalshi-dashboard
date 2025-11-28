@@ -284,17 +284,6 @@ def to_dict(obj):
 def generate_summary_json(days: int = 365):
     """
     Pulls data from Kalshi, computes stats, and writes data/kalshi_summary.json
-
-    JSON structure:
-
-      {
-        "generated_at": "...",
-        "lookback_days": 365,
-        "account": { ... },     # raw balance/portfolio numbers
-        "fills_last_n_days": [...],
-        "settlements_last_n_days": [...],
-        "summary": { ... }      # stats incl. deposits & P&L
-      }
     """
     client = load_kalshi_client()
 
@@ -326,16 +315,25 @@ def generate_summary_json(days: int = 365):
     stats = compute_stats(fills, settlements)
 
     # ---------- 3) Deposits & P&L ----------
-    # You control this via TOTAL_DEPOSITS in your .env
-    total_deposits_str = os.getenv("TOTAL_DEPOSITS", "0").strip() or "0"
-    try:
-        total_deposits = float(total_deposits_str)
-    except ValueError:
-        total_deposits = 0.0
+    # For now: hard-code $40 of deposits.
+    # Later: you can override with env var TOTAL_DEPOSITS.
+    env_val = os.getenv("TOTAL_DEPOSITS")
+    if env_val:
+        try:
+            total_deposits = float(env_val)
+        except ValueError:
+            total_deposits = 40.0
+    else:
+        total_deposits = 40.0
 
     realized_pnl = stats.get("realized_pnl", 0.0)
     net_profit = portfolio_total - total_deposits
     unrealized_pnl = net_profit - realized_pnl
+
+    if portfolio_total > 0:
+        house_money_pct = (net_profit / portfolio_total) * 100.0
+    else:
+        house_money_pct = 0.0
 
     stats.update(
         {
@@ -343,6 +341,7 @@ def generate_summary_json(days: int = 365):
             "account_value": portfolio_total,
             "unrealized_pnl": unrealized_pnl,
             "net_profit": net_profit,
+            "house_money_pct": house_money_pct,
         }
     )
 
