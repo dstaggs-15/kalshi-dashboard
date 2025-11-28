@@ -1,15 +1,37 @@
 {
-    "generated_at": "2025-11-28T22:18:59.226875",
+    "generated_at": "2025-11-28T22:37:12.260167",
     "lookback_days": 365,
     "account": {
-        "cash_cents": 4988,
+        "cash_cents": 5484,
         "positions_cents": 0,
-        "cash": 49.88,
+        "cash": 54.84,
         "positions_value": 0.0,
-        "portfolio_total": 49.88,
+        "portfolio_total": 54.84,
         "updated_ts": null
     },
     "fills_last_n_days": [
+        {
+            "fill_id": "d24713bf-79d8-6111-095b-455f93112f86",
+            "order_id": "0ea66d78-5bd0-48d5-ac92-d0a998fe84c6",
+            "ticker": "KXNFLGAME-25NOV28CHIPHI-PHI",
+            "side": "yes",
+            "action": "buy",
+            "count": 6,
+            "price": 0.3,
+            "is_taker": true,
+            "created_time": "2025-11-28T22:23:06.945268+00:00"
+        },
+        {
+            "fill_id": "5f97babc-de6a-4f7b-c43a-8c016dcca3d5",
+            "order_id": "324d365d-c235-405c-9ec6-aab9d48e5a2b",
+            "ticker": "KXNFLGAME-25NOV28CHIPHI-CHI",
+            "side": "no",
+            "action": "sell",
+            "count": 10,
+            "price": 0.7,
+            "is_taker": true,
+            "created_time": "2025-11-28T22:22:44.292196+00:00"
+        },
         {
             "fill_id": "7d03acde-07de-6d43-e99a-b2f2e0289021",
             "order_id": "299beff6-4738-4b18-99cb-1db81357db5a",
@@ -343,11 +365,11 @@
     ],
     "settlements_last_n_days": [],
     "summary": {
-        "total_invested": 153.21,
-        "reinvested": 153.21,
+        "total_invested": 155.01,
+        "reinvested": 155.01,
         "cash_invested": 0.0,
         "realized_pnl": 0.0,
-        "portfolio_value": 153.21,
+        "portfolio_value": 155.01,
         "return_rate": 0.0,
         "cash_in": 0.0,
         "cash_out": 0.0,
