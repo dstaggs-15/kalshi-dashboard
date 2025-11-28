@@ -1,127 +1,132 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Kalshi Analytics Dashboard</title>
-    <!-- Chart.js for graphs -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>Kalshi Portfolio Tracker</title>
     <link rel="stylesheet" href="styles.css" />
-</head>
-<body>
-    <!-- Top navigation / header -->
+  </head>
+  <body>
     <header class="navbar">
-        <h1 class="app-title">Kalshi Analytics Dashboard</h1>
-        <div class="nav-metrics">
-            <div class="nav-metric">
-                <span id="nav-portfolio-value" class="metric-value">$0</span>
-                <span class="metric-label">Portfolio</span>
-            </div>
-            <div class="nav-metric">
-                <span id="nav-total-invested" class="metric-value">$0</span>
-                <span class="metric-label">Invested</span>
-            </div>
-            <div class="nav-metric">
-                <span id="nav-realized-pnl" class="metric-value">$0</span>
-                <span class="metric-label">Realized P&amp;L</span>
-            </div>
+      <h1 class="app-title">Kalshi Portfolio Tracker</h1>
+      <div class="nav-metrics">
+        <div class="nav-metric">
+          <span class="label">Account Value</span>
+          <span id="metric-account-value" class="value">$0.00</span>
         </div>
+        <div class="nav-metric">
+          <span class="label">Cash</span>
+          <span id="metric-cash" class="value">$0.00</span>
+        </div>
+        <div class="nav-metric">
+          <span class="label">Deposits</span>
+          <span id="metric-deposits" class="value">$0.00</span>
+        </div>
+        <div class="nav-metric">
+          <span class="label">Net Profit</span>
+          <span id="metric-net-profit" class="value">$0.00</span>
+        </div>
+      </div>
     </header>
 
-    <!-- Main app content -->
-    <main>
-        <!-- Overview cards -->
-        <section class="cards-grid">
-            <div class="card">
-                <h2>Summary</h2>
-                <div class="metrics-grid">
-                    <div class="metric-card">
-                        <span id="portfolio-value" class="metric-value">$0</span>
-                        <span class="metric-label">Portfolio Value</span>
-                    </div>
-                    <div class="metric-card">
-                        <span id="total-invested" class="metric-value">$0</span>
-                        <span class="metric-label">Total Invested</span>
-                    </div>
-                    <div class="metric-card">
-                        <span id="cash-invested" class="metric-value">$0</span>
-                        <span class="metric-label">Cash Invested</span>
-                    </div>
-                    <div class="metric-card">
-                        <span id="reinvested" class="metric-value">$0</span>
-                        <span class="metric-label">Reinvested</span>
-                    </div>
-                    <div class="metric-card">
-                        <span id="realized-pnl" class="metric-value">$0</span>
-                        <span class="metric-label">Realized P&amp;L</span>
-                    </div>
-                    <div class="metric-card">
-                        <span id="return-rate" class="metric-value">0%</span>
-                        <span class="metric-label">Return Rate</span>
-                    </div>
-                </div>
-            </div>
-            <!-- Donut chart for investment breakdown -->
-            <div class="card chart-card">
-                <h2>Investment Breakdown</h2>
-                <canvas id="investment-breakdown-chart"></canvas>
-            </div>
-            <!-- Line chart for performance over time -->
-            <div class="card chart-card">
-                <h2>Performance Over Time</h2>
-                <canvas id="performance-chart"></canvas>
-            </div>
-        </section>
+    <main class="main">
+      <section class="card">
+        <div class="card-header">
+          <h2>Portfolio Summary</h2>
+          <div class="card-header-right">
+            <span id="summary-generated-at" class="timestamp">–</span>
+            <button id="refresh-button" class="btn">Refresh now</button>
+          </div>
+        </div>
+        <table class="summary-table">
+          <thead>
+            <tr>
+              <th>Metric</th>
+              <th>Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Total Deposits</td>
+              <td id="cell-total-deposits">$0.00</td>
+            </tr>
+            <tr>
+              <td>Cash</td>
+              <td id="cell-cash">$0.00</td>
+            </tr>
+            <tr>
+              <td>Positions Value</td>
+              <td id="cell-positions-value">$0.00</td>
+            </tr>
+            <tr>
+              <td>Account Value</td>
+              <td id="cell-account-value">$0.00</td>
+            </tr>
+            <tr>
+              <td>Realized P&amp;L</td>
+              <td id="cell-realized-pnl">$0.00</td>
+            </tr>
+            <tr>
+              <td>Unrealized P&amp;L</td>
+              <td id="cell-unrealized-pnl">$0.00</td>
+            </tr>
+            <tr>
+              <td>Net Profit</td>
+              <td id="cell-net-profit">$0.00</td>
+            </tr>
+            <tr>
+              <td>Return on Investment</td>
+              <td id="cell-roi">0%</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
 
-        <!-- Table of recent trades -->
-        <section class="table-section">
-            <h2>Recent Fills</h2>
-            <div class="table-wrapper">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Time</th>
-                            <th>Ticker</th>
-                            <th>Action</th>
-                            <th>Size</th>
-                            <th>Price</th>
-                            <th>Cost</th>
-                        </tr>
-                    </thead>
-                    <tbody id="fills-table-body">
-                        <tr><td colspan="6" class="placeholder">Loading…</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </section>
+      <section class="card">
+        <div class="card-header">
+          <h2>Recent Fills</h2>
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Ticker</th>
+              <th>Action</th>
+              <th>Size</th>
+              <th>Price</th>
+              <th>Cost</th>
+            </tr>
+          </thead>
+          <tbody id="fills-table-body">
+            <tr>
+              <td colspan="6" class="placeholder">Loading…</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
 
-        <!-- Table of settlements / closed trades -->
-        <section class="table-section">
-            <h2>Recent Settlements</h2>
-            <div class="table-wrapper">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Time</th>
-                            <th>Ticker</th>
-                            <th>Outcome</th>
-                            <th>Cash Change</th>
-                        </tr>
-                    </thead>
-                    <tbody id="settlements-table-body">
-                        <tr><td colspan="4" class="placeholder">Loading…</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </section>
+      <section class="card">
+        <div class="card-header">
+          <h2>Recent Settlements</h2>
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Ticker</th>
+              <th>Outcome</th>
+              <th>Cash Change</th>
+            </tr>
+          </thead>
+          <tbody id="settlements-table-body">
+            <tr>
+              <td colspan="4" class="placeholder">Loading…</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
     </main>
 
-    <!-- Footer -->
-    <footer class="app-footer">
-        <p>Auto-refreshes every <span id="refresh-interval-label">60</span>s.</p>
-        <button id="refresh-button">Refresh now</button>
-    </footer>
-
     <script src="app.js"></script>
-</body>
+  </body>
 </html>
