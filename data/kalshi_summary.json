@@ -1,5 +1,6 @@
 {
-    "generated_at": "2025-11-28T20:21:59.915817",
+    "generated_at": "2025-11-28T20:31:01.682724",
+    "lookback_days": 1,
     "fills_last_1_day": [
         {
             "fill_id": "402665ce-5268-6432-9e2e-57e9ca9e8da0",
@@ -222,5 +223,16 @@
             "created_time": "2025-11-27T20:58:21.786990+00:00"
         }
     ],
-    "settlements_last_1_day": []
+    "settlements_last_1_day": [],
+    "summary": {
+        "total_invested": 106.79999999999998,
+        "reinvested": 106.79999999999998,
+        "cash_invested": 0.0,
+        "realized_pnl": 0.0,
+        "portfolio_value": 106.79999999999998,
+        "return_rate": 0.0,
+        "cash_in": 0.0,
+        "cash_out": 0.0,
+        "cumulative_series": []
+    }
 }
