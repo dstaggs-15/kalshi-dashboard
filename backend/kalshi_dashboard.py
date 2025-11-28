@@ -2,7 +2,6 @@ import os
 import json
 from datetime import datetime, timedelta, timezone
 
-from dotenv import load_dotenv
 import kalshi_python
 from kalshi_python.api import PortfolioApi
 
@@ -20,44 +19,24 @@ OUTPUT_JSON = os.path.join(DATA_DIR, "kalshi_summary.json")
 
 # ------------ HELPERS ------------
 
-def load_env():
-    """
-    Load environment variables from backend/.env
-    (We will create this file locally later; it is gitignored.)
-    """
-    env_path = os.path.join(os.path.dirname(__file__), ".env")
-    if os.path.exists(env_path):
-        load_dotenv(env_path)
-    else:
-        raise RuntimeError("backend/.env not found. Create it with your Kalshi keys.")
-
-
 def make_client():
     """
     Initialize Kalshi Python SDK client using API key + private key.
 
-    NOTE: This assumes you're using key-based auth.
-    You will need:
-      - KALSHI_API_KEY_ID  in backend/.env
-      - KALSHI_PRIVATE_KEY_PATH  path to your PEM in backend/.env
+    Expects these environment variables (we'll set them in GitHub Secrets):
+
+      - KALSHI_API_KEY_ID   -> your Kalshi API key ID
+      - KALSHI_PRIVATE_KEY  -> the full contents of your PEM private key
     """
     api_key_id = os.getenv("KALSHI_API_KEY_ID")
-    key_path = os.getenv("KALSHI_PRIVATE_KEY_PATH")
+    private_key_pem = os.getenv("KALSHI_PRIVATE_KEY")
 
-    if not api_key_id or not key_path:
-        raise RuntimeError("Missing KALSHI_API_KEY_ID or KALSHI_PRIVATE_KEY_PATH in backend/.env")
+    if not api_key_id or not private_key_pem:
+        raise RuntimeError(
+            "Missing KALSHI_API_KEY_ID or KALSHI_PRIVATE_KEY env vars. "
+            "Set them as GitHub Secrets or environment variables."
+        )
 
-    if not os.path.isabs(key_path):
-        # Treat as relative to backend/
-        key_path = os.path.join(os.path.dirname(__file__), key_path)
-
-    if not os.path.exists(key_path):
-        raise RuntimeError(f"Private key file not found at: {key_path}")
-
-    with open(key_path, "r") as f:
-        private_key_pem = f.read()
-
-    # Base config – this host may be updated by Kalshi; adjust if needed per docs.
     config = kalshi_python.Configuration(
         host="https://api.elections.kalshi.com/trade-api/v2"
     )
@@ -78,11 +57,9 @@ def unix_ts(dt: datetime) -> int:
 def fetch_balance(portfolio_api: PortfolioApi):
     """
     Get current account balance and portfolio value.
-
-    Uses /portfolio/balance endpoint via SDK.
     """
     resp = portfolio_api.get_balance()
-    # Depending on SDK version, these field names may differ slightly.
+
     balance_cents = getattr(resp, "balance", 0)
     portfolio_value_cents = getattr(resp, "portfolio_value", balance_cents)
     updated_ts = getattr(resp, "updated_ts", int(datetime.now(timezone.utc).timestamp()))
@@ -97,8 +74,6 @@ def fetch_balance(portfolio_api: PortfolioApi):
 def fetch_settlements_last_n_days(portfolio_api: PortfolioApi, days_back: int):
     """
     Fetch realized settlements (closed outcomes) for the last N days.
-
-    We'll use this to approximate realized P&L per day.
     """
     now = datetime.now(timezone.utc)
     min_dt = now - timedelta(days=days_back)
@@ -115,7 +90,6 @@ def fetch_settlements_last_n_days(portfolio_api: PortfolioApi, days_back: int):
             min_ts=min_ts,
             max_ts=max_ts,
         )
-        # resp.settlements should be a list of settlement objects
         settlements.extend(getattr(resp, "settlements", []))
 
         cursor = getattr(resp, "cursor", None)
@@ -129,31 +103,27 @@ def group_daily_pnl_from_settlements(settlements):
     """
     Aggregate realized P&L per day from settlement objects.
 
-    IMPORTANT:
-    - You will likely need to adjust the field names here
-      after printing an example settlement from your account.
+    NOTE: You will probably need to adjust the field names after we
+    see a real example of your settlement data.
     """
     daily = {}
 
     for s in settlements:
-        # Guess likely timestamp field names:
+        # Guess timestamp field name.
         ts = getattr(s, "ts", None) or getattr(s, "settled_ts", None)
         if ts is None:
-            # Try another common one, or skip.
             continue
 
-        # If ts is in ms instead of seconds, divide by 1000.
+        # If ts looks like ms, convert to seconds.
         if ts > 10_000_000_000:
             ts = ts / 1000.0
 
         dt = datetime.fromtimestamp(ts, tz=timezone.utc)
         day_str = dt.date().isoformat()
 
-        # Guess P&L / cash change field.
-        # You will need to inspect your own data to confirm.
+        # Guess P&L field.
         cash_change_cents = getattr(s, "cash_change", None)
         if cash_change_cents is None:
-            # As a fallback, try generic 'amount' or 'payout'
             cash_change_cents = getattr(s, "amount", 0)
 
         if day_str not in daily:
@@ -172,7 +142,6 @@ def build_summary_json(balance_info, daily_pnl):
     """
     Build JSON structure for frontend consumption.
     """
-    # Sort days descending (newest first)
     sorted_days = sorted(daily_pnl.items(), key=lambda x: x[0], reverse=True)
 
     daily_rows = []
@@ -210,8 +179,6 @@ def build_summary_json(balance_info, daily_pnl):
 
 
 def main():
-    load_env()
-
     os.makedirs(DATA_DIR, exist_ok=True)
 
     client = make_client()
