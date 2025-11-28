@@ -5,28 +5,39 @@ const statusPill = document.getElementById("status-pill");
 const statusText = document.getElementById("status-text");
 
 const lastUpdatedEl = document.getElementById("last-updated");
-const fillsCountEl = document.getElementById("fills-count");
-const settlementsCountEl = document.getElementById("settlements-count");
+const noSettlementsNote = document.getElementById("no-settlements-note");
 
 const realizedPnlEl = document.getElementById("realized-pnl");
 const cashInEl = document.getElementById("cash-in");
 const cashOutEl = document.getElementById("cash-out");
 const winRateEl = document.getElementById("win-rate");
 
-const fillsPill = document.getElementById("fills-pill");
+const settlementsCountEl = document.getElementById("settlements-count");
 const settlementsPill = document.getElementById("settlements-pill");
 
-const fillsTableBody = document.getElementById("fills-table-body");
+const tradesCountEl = document.getElementById("trades-count");
+const marketsCountEl = document.getElementById("markets-count");
+const contractsTradedEl = document.getElementById("contracts-traded");
+const grossVolumeEl = document.getElementById("gross-volume");
+const avgStakeEl = document.getElementById("avg-stake");
+const yesNoBreakdownEl = document.getElementById("yes-no-breakdown");
+const activityPill = document.getElementById("activity-pill");
+
 const settlementsTableBody = document.getElementById("settlements-table-body");
 
 const refreshButton = document.getElementById("refresh-button");
 const refreshIntervalLabel = document.getElementById("refresh-interval-label");
+
+const pnlByMarketPlaceholder = document.getElementById("pnl-by-market-placeholder");
+const pnlOverTimePlaceholder = document.getElementById("pnl-over-time-placeholder");
 
 refreshIntervalLabel.textContent = Math.round(REFRESH_MS / 1000).toString();
 
 // Chart instances
 let pnlByMarketChart = null;
 let pnlOverTimeChart = null;
+
+/* ------------------ FETCH & STATUS ------------------ */
 
 async function fetchSummary() {
   try {
@@ -38,12 +49,11 @@ async function fetchSummary() {
       : `${JSON_URL}?${cacheBuster}`;
 
     const res = await fetch(url, { cache: "no-store" });
-    if (!res.ok) {
-      throw new Error(`HTTP ${res.status}`);
-    }
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
     const data = await res.json();
     renderDashboard(data);
+
     setStatus("Live · data loaded", false);
   } catch (err) {
     console.error("Error fetching summary:", err);
@@ -60,7 +70,10 @@ function setStatus(text, isError) {
   }
 }
 
+/* ------------------ RENDER MAIN DASHBOARD ------------------ */
+
 function renderDashboard(data) {
+  // Time
   const generatedAt = data.generated_at || null;
   if (generatedAt) {
     const dt = new Date(generatedAt);
@@ -77,47 +90,33 @@ function renderDashboard(data) {
     ? data.settlements_last_1_day
     : [];
 
-  fillsCountEl.textContent = fills.length.toString();
-  settlementsCountEl.textContent = settlements.length.toString();
+  const hasSettlements = settlements.length > 0;
+  noSettlementsNote.style.display = hasSettlements ? "none" : "block";
 
-  fillsPill.textContent =
-    fills.length === 0 ? "No fills in last 24h" : `${fills.length} fill(s)`;
-  settlementsPill.textContent =
-    settlements.length === 0
-      ? "No settlements in last 24h"
-      : `${settlements.length} settlement(s)`;
+  // Money stats from settlements
+  const settlementStats = computeSettlementStats(settlements);
+  renderMoneyCards(settlementStats);
 
-  // Money analytics from settlements
-  const analytics = computeAnalytics(settlements);
-  realizedPnlEl.textContent = formatDollars(analytics.realizedPnl);
-  realizedPnlEl.classList.remove("positive", "negative");
-  if (analytics.realizedPnl > 0) realizedPnlEl.classList.add("positive");
-  if (analytics.realizedPnl < 0) realizedPnlEl.classList.add("negative");
+  // Trading activity from fills
+  const activityStats = computeActivityStats(fills);
+  renderActivityCards(activityStats);
 
-  cashInEl.textContent = formatDollars(analytics.cashIn);
-  cashOutEl.textContent = formatDollars(-analytics.cashOut); // show as negative dollars
-  cashOutEl.classList.add("negative");
-
-  winRateEl.textContent =
-    analytics.totalSettlements > 0
-      ? `${analytics.winRate.toFixed(1)}%`
-      : "—";
-
-  renderFillsTable(fills);
+  // Settlements table
   renderSettlementsTable(settlements);
 
-  renderPnlByMarketChart(analytics.pnlByMarket);
-  renderPnlOverTimeChart(analytics.cumulativeSeries);
+  // Charts
+  renderPnlByMarketChart(settlementStats.pnlByMarket);
+  renderPnlOverTimeChart(settlementStats.cumulativeSeries);
 }
 
-/* ---------- ANALYTICS ---------- */
+/* ------------------ COMPUTE STATS ------------------ */
 
-function computeAnalytics(settlements) {
+function computeSettlementStats(settlements) {
   let realizedPnl = 0;
   let cashIn = 0;
   let cashOut = 0;
-  let winCount = 0;
-  let lossCount = 0;
+  let wins = 0;
+  let losses = 0;
 
   const pnlByMarket = {};
   const series = [];
@@ -138,27 +137,30 @@ function computeAnalytics(settlements) {
 
     if (cashChange > 0) {
       cashIn += cashChange;
-      winCount++;
+      wins++;
     } else if (cashChange < 0) {
       cashOut += -cashChange;
-      lossCount++;
+      losses++;
     }
 
-    const marketLabel = getMarketLabel(s);
-    pnlByMarket[marketLabel] = (pnlByMarket[marketLabel] || 0) + cashChange;
+    const market = getMarketLabel(s);
+    pnlByMarket[market] = (pnlByMarket[market] || 0) + cashChange;
 
     const ts = getSafeTimestamp(s);
     if (ts) {
       running += cashChange;
-      series.push({
-        ts,
-        cumulative: running,
-      });
+      series.push({ ts, cumulative: running });
     }
   }
 
-  const totalSettlements = winCount + lossCount;
-  const winRate = totalSettlements > 0 ? (winCount / totalSettlements) * 100 : 0;
+  const totalSettlements = wins + losses;
+  const winRate = totalSettlements > 0 ? (wins / totalSettlements) * 100 : 0;
+
+  settlementsCountEl.textContent = totalSettlements.toString();
+  settlementsPill.textContent =
+    totalSettlements === 0
+      ? "No settlements in last 24h"
+      : `${totalSettlements} settlement(s)`;
 
   return {
     realizedPnl,
@@ -171,61 +173,102 @@ function computeAnalytics(settlements) {
   };
 }
 
-/* ---------- TABLE RENDERING ---------- */
+function computeActivityStats(fills) {
+  let trades = fills.length;
+  const markets = new Set();
+  let totalContracts = 0;
+  let grossVolume = 0;
+  let yesCount = 0;
+  let noCount = 0;
 
-function renderFillsTable(fills) {
-  fillsTableBody.innerHTML = "";
+  for (const f of fills) {
+    const m = getMarketLabel(f);
+    markets.add(m);
 
-  if (fills.length === 0) {
-    fillsTableBody.innerHTML =
-      '<tr><td colspan="5" class="placeholder">No fills in the last 24 hours.</td></tr>';
-    return;
+    const size =
+      f.size ??
+      f.quantity ??
+      f.contracts ??
+      f.contracts_count ??
+      0;
+    const price = Number(f.price ?? 0);
+
+    totalContracts += Number(size) || 0;
+    grossVolume += Math.abs((Number(size) || 0) * price);
+
+    const side = (f.side || f.direction || "").toString().toLowerCase();
+    if (side === "yes") yesCount++;
+    if (side === "no") noCount++;
   }
 
-  const sorted = [...fills].sort((a, b) => {
-    const ta = getSafeTimestamp(a);
-    const tb = getSafeTimestamp(b);
-    return tb - ta;
-  });
+  const avgStake = trades > 0 ? grossVolume / trades : 0;
 
-  sorted.slice(0, 40).forEach((fill) => {
-    const tr = document.createElement("tr");
+  return {
+    trades,
+    marketsCount: markets.size,
+    totalContracts,
+    grossVolume,
+    avgStake,
+    yesCount,
+    noCount,
+  };
+}
 
-    const timeCell = document.createElement("td");
-    timeCell.textContent = formatTimeCell(fill);
+/* ------------------ RENDER CARDS / TABLES ------------------ */
 
-    const marketCell = document.createElement("td");
-    marketCell.textContent = getMarketLabel(fill);
+function renderMoneyCards(stats) {
+  realizedPnlEl.textContent = formatDollars(stats.realizedPnl);
+  realizedPnlEl.classList.remove("positive", "negative");
+  if (stats.realizedPnl > 0) realizedPnlEl.classList.add("positive");
+  if (stats.realizedPnl < 0) realizedPnlEl.classList.add("negative");
 
-    const sideCell = document.createElement("td");
-    sideCell.textContent = fill.side || fill.direction || "—";
+  cashInEl.textContent = formatDollars(stats.cashIn);
+  cashOutEl.textContent = formatDollars(-stats.cashOut); // show as negative
+  cashOutEl.classList.add("negative");
 
-    const sizeCell = document.createElement("td");
-    const size =
-      fill.size ??
-      fill.quantity ??
-      fill.contracts ??
-      fill.contracts_count ??
-      null;
-    sizeCell.textContent = size == null ? "—" : size;
+  if (stats.totalSettlements > 0) {
+    winRateEl.textContent = `${stats.winRate.toFixed(1)}%`;
+  } else {
+    winRateEl.textContent = "—";
+  }
+}
 
-    const priceCell = document.createElement("td");
-    priceCell.textContent = formatPrice(fill.price);
+function renderActivityCards(activity) {
+  tradesCountEl.textContent =
+    activity.trades > 0 ? activity.trades.toString() : "0";
 
-    tr.appendChild(timeCell);
-    tr.appendChild(marketCell);
-    tr.appendChild(sideCell);
-    tr.appendChild(sizeCell);
-    tr.appendChild(priceCell);
+  marketsCountEl.textContent =
+    activity.marketsCount > 0 ? activity.marketsCount.toString() : "0";
 
-    fillsTableBody.appendChild(tr);
-  });
+  contractsTradedEl.textContent =
+    activity.totalContracts > 0 ? activity.totalContracts.toString() : "0";
+
+  grossVolumeEl.textContent = formatDollars(activity.grossVolume);
+  avgStakeEl.textContent = formatDollars(activity.avgStake);
+
+  if (activity.trades === 0) {
+    yesNoBreakdownEl.textContent = "No trades today";
+    activityPill.textContent = "No trades in last 24h";
+  } else {
+    const yesPct =
+      activity.trades > 0 ? (activity.yesCount / activity.trades) * 100 : 0;
+    const noPct =
+      activity.trades > 0 ? (activity.noCount / activity.trades) * 100 : 0;
+
+    yesNoBreakdownEl.textContent = `Yes: ${activity.yesCount} (${yesPct.toFixed(
+      0
+    )}%) · No: ${activity.noCount} (${noPct.toFixed(0)}%)`;
+
+    activityPill.textContent = `${activity.trades} trade${
+      activity.trades === 1 ? "" : "s"
+    } in last 24h`;
+  }
 }
 
 function renderSettlementsTable(settlements) {
   settlementsTableBody.innerHTML = "";
 
-  if (settlements.length === 0) {
+  if (!settlements || settlements.length === 0) {
     settlementsTableBody.innerHTML =
       '<tr><td colspan="4" class="placeholder">No settlements in the last 24 hours.</td></tr>';
     return;
@@ -237,7 +280,7 @@ function renderSettlementsTable(settlements) {
     return tb - ta;
   });
 
-  sorted.slice(0, 40).forEach((s) => {
+  sorted.slice(0, 50).forEach((s) => {
     const tr = document.createElement("tr");
 
     const timeCell = document.createElement("td");
@@ -252,8 +295,13 @@ function renderSettlementsTable(settlements) {
 
     const cashCell = document.createElement("td");
     const change = extractCashChange(s);
-    cashCell.textContent =
-      change === null ? "—" : formatDollars(change, { showPlus: true });
+    if (change === null) {
+      cashCell.textContent = "—";
+    } else {
+      cashCell.textContent = formatDollars(change, { showPlus: true });
+      if (change > 0) cashCell.classList.add("positive");
+      if (change < 0) cashCell.classList.add("negative");
+    }
 
     tr.appendChild(timeCell);
     tr.appendChild(marketCell);
@@ -264,26 +312,27 @@ function renderSettlementsTable(settlements) {
   });
 }
 
-/* ---------- CHARTS ---------- */
+/* ------------------ CHARTS ------------------ */
 
 function renderPnlByMarketChart(pnlByMarket) {
-  const ctx = document.getElementById("pnl-by-market-chart");
-  if (!ctx) return;
+  const canvas = document.getElementById("pnl-by-market-chart");
+  if (!canvas) return;
 
-  const labels = Object.keys(pnlByMarket);
+  const labels = Object.keys(pnlByMarket || {});
   const values = labels.map((k) => pnlByMarket[k]);
 
-  if (pnlByMarketChart) {
-    pnlByMarketChart.destroy();
-  }
+  if (pnlByMarketChart) pnlByMarketChart.destroy();
 
-  if (labels.length === 0) {
-    // nothing to chart
-    pnlByMarketChart = null;
+  if (!labels.length) {
+    canvas.style.display = "none";
+    pnlByMarketPlaceholder.style.display = "block";
     return;
   }
 
-  pnlByMarketChart = new Chart(ctx, {
+  canvas.style.display = "block";
+  pnlByMarketPlaceholder.style.display = "none";
+
+  pnlByMarketChart = new Chart(canvas, {
     type: "bar",
     data: {
       labels,
@@ -297,21 +346,10 @@ function renderPnlByMarketChart(pnlByMarket) {
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-      },
+      plugins: { legend: { display: false } },
       scales: {
-        x: {
-          ticks: {
-            maxRotation: 45,
-            minRotation: 0,
-          },
-        },
         y: {
-          title: {
-            display: true,
-            text: "Dollars",
-          },
+          title: { display: true, text: "Dollars" },
         },
       },
     },
@@ -319,17 +357,19 @@ function renderPnlByMarketChart(pnlByMarket) {
 }
 
 function renderPnlOverTimeChart(series) {
-  const ctx = document.getElementById("pnl-over-time-chart");
-  if (!ctx) return;
+  const canvas = document.getElementById("pnl-over-time-chart");
+  if (!canvas) return;
 
-  if (pnlOverTimeChart) {
-    pnlOverTimeChart.destroy();
-  }
+  if (pnlOverTimeChart) pnlOverTimeChart.destroy();
 
-  if (!series || series.length === 0) {
-    pnlOverTimeChart = null;
+  if (!series || !series.length) {
+    canvas.style.display = "none";
+    pnlOverTimePlaceholder.style.display = "block";
     return;
   }
+
+  canvas.style.display = "block";
+  pnlOverTimePlaceholder.style.display = "none";
 
   const labels = series.map((p) =>
     new Date(p.ts * 1000).toLocaleTimeString([], {
@@ -339,7 +379,7 @@ function renderPnlOverTimeChart(series) {
   );
   const values = series.map((p) => p.cumulative);
 
-  pnlOverTimeChart = new Chart(ctx, {
+  pnlOverTimeChart = new Chart(canvas, {
     type: "line",
     data: {
       labels,
@@ -354,25 +394,20 @@ function renderPnlOverTimeChart(series) {
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-      },
+      plugins: { legend: { display: false } },
       scales: {
         y: {
-          title: {
-            display: true,
-            text: "Dollars",
-          },
+          title: { display: true, text: "Dollars" },
         },
       },
     },
   });
 }
 
-/* ---------- HELPERS ---------- */
+/* ------------------ HELPERS ------------------ */
 
 function getSafeTimestamp(obj) {
-  const candidates = [
+  const keys = [
     "ts",
     "timestamp",
     "time",
@@ -382,33 +417,22 @@ function getSafeTimestamp(obj) {
     "settled_ts",
   ];
 
-  let raw = null;
-  for (const key of candidates) {
-    if (Object.prototype.hasOwnProperty.call(obj, key)) {
-      raw = obj[key];
-      break;
+  for (const k of keys) {
+    if (Object.prototype.hasOwnProperty.call(obj, k) && obj[k] != null) {
+      const raw = obj[k];
+
+      if (typeof raw === "string") {
+        const parsed = Date.parse(raw);
+        if (!Number.isNaN(parsed)) return Math.floor(parsed / 1000);
+      }
+
+      let num = Number(raw);
+      if (Number.isNaN(num)) continue;
+      if (num > 10_000_000_000) num = num / 1000; // ms -> s
+      return num;
     }
   }
-
-  if (raw == null) return 0;
-
-  if (typeof raw === "string") {
-    // ISO string
-    const dt = Date.parse(raw);
-    if (!Number.isNaN(dt)) {
-      return Math.floor(dt / 1000);
-    }
-  }
-
-  let num = Number(raw);
-  if (Number.isNaN(num)) return 0;
-
-  // If it's milliseconds, convert to seconds
-  if (num > 10_000_000_000) {
-    num = num / 1000;
-  }
-
-  return num;
+  return 0;
 }
 
 function formatTimeCell(obj) {
@@ -430,15 +454,8 @@ function getMarketLabel(obj) {
   );
 }
 
-function formatPrice(price) {
-  if (price == null) return "—";
-  const num = Number(price);
-  if (Number.isNaN(num)) return String(price);
-  return num.toFixed(2);
-}
-
 function extractCashChange(settlement) {
-  const candidates = [
+  const keys = [
     "cash_change",
     "cash_change_cents",
     "pnl",
@@ -446,18 +463,15 @@ function extractCashChange(settlement) {
     "cash_delta",
   ];
 
-  for (const key of candidates) {
-    if (Object.prototype.hasOwnProperty.call(settlement, key)) {
-      const v = settlement[key];
-      if (v == null) return null;
-      const num = Number(v);
+  for (const k of keys) {
+    if (Object.prototype.hasOwnProperty.call(settlement, k)) {
+      const raw = settlement[k];
+      if (raw == null) return null;
+      let num = Number(raw);
       if (Number.isNaN(num)) return null;
 
-      // If Kalshi uses cents for this field, it will be relatively large –
-      // you can adjust this threshold later if needed.
-      if (Math.abs(num) > 10000) {
-        return num / 100; // treat as cents -> dollars
-      }
+      // crude “is this cents?” check
+      if (Math.abs(num) > 10000) num = num / 100;
       return num;
     }
   }
@@ -467,12 +481,12 @@ function extractCashChange(settlement) {
 
 function formatDollars(amount, opts = {}) {
   const { showPlus = false } = opts;
-  if (amount == null || Number.isNaN(amount)) return "$—";
+  if (amount == null || Number.isNaN(amount)) return "$0.00";
   const sign = amount > 0 && showPlus ? "+" : "";
   return `${sign}$${amount.toFixed(2)}`;
 }
 
-/* ---------- WIRING ---------- */
+/* ------------------ WIRING ------------------ */
 
 refreshButton.addEventListener("click", () => {
   fetchSummary();
