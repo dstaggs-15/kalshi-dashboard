@@ -1,7 +1,26 @@
 {
-    "generated_at": "2025-11-28T20:55:54.153390",
-    "lookback_days": 1,
-    "fills_last_1_day": [
+    "generated_at": "2025-11-28T21:47:01.910858",
+    "lookback_days": 365,
+    "account": {
+        "cash_cents": 4988,
+        "positions_cents": 0,
+        "cash": 49.88,
+        "positions_value": 0.0,
+        "portfolio_total": 49.88,
+        "updated_ts": null
+    },
+    "fills_last_n_days": [
+        {
+            "fill_id": "7d03acde-07de-6d43-e99a-b2f2e0289021",
+            "order_id": "299beff6-4738-4b18-99cb-1db81357db5a",
+            "ticker": "KXNCAAFGAME-25NOV28TXAMTEX-TEX",
+            "side": "yes",
+            "action": "buy",
+            "count": 11,
+            "price": 0.43,
+            "is_taker": true,
+            "created_time": "2025-11-28T21:35:03.014094+00:00"
+        },
         {
             "fill_id": "5752b80a-afdb-4872-2b34-5ee25ccba38c",
             "order_id": "3c7ad533-953d-414b-a599-3a687e24c13e",
@@ -243,15 +262,92 @@
             "price": 0.9,
             "is_taker": true,
             "created_time": "2025-11-27T20:58:21.786990+00:00"
+        },
+        {
+            "fill_id": "c87f2282-b516-7e62-6fda-fe3fb70e22a0",
+            "order_id": "39ad03a5-4b6b-4e04-b6f7-1539d5418396",
+            "ticker": "KXNFLGAME-25NOV27GBDET-GB",
+            "side": "yes",
+            "action": "buy",
+            "count": 24,
+            "price": 0.41,
+            "is_taker": true,
+            "created_time": "2025-11-27T15:47:02.267362+00:00"
+        },
+        {
+            "fill_id": "b7ceb0e5-1ea3-5b8a-f3e0-1e02f06149db",
+            "order_id": "9a7ed0f6-d29c-443b-95b7-3c81b91312a1",
+            "ticker": "KXHIGHAUS-25NOV26-B65.5",
+            "side": "yes",
+            "action": "buy",
+            "count": 11,
+            "price": 0.82,
+            "is_taker": true,
+            "created_time": "2025-11-26T20:57:58.067594+00:00"
+        },
+        {
+            "fill_id": "f7c9750f-cb03-5e4c-fe35-12bcfe2a97d8",
+            "order_id": "5d497caf-04fe-4431-921f-0c28d5e259bf",
+            "ticker": "KXZELENSKYYPUTINMEET-26",
+            "side": "yes",
+            "action": "buy",
+            "count": 6,
+            "price": 0.14,
+            "is_taker": true,
+            "created_time": "2025-11-26T20:42:04.716006+00:00"
+        },
+        {
+            "fill_id": "8b782715-0948-5ca0-e1d8-922613a8f832",
+            "order_id": "5d497caf-04fe-4431-921f-0c28d5e259bf",
+            "ticker": "KXZELENSKYYPUTINMEET-26",
+            "side": "yes",
+            "action": "buy",
+            "count": 54,
+            "price": 0.14,
+            "is_taker": true,
+            "created_time": "2025-11-26T20:42:04.716006+00:00"
+        },
+        {
+            "fill_id": "745f2125-fa83-5b5d-ca57-be7801a5df66",
+            "order_id": "5d497caf-04fe-4431-921f-0c28d5e259bf",
+            "ticker": "KXZELENSKYYPUTINMEET-26",
+            "side": "yes",
+            "action": "buy",
+            "count": 6,
+            "price": 0.14,
+            "is_taker": true,
+            "created_time": "2025-11-26T20:42:04.716006+00:00"
+        },
+        {
+            "fill_id": "24b1fe07-082c-5914-d7f5-1e7cbb509274",
+            "order_id": "cd761ee2-77bd-4753-91ff-30ba750d430f",
+            "ticker": "KXHEISMAN-26-DPAV",
+            "side": "yes",
+            "action": "buy",
+            "count": 45,
+            "price": 0.1,
+            "is_taker": true,
+            "created_time": "2025-11-25T19:45:40.618516+00:00"
+        },
+        {
+            "fill_id": "c2b4e197-7650-5095-50a1-778d4c7d10e8",
+            "order_id": "181f505a-369a-47ed-b46f-30852c775542",
+            "ticker": "KXHEISMAN-26-JLOV",
+            "side": "yes",
+            "action": "buy",
+            "count": 26,
+            "price": 0.18,
+            "is_taker": true,
+            "created_time": "2025-11-25T19:45:03.871428+00:00"
         }
     ],
-    "settlements_last_1_day": [],
+    "settlements_last_n_days": [],
     "summary": {
-        "total_invested": 111.19999999999999,
-        "reinvested": 111.19999999999999,
+        "total_invested": 153.21,
+        "reinvested": 153.21,
         "cash_invested": 0.0,
         "realized_pnl": 0.0,
-        "portfolio_value": 111.19999999999999,
+        "portfolio_value": 153.21,
         "return_rate": 0.0,
         "cash_in": 0.0,
         "cash_out": 0.0,
