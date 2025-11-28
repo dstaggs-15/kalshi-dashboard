@@ -9,9 +9,16 @@ from kalshi_python import Configuration, KalshiClient
 # ============================================================
 # Kalshi client
 # ============================================================
-def load_kalshi_client():
+
+
+def load_kalshi_client() -> KalshiClient:
     """
     Load Kalshi client using API keys from env / .env.
+    Expects:
+
+      KALSHI_API_KEY_ID  - your API key id
+      KALSHI_PRIVATE_KEY - your PEM private key (single line or with \n)
+
     """
     load_dotenv()
 
@@ -19,24 +26,24 @@ def load_kalshi_client():
     private_key = os.getenv("KALSHI_PRIVATE_KEY")
 
     if not key_id or not private_key:
-        raise Exception(
+        raise RuntimeError(
             "Missing Kalshi credentials. "
-            "Make sure KALSHI_API_KEY_ID and KALSHI_PRIVATE_KEY are set."
+            "Make sure KALSHI_API_KEY_ID and KALSHI_PRIVATE_KEY are set "
+            "in your environment or .env file."
         )
 
-    config = Configuration(
-        host="https://api.elections.kalshi.com/trade-api/v2"
-    )
+    config = Configuration(host="https://api.elections.kalshi.com/trade-api/v2")
     config.api_key_id = key_id
     config.private_key_pem = private_key
 
-    client = KalshiClient(config)
-    return client
+    return KalshiClient(config)
 
 
 # ============================================================
 # Fills and settlements
 # ============================================================
+
+
 def fetch_fills_last_n_days(client: KalshiClient, days: int = 1):
     """
     Fetch fills from the last N days using min_ts/max_ts filters.
@@ -70,7 +77,7 @@ def fetch_settlements_last_n_days(client: KalshiClient, days: int = 1):
     """
     Fetch settlements from the last N days.
 
-    The SDK's get_settlements() **does not** support min_ts/max_ts,
+    The SDK's get_settlements() does NOT support min_ts/max_ts,
     so we paginate everything and filter by timestamp locally.
     """
     now = datetime.utcnow()
@@ -81,11 +88,7 @@ def fetch_settlements_last_n_days(client: KalshiClient, days: int = 1):
     cursor = None
 
     while True:
-        # NO min_ts / max_ts here – the SDK doesn't support them
-        resp = client.get_settlements(
-            limit=200,
-            cursor=cursor,
-        )
+        resp = client.get_settlements(limit=200, cursor=cursor)
 
         for s in getattr(resp, "settlements", []):
             ts_val = getattr(s, "ts", None)
@@ -109,7 +112,9 @@ def fetch_settlements_last_n_days(client: KalshiClient, days: int = 1):
 # ============================================================
 # Timestamp helper
 # ============================================================
-def get_ts_ms(obj) -> int | None:
+
+
+def get_ts_ms(obj):
     """
     Try to pull a timestamp (ms) off a Kalshi object or dict.
     Looks at ts / timestamp / created_time.
@@ -149,19 +154,21 @@ def get_ts_ms(obj) -> int | None:
 # ============================================================
 # Core stats
 # ============================================================
+
+
 def compute_stats(fills, settlements):
     """
     Calculate investment + P&L stats from fills and settlements.
 
     Returns a dict with:
-    - total_invested
-    - reinvested
-    - cash_invested
-    - realized_pnl
-    - portfolio_value (approx, based on cash_invested + reinvested + realized_pnl)
-    - return_rate
-    - cash_in, cash_out
-    - cumulative_series: [{ts, cumulative}] for P&L chart
+      - total_invested   : total size*price on BUY fills
+      - reinvested       : portion of that funded by SELL fills
+      - cash_invested    : net cash actually put in via fills
+      - realized_pnl     : sum of settlement cash_change
+      - return_rate      : realized_pnl / total_invested (if > 0)
+      - cash_in          : total positive settlements
+      - cash_out         : total negative settlements
+      - cumulative_series: [{ts, cumulative}] for P&L over time
     """
     # ---------- From fills ----------
     total_invested = 0.0
@@ -170,7 +177,7 @@ def compute_stats(fills, settlements):
     for f in fills:
         size = getattr(f, "size", None)
         if size is None:
-            size = getattr(f, "count", 0)  # Kalshi uses "count" in your JSON
+            size = getattr(f, "count", 0)  # Kalshi sometimes uses "count"
         price = float(getattr(f, "price", 0.0) or 0.0)
         cost = float(size) * price
 
@@ -214,7 +221,6 @@ def compute_stats(fills, settlements):
             running += cash_change
             cumulative_series.append({"ts": ts, "cumulative": running})
 
-    portfolio_value = cash_invested + reinvested + realized_pnl
     return_rate = (realized_pnl / total_invested) if total_invested > 0 else 0.0
 
     return {
@@ -222,7 +228,6 @@ def compute_stats(fills, settlements):
         "reinvested": reinvested,
         "cash_invested": cash_invested,
         "realized_pnl": realized_pnl,
-        "portfolio_value": portfolio_value,
         "return_rate": return_rate,
         "cash_in": cash_in,
         "cash_out": cash_out,
@@ -233,6 +238,8 @@ def compute_stats(fills, settlements):
 # ============================================================
 # JSON cleaning
 # ============================================================
+
+
 def _clean_for_json(obj):
     """
     Recursively convert Kalshi SDK objects (and nested stuff)
@@ -272,13 +279,22 @@ def to_dict(obj):
 # ============================================================
 # Main summary generator
 # ============================================================
+
+
 def generate_summary_json(days: int = 365):
     """
     Pulls data from Kalshi, computes stats, and writes data/kalshi_summary.json
 
-    - 'account' block: matches portfolio/cash from Kalshi app
-    - 'fills_last_n_days' / 'settlements_last_n_days': raw activity
-    - 'summary': investment + P&L stats
+    JSON structure:
+
+      {
+        "generated_at": "...",
+        "lookback_days": 365,
+        "account": { ... },     # raw balance/portfolio numbers
+        "fills_last_n_days": [...],
+        "settlements_last_n_days": [...],
+        "summary": { ... }      # stats incl. deposits & P&L
+      }
     """
     client = load_kalshi_client()
 
@@ -287,12 +303,19 @@ def generate_summary_json(days: int = 365):
     balance_cents = getattr(balance_resp, "balance", 0) or 0
     portfolio_cents = getattr(balance_resp, "portfolio_value", 0) or 0
 
+    # portfolio_value returned by Kalshi already includes cash.
+    positions_cents = max(portfolio_cents - balance_cents, 0)
+
+    cash = balance_cents / 100.0
+    positions_value = positions_cents / 100.0
+    portfolio_total = portfolio_cents / 100.0
+
     account = {
         "cash_cents": balance_cents,
-        "positions_cents": portfolio_cents,
-        "cash": balance_cents / 100.0,
-        "positions_value": portfolio_cents / 100.0,
-        "portfolio_total": (balance_cents + portfolio_cents) / 100.0,
+        "positions_cents": positions_cents,
+        "cash": cash,
+        "positions_value": positions_value,
+        "portfolio_total": portfolio_total,
         "updated_ts": getattr(balance_resp, "updated_ts", None),
     }
 
@@ -302,6 +325,28 @@ def generate_summary_json(days: int = 365):
 
     stats = compute_stats(fills, settlements)
 
+    # ---------- 3) Deposits & P&L ----------
+    # You control this via TOTAL_DEPOSITS in your .env
+    total_deposits_str = os.getenv("TOTAL_DEPOSITS", "0").strip() or "0"
+    try:
+        total_deposits = float(total_deposits_str)
+    except ValueError:
+        total_deposits = 0.0
+
+    realized_pnl = stats.get("realized_pnl", 0.0)
+    net_profit = portfolio_total - total_deposits
+    unrealized_pnl = net_profit - realized_pnl
+
+    stats.update(
+        {
+            "total_deposits": total_deposits,
+            "account_value": portfolio_total,
+            "unrealized_pnl": unrealized_pnl,
+            "net_profit": net_profit,
+        }
+    )
+
+    # ---------- 4) Serialize ----------
     fills_dict = [to_dict(f) for f in fills]
     settlements_dict = [to_dict(s) for s in settlements]
 
@@ -317,12 +362,12 @@ def generate_summary_json(days: int = 365):
     os.makedirs("data", exist_ok=True)
     output_path = os.path.join("data", "kalshi_summary.json")
 
-    with open(output_path, "w") as f:
+    with open(output_path, "w", encoding="utf-8") as f:
         json.dump(summary, f, indent=4)
 
     print(f"✓ Summary JSON generated at {output_path}")
 
 
 if __name__ == "__main__":
-    # use a long window so the chart + stats have real history
+    # Use a long window so the stats have real history
     generate_summary_json(days=365)
