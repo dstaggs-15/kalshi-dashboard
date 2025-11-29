@@ -1,19 +1,5 @@
 """
 Generate a JSON summary of your Kalshi portfolio for the dashboard.
-
-What this script does:
-- Pulls from Kalshi:
-    * Cash balance (balance)
-    * Total account value (portfolio_value)
-    * Fills (trades)
-    * Settlements (closed/settled markets)
-- Computes:
-    * Total deposits (env TOTAL_DEPOSITS, default 40.0)
-    * Net profit = portfolio_value - deposits
-    * Realized P&L (closed bets)
-    * Unrealized P&L (open bets, forced to 0 if no open bets)
-    * Cumulative realized P&L series for a chart
-- Writes everything to data/kalshi_summary.json for the frontend.
 """
 
 from __future__ import annotations
@@ -30,21 +16,18 @@ from kalshi_python import Configuration, KalshiClient
 
 
 # ---------------------------------------------------------------------------
-# Utility helpers
+# Helpers
 # ---------------------------------------------------------------------------
-
 
 def get_ts_ms(obj: Any) -> Optional[int]:
     """
     Extract a timestamp in milliseconds from a Kalshi SDK object.
-    Handles several possible field names and formats.
     """
     for attr in ("time", "ts", "created_time", "created_ts", "settled_time"):
         value = getattr(obj, attr, None)
         if value is None:
             continue
         if isinstance(value, int):
-            # If it's > 1e12, assume ms; otherwise it's seconds.
             return value if value > 1_000_000_000_000 else value * 1000
         if isinstance(value, float):
             return int(value * 1000)
@@ -59,7 +42,7 @@ def get_ts_ms(obj: Any) -> Optional[int]:
 
 def to_dict(obj: Any) -> Any:
     """
-    Recursively convert Kalshi SDK models into JSON-serializable primitives.
+    Recursively convert Kalshi SDK models into JSON-serializable structures.
     """
     if obj is None:
         return None
@@ -78,28 +61,23 @@ def to_dict(obj: Any) -> Any:
 
 
 # ---------------------------------------------------------------------------
-# Kalshi client setup
+# Kalshi client
 # ---------------------------------------------------------------------------
-
 
 def load_kalshi_client() -> KalshiClient:
     """
-    Load credentials from env/.env and return an authenticated Kalshi client.
-
-    Env vars:
-      - KALSHI_API_KEY_ID
-      - KALSHI_PRIVATE_KEY  (PEM string)
+    Load credentials from .env and return an authenticated Kalshi client.
     """
     load_dotenv()
     key_id = os.getenv("KALSHI_API_KEY_ID")
     private_key = os.getenv("KALSHI_PRIVATE_KEY")
+
     if not key_id or not private_key:
-        raise Exception(
+        raise RuntimeError(
             "Missing Kalshi credentials. Set KALSHI_API_KEY_ID and "
             "KALSHI_PRIVATE_KEY in your environment or .env file."
         )
 
-    # Official host from docs
     config = Configuration(
         host="https://api.elections.kalshi.com/trade-api/v2"
     )
@@ -111,7 +89,6 @@ def load_kalshi_client() -> KalshiClient:
 # ---------------------------------------------------------------------------
 # Data fetching
 # ---------------------------------------------------------------------------
-
 
 def fetch_fills_last_n_days(client: KalshiClient, days: int = 365):
     """
@@ -136,10 +113,7 @@ def fetch_fills_last_n_days(client: KalshiClient, days: int = 365):
 
 def fetch_settlements_last_n_days(client: KalshiClient, days: int = 365):
     """
-    Fetch settlements from the last `days` days.
-
-    get_settlements in your SDK does NOT accept min_ts keyword arg,
-    so we paginate everything and filter client-side by timestamp.
+    Fetch settlements from the last `days` days and filter client-side by time.
     """
     now = datetime.now(timezone.utc)
     min_dt = now - timedelta(days=days)
@@ -167,23 +141,12 @@ def fetch_settlements_last_n_days(client: KalshiClient, days: int = 365):
 
 
 # ---------------------------------------------------------------------------
-# P&L / stats computation
+# P&L computation from fills/settlements
 # ---------------------------------------------------------------------------
-
 
 def compute_stats(fills, settlements):
     """
-    Compute investment and P&L statistics from fills and settlements.
-
-    Returns a dict with:
-      - total_invested
-      - reinvested
-      - cash_invested
-      - realized_pnl
-      - return_rate
-      - cash_in
-      - cash_out
-      - cumulative_series (for chart)
+    Compute summary P&L stats from fills and settlements.
     """
     total_invested = 0.0
     total_cash_generated = 0.0
@@ -244,9 +207,8 @@ def compute_stats(fills, settlements):
 
 
 # ---------------------------------------------------------------------------
-# Main summary generation
+# Main summary generator
 # ---------------------------------------------------------------------------
-
 
 def generate_summary_json(days: int = 365):
     """
@@ -254,32 +216,39 @@ def generate_summary_json(days: int = 365):
     """
     client = load_kalshi_client()
 
-    # ----- 1) Account-level numbers: use get_balance directly -----
+    # 1) Account-level numbers from get_balance()
     balance_resp = client.get_balance()
 
-    # Official response fields: balance, portfolio_value, updated_ts
-    # https://docs.kalshi.com/api-reference/portfolio/get-balance
-    balance_cents = getattr(balance_resp, "balance", 0) or 0
-    portfolio_cents = getattr(balance_resp, "portfolio_value", None)
-    if portfolio_cents is None:
-        portfolio_cents = balance_cents
+    # Use robust attribute access in case SDK changes naming slightly
+    balance_cents = (
+        getattr(balance_resp, "balance", None)
+        or getattr(balance_resp, "available_balance", None)
+        or 0
+    )
 
+    portfolio_cents = (
+        getattr(balance_resp, "portfolio_value", None)
+        or getattr(balance_resp, "portfolioValue", None)
+        or balance_cents
+    )
+
+    # Money in bets = portfolio_value - cash
     positions_cents = portfolio_cents - balance_cents
     if positions_cents < 0:
         positions_cents = 0
 
     account = {
-        "cash_cents": balance_cents,
-        "positions_cents": positions_cents,
+        "cash_cents": int(balance_cents),
+        "positions_cents": int(positions_cents),
         "cash": balance_cents / 100.0,
         "positions_value": positions_cents / 100.0,
         "portfolio_total": portfolio_cents / 100.0,
         "updated_ts": getattr(balance_resp, "updated_ts", None),
-        # debug: see exactly what Kalshi returned if something is weird
+        # Debug payload so we can see exactly what Kalshi sent if needed
         "raw_balance_response": to_dict(balance_resp),
     }
 
-    # ----- 2) Trading activity for realized P&L -----
+    # 2) Fills & settlements → realized P&L, etc.
     fills = fetch_fills_last_n_days(client, days=days)
     settlements = fetch_settlements_last_n_days(client, days=days)
     stats = compute_stats(fills, settlements)
@@ -287,33 +256,24 @@ def generate_summary_json(days: int = 365):
     fills_dict = [to_dict(f) for f in fills]
     settlements_dict = [to_dict(s) for s in settlements]
 
-    # ----- 3) Deposits, net profit, unrealized P&L -----
-    # DEFAULT: assume you've deposited $40 unless TOTAL_DEPOSITS overrides it.
-    total_deposits_env = os.getenv("TOTAL_DEPOSITS")
-    if total_deposits_env is None or total_deposits_env.strip() == "":
-        total_deposits = 40.0
-    else:
-        try:
-            total_deposits = float(total_deposits_env)
-        except Exception:
-            total_deposits = 40.0
+    # 3) Deposits & P&L framing
+    # HARD-CODED for now per your request
+    total_deposits = 40.0
 
     portfolio_total = account["portfolio_total"]
     realized_pnl = stats.get("realized_pnl", 0.0)
     positions_value = account["positions_value"]
 
+    # How much you're up total vs what you put in
     net_profit = portfolio_total - total_deposits
 
-    # If you have no open positions, treat everything as realized from a UX POV.
+    # If no open positions, treat everything as realized for UX
     if positions_value <= 1e-6:
         unrealized_pnl = 0.0
     else:
         unrealized_pnl = net_profit - realized_pnl
 
-    # ROI stored as fraction; frontend multiplies by 100.
-    net_profit_percent = (
-        (net_profit / total_deposits) if total_deposits > 0 else 0.0
-    )
+    net_profit_percent = (net_profit / total_deposits) if total_deposits > 0 else 0.0
 
     stats_extra = dict(stats)
     stats_extra["total_deposits"] = total_deposits
@@ -321,8 +281,9 @@ def generate_summary_json(days: int = 365):
     stats_extra["net_profit_percent"] = net_profit_percent
     stats_extra["unrealized_pnl"] = unrealized_pnl
 
-    # ----- 4) Final JSON -----
+    # 4) Final JSON
     now_utc = datetime.now(timezone.utc)
+
     summary: Dict[str, Any] = {
         "generated_at": now_utc.isoformat(),
         "lookback_days": days,
