@@ -26,7 +26,7 @@ def save_json(data):
         traceback.print_exc()
 
 def main():
-    print("--- STARTING FINAL FIX SCRIPT ---")
+    print("--- STARTING FINAL PRODUCTION SCRIPT ---")
     
     final_data = {
         "meta": {"updated_at": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")},
@@ -49,19 +49,20 @@ def main():
         if not private_key:
             raise ValueError("Missing KALSHI_PRIVATE_KEY")
 
-        # FIX: Handle newlines if they got mashed by GitHub
+        # 2. KEY FORMATTING
+        # GitHub Secrets often flatten newlines. We MUST fix this.
         if "\\n" in private_key:
             private_key = private_key.replace("\\n", "\n")
 
-        # 2. KEY VALIDATION (Debug the 401 error)
-        if "-----BEGIN RSA PRIVATE KEY-----" not in private_key:
-            error_msg = "KEY ERROR: Your Private Key is missing the header '-----BEGIN RSA PRIVATE KEY-----'. You likely pasted only the middle part."
-            final_data["debug_log"].append(error_msg)
-            raise ValueError(error_msg)
+        # Key Validation Log
+        if "-----BEGIN RSA PRIVATE KEY-----" in private_key:
+             final_data["debug_log"].append("Key Format: Valid Header Found")
+        else:
+             final_data["debug_log"].append("Key Format: INVALID (Missing -----BEGIN...)")
 
         # 3. API CONNECTION
         config = Configuration()
-        # REVERTED TO THE CORRECT HOST
+        # CORRECT PRODUCTION URL
         config.host = "https://api.elections.kalshi.com/trade-api/v2"
         config.api_key_id = api_key_id
         config.private_key = private_key
@@ -69,7 +70,7 @@ def main():
         client = KalshiClient(config)
         
         # 4. FETCH DATA
-        print("Fetching Balance...")
+        print(f"Connecting to {config.host}...")
         balance = client.get_balance()
         
         raw_bal = getattr(balance, 'balance', 0)
@@ -122,7 +123,7 @@ def main():
         final_data["summary"]["roi_percent"] = ((total - 40.0)/40.0)*100
         final_data["fills"] = clean_fills
         final_data["settlements"] = clean_settlements
-        final_data["debug_log"].append("Success")
+        final_data["debug_log"].append("Success: Connected to Production")
         
         print(f"Success. Cash: {cash}, Total: {total}")
 
