@@ -12,7 +12,7 @@ What this script does:
     * Net profit = portfolio_value - deposits
     * Realized P&L (closed bets)
     * Unrealized P&L (open bets, forced to 0 if no open bets)
-    * Cumulative P&L series for a chart
+    * Cumulative realized P&L series for a chart
 - Writes everything to data/kalshi_summary.json for the frontend.
 """
 
@@ -85,6 +85,7 @@ def to_dict(obj: Any) -> Any:
 def load_kalshi_client() -> KalshiClient:
     """
     Load credentials from env/.env and return an authenticated Kalshi client.
+
     Env vars:
       - KALSHI_API_KEY_ID
       - KALSHI_PRIVATE_KEY  (PEM string)
@@ -136,8 +137,8 @@ def fetch_settlements_last_n_days(client: KalshiClient, days: int = 365):
     """
     Fetch settlements from the last `days` days.
 
-    get_settlements in your SDK choked on min_ts as a keyword arg before,
-    so here we paginate everything and filter client-side by timestamp.
+    get_settlements in your SDK does NOT accept min_ts keyword arg,
+    so we paginate everything and filter client-side by timestamp.
     """
     now = datetime.now(timezone.utc)
     min_dt = now - timedelta(days=days)
@@ -257,11 +258,13 @@ def generate_summary_json(days: int = 365):
     balance_cents = getattr(balance_resp, "balance", 0) or 0
     portfolio_cents = getattr(balance_resp, "portfolio_value", None)
     if portfolio_cents is None:
-        # Fallback: if SDK or env is weird, treat portfolio as pure cash.
+        # Fallback: treat as cash only (rare / defensive)
         portfolio_cents = balance_cents
 
-    # Money in bets is whatever part of portfolio is not cash.
-    positions_cents = max(portfolio_cents - balance_cents, 0)
+    # Money in bets (positions) = portfolio_value - cash
+    positions_cents = portfolio_cents - balance_cents
+    if positions_cents < 0:
+        positions_cents = 0
 
     account = {
         "cash_cents": balance_cents,
@@ -297,12 +300,13 @@ def generate_summary_json(days: int = 365):
 
     net_profit = portfolio_total - total_deposits
 
-    # If you have no open positions, don't pretend any of your profit is "open".
+    # If you have no open positions, treat all profit as realized for the UI.
     if positions_value <= 1e-6:
         unrealized_pnl = 0.0
     else:
         unrealized_pnl = net_profit - realized_pnl
 
+    # Store ROI as a fraction (e.g. 0.37 = 37%), frontend multiplies by 100.
     net_profit_percent = (
         (net_profit / total_deposits) if total_deposits > 0 else 0.0
     )
