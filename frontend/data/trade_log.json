@@ -1,0 +1,40 @@
+{
+  "meta": {
+    "last_updated": "2025-11-29T00:00:00Z",
+    "base_currency": "USD",
+    "total_deposited": 40.0
+  },
+  "trades": [
+    {
+      "id": 1,
+      "date": "2025-11-28",
+      "status": "CLOSED",            // OPEN or CLOSED
+      "market": "Texas A&M at Texas",
+      "contract": "Yes - Texas",
+      "side": "YES",
+      "ticker": "KXNCAAFGAME-25NOV28TXAMTEX-TEX",
+      "contracts": 20,
+      "avg_entry_price_cents": 43,   // 43¢
+      "avg_exit_price_cents": 100,   // 100¢ if it won and fully paid out
+      "total_cost": 8.60,
+      "total_payout": 20.00,
+      "fees": 0.08,
+      "notes": "Example closed win"
+    },
+    {
+      "id": 2,
+      "date": "2025-11-29",
+      "status": "OPEN",
+      "market": "Ohio St. at Michigan",
+      "contract": "Yes - Michigan",
+      "side": "YES",
+      "ticker": "KXNCAAFGAME-25NOV29OSUMICH-MICH",
+      "contracts": 19,
+      "avg_entry_price_cents": 24,
+      "current_price_cents": 23,     // optional, for open P/L
+      "total_cost": 4.56,
+      "fees": 0.03,
+      "notes": "Example open position"
+    }
+  ]
+}
