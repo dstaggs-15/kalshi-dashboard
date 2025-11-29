@@ -1,0 +1,18 @@
+{
+    "meta": {
+        "updated_at": "2025-11-29 04:00:40"
+    },
+    "account": {
+        "cash_balance": 0.0,
+        "total_account_value": 0.0,
+        "money_in_bets": 0.0
+    },
+    "summary": {
+        "total_deposits": 40.0,
+        "net_profit": -40.0,
+        "roi_percent": -100.0,
+        "house_money_share": 0.0
+    },
+    "fills": [],
+    "settlements": []
+}
