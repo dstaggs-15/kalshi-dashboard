@@ -19,11 +19,11 @@
       </div>
       <div class="navbar-right">
         <div class="nav-pill">
-          <span class="nav-pill-label">Account Value</span>
+          <span class="nav-pill-label">Total Account Value</span>
           <span id="nav-account-value" class="nav-pill-value">$0.00</span>
         </div>
         <div class="nav-pill">
-          <span class="nav-pill-label">Net Profit</span>
+          <span class="nav-pill-label">Overall Profit / Loss</span>
           <span id="nav-net-profit" class="nav-pill-value">$0.00</span>
         </div>
       </div>
@@ -36,99 +36,103 @@
           <h2>At-a-Glance Summary</h2>
           <span id="summary-generated-at" class="timestamp">Updated: –</span>
         </div>
+
         <div class="metrics-grid">
-          <!-- Total Deposits -->
+          <!-- Money You Added -->
           <div class="metric-card">
-            <div class="metric-label">Total Deposits</div>
+            <div class="metric-label">Money You Added</div>
             <div id="metric-deposits" class="metric-value">$0.00</div>
             <details class="metric-details">
-              <summary>What does this mean?</summary>
-              <p>Money you’ve moved into Kalshi from Venmo/bank. This is your own cash you put in.</p>
+              <summary>What is this?</summary>
+              <p>Total money you have moved into Kalshi. Think of this as your “initial investment.”</p>
             </details>
           </div>
 
-          <!-- Account Value -->
+          <!-- Total Account Value -->
           <div class="metric-card">
-            <div class="metric-label">Account Value</div>
+            <div class="metric-label">Total Account Value</div>
             <div id="metric-account-value" class="metric-value">$0.00</div>
             <details class="metric-details">
-              <summary>What does this mean?</summary>
-              <p>Cash + current value of all open positions. This should match the total value shown in the Kalshi app.</p>
+              <summary>What is this?</summary>
+              <p>If you cashed everything out right now, this is roughly what your account would be worth.</p>
             </details>
           </div>
 
-          <!-- Cash -->
+          <!-- Cash You Can Take Out -->
           <div class="metric-card">
-            <div class="metric-label">Cash (withdrawable)</div>
+            <div class="metric-label">Cash You Can Take Out</div>
             <div id="metric-cash" class="metric-value">$0.00</div>
             <details class="metric-details">
-              <summary>What does this mean?</summary>
-              <p>Money that is not tied up in any bets. You can withdraw this immediately.</p>
+              <summary>What is this?</summary>
+              <p>Money that is not tied up in any bets. You can withdraw this today.</p>
             </details>
           </div>
 
-          <!-- Positions -->
+          <!-- Money in Bets -->
           <div class="metric-card">
-            <div class="metric-label">Positions Value</div>
+            <div class="metric-label">Money in Bets</div>
             <div id="metric-positions-value" class="metric-value">$0.00</div>
             <details class="metric-details">
-              <summary>What does this mean?</summary>
-              <p>What your open bets are worth right now, based on current prices.</p>
+              <summary>What is this?</summary>
+              <p>What your open bets are worth right now, based on current market prices.</p>
             </details>
           </div>
 
-          <!-- Net Profit -->
+          <!-- Overall Profit / Loss -->
           <div class="metric-card">
-            <div class="metric-label">Net Profit</div>
+            <div class="metric-label">Overall Profit / Loss</div>
             <div id="metric-net-profit" class="metric-value signed">$0.00</div>
             <details class="metric-details">
-              <summary>What does this mean?</summary>
+              <summary>What is this?</summary>
               <p>
-                Account Value − Total Deposits. This is how much you’ve truly made or lost after everything, including open
-                positions.
+                Total Account Value minus Money You Added. This is how much you are up or down overall after everything.
               </p>
             </details>
           </div>
 
-          <!-- Realized P&L -->
+          <!-- Closed Bets Profit / Loss -->
           <div class="metric-card">
-            <div class="metric-label">Realized P&amp;L</div>
+            <div class="metric-label">Closed Bets Profit / Loss</div>
             <div id="metric-realized-pnl" class="metric-value signed">$0.00</div>
             <details class="metric-details">
-              <summary>What does this mean?</summary>
-              <p>Profit or loss from bets that have fully settled (closed markets only).</p>
+              <summary>What is this?</summary>
+              <p>Money you have already won or lost from bets that are completely finished.</p>
             </details>
           </div>
 
-          <!-- Unrealized P&L -->
+          <!-- Open Bets Profit / Loss -->
           <div class="metric-card">
-            <div class="metric-label">Unrealized P&amp;L</div>
+            <div class="metric-label">Open Bets Profit / Loss</div>
             <div id="metric-unrealized-pnl" class="metric-value signed">$0.00</div>
             <details class="metric-details">
-              <summary>What does this mean?</summary>
-              <p>Profit or loss on open bets if they cashed out at current prices.</p>
+              <summary>What is this?</summary>
+              <p>
+                How much you are currently up or down on open bets. This can change as prices move or results come in.
+              </p>
             </details>
           </div>
 
-          <!-- ROI -->
+          <!-- Overall Return (%) -->
           <div class="metric-card">
-            <div class="metric-label">Return on Investment (ROI)</div>
+            <div class="metric-label">Overall Return (%)</div>
             <div id="metric-roi" class="metric-value">0%</div>
             <details class="metric-details">
-              <summary>What does this mean?</summary>
-              <p>Net Profit ÷ Total Deposits. How hard your money is working overall.</p>
+              <summary>What is this?</summary>
+              <p>
+                Overall Profit / Loss divided by Money You Added. Example: you put in $40 and now have $80 → that’s +100%.
+              </p>
             </details>
           </div>
 
-          <!-- House Money -->
+          <!-- “House Money” Share -->
           <div class="metric-card">
-            <div class="metric-label">House Money %</div>
+            <div class="metric-label">“House Money” Share</div>
             <div id="metric-house-money" class="metric-value">0%</div>
             <details class="metric-details">
-              <summary>What does this mean?</summary>
+              <summary>What is this?</summary>
               <p>
-                What percentage of your account is winnings instead of original deposits. Example: if this is 50%, half of
-                your account is pure profit.
+                What percentage of your account is winnings instead of your own cash. If this says 60%, most of your account
+                is profit.
               </p>
             </details>
           </div>
@@ -139,7 +143,7 @@
       <section class="charts-row">
         <section class="card chart-card">
           <div class="card-header">
-            <h2>Profit Over Time (Realized)</h2>
+            <h2>Profit Over Time (Closed Bets)</h2>
           </div>
           <canvas id="pnlChart"></canvas>
         </section>
@@ -172,7 +176,7 @@
             <tr>
               <th>Time</th>
               <th>Market</th>
-              <th>Side</th>
+              <th>Side</</th>
               <th>Contracts</th>
               <th>Price</th>
               <th>Cost</th>
