@@ -1,5 +1,5 @@
 {
-    "generated_at": "2025-11-29T02:20:52.870035+00:00",
+    "generated_at": "2025-11-29T02:28:11.584358+00:00",
     "lookback_days": 365,
     "account": {
         "cash_cents": 5484,
@@ -373,9 +373,9 @@
         "cash_in": 0.0,
         "cash_out": 0.0,
         "cumulative_series": [],
-        "total_deposits": 0.0,
-        "net_profit": 54.84,
-        "net_profit_percent": 0.0,
-        "unrealized_pnl": 54.84
+        "total_deposits": 40.0,
+        "net_profit": 14.840000000000003,
+        "net_profit_percent": 0.3710000000000001,
+        "unrealized_pnl": 0.0
     }
 }
