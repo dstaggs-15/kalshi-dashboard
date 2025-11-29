@@ -1,426 +1,393 @@
+// JavaScript for the Kalshi Portfolio Dashboard
+
 const JSON_URL = "../data/kalshi_summary.json";
-const REFRESH_MS = 60_000;
+const REFRESH_MS = 60_000; // 60s
 
-let pnlChart = null;
-let breakdownChart = null;
+// ------------------------------
+// Entry point
+// ------------------------------
+async function fetchAndRender() {
+  try {
+    const cacheBuster = `t=${Date.now()}`;
+    const url = JSON_URL.includes("?")
+      ? `${JSON_URL}&${cacheBuster}`
+      : `${JSON_URL}?${cacheBuster}`;
 
-// ---------------------- helpers ---------------------- //
+    const res = await fetch(url, { cache: "no-store" });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
-function formatCurrency(value, withSign = false) {
-  const n = Number(value || 0);
-  const sign = withSign && n > 0 ? "+" : "";
-  return `${sign}$${n.toFixed(2)}`;
+    const data = await res.json();
+
+    const account = data.account || {};
+    const summary = data.summary || {};
+
+    // --- Core numbers from backend (with safe defaults) ---
+    const deposits = toNumber(summary.total_deposits, 0);
+    const cash = toNumber(account.cash, 0);
+
+    // portfolio_total comes from Kalshi's portfolio_value (via backend)
+    let portfolioTotal = toNumber(account.portfolio_total, NaN);
+    if (!Number.isFinite(portfolioTotal)) {
+      // Fallback: if portfolio_total isn't present for some reason,
+      // approximate as cash + positions_value (older backend behavior).
+      portfolioTotal =
+        cash + toNumber(account.positions_value, 0);
+    }
+
+    // Money in bets (positions value).
+    // This is the important fix:
+    // If backend gave us positions_value and it's non-trivial, use it.
+    // Otherwise, compute it directly as portfolio - cash.
+    let positionsValue = toNumber(account.positions_value, NaN);
+    if (!Number.isFinite(positionsValue) || Math.abs(positionsValue) < 0.01) {
+      positionsValue = Math.max(portfolioTotal - cash, 0);
+    }
+
+    // Net profit: prefer backend's net_profit, fallback to portfolio - deposits.
+    const netProfit = toNumber(
+      summary.net_profit,
+      portfolioTotal - deposits,
+    );
+
+    // Realized P&L (closed bets) from backend
+    const realizedPnL = toNumber(summary.realized_pnl, 0);
+
+    // Unrealized P&L: backend field if present, otherwise netProfit - realized
+    let unrealizedPnL;
+    if (summary.unrealized_pnl !== undefined && summary.unrealized_pnl !== null) {
+      unrealizedPnL = toNumber(summary.unrealized_pnl, 0);
+    } else {
+      unrealizedPnL = netProfit - realizedPnL;
+    }
+
+    // ROI: backend net_profit_percent is a fraction (e.g. 0.37),
+    // otherwise compute from current numbers.
+    let roiFraction;
+    if (summary.net_profit_percent !== undefined && summary.net_profit_percent !== null) {
+      roiFraction = toNumber(summary.net_profit_percent, 0);
+    } else {
+      roiFraction = deposits > 0 ? netProfit / deposits : 0;
+    }
+    const roiPercent = roiFraction * 100;
+
+    // ------------------------------
+    // Update NAV "bubbles" at the top
+    // ------------------------------
+    updateText("nav-portfolio-total", formatCurrency(portfolioTotal));
+    updateText("nav-cash", formatCurrency(cash));
+    updateText("nav-deposits", formatCurrency(deposits));
+    updateText("nav-profit", formatCurrency(netProfit, true));
+
+    // ------------------------------
+    // Update main summary table
+    // ------------------------------
+    updateText("summary-deposits", formatCurrency(deposits));
+    updateText("summary-cash", formatCurrency(cash));
+    updateText("summary-positions", formatCurrency(positionsValue));
+    updateText("summary-portfolio", formatCurrency(portfolioTotal));
+    updateText("summary-realized-pnl", formatCurrency(realizedPnL, true));
+    updateText("summary-unrealized-pnl", formatCurrency(unrealizedPnL, true));
+    updateText("summary-net-profit", formatCurrency(netProfit, true));
+    updateText("summary-roi", `${roiPercent.toFixed(2)}%`);
+
+    // ------------------------------
+    // Render tables (fills & settlements)
+    // ------------------------------
+    const fills = Array.isArray(data.fills_last_n_days)
+      ? data.fills_last_n_days
+      : [];
+    const settlements = Array.isArray(data.settlements_last_n_days)
+      ? data.settlements_last_n_days
+      : [];
+
+    renderFillsTable(fills);
+    renderSettlementsTable(settlements);
+
+    // ------------------------------
+    // Refresh label
+    // ------------------------------
+    const refreshIntervalLabel = document.getElementById(
+      "refresh-interval-label",
+    );
+    if (refreshIntervalLabel) {
+      refreshIntervalLabel.textContent = String(Math.round(REFRESH_MS / 1000));
+    }
+  } catch (err) {
+    console.error("Error loading summary:", err);
+  }
 }
 
-function toPercent(value) {
-  const n = Number(value || 0);
-  return `${n.toFixed(1)}%`;
+// ------------------------------
+// Helpers
+// ------------------------------
+function toNumber(value, fallback = 0) {
+  const num = Number(value);
+  return Number.isFinite(num) ? num : fallback;
 }
 
+function formatCurrency(value, showSign = false) {
+  const num = toNumber(value, 0);
+  const abs = Math.abs(num);
+  const sign =
+    showSign && num > 0
+      ? "+"
+      : showSign && num < 0
+      ? "-"
+      : "";
+  const formatted = abs.toLocaleString("en-US", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+  return sign ? `${sign}${formatted.slice(1)}` : formatted;
+}
+
+function updateText(id, text) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = text;
+}
+
+// Safely extract a timestamp (ms) from API objects
 function getSafeTimestamp(obj) {
-  if (!obj) return null;
-  const raw = obj.created_time || obj.ts || obj.timestamp || obj.updated_ts;
+  if (!obj || typeof obj !== "object") return null;
+  const raw =
+    obj.ts ??
+    obj.timestamp ??
+    obj.created_time ??
+    obj.createdTime ??
+    obj.settled_time ??
+    null;
   if (!raw) return null;
 
-  if (typeof raw === "string") {
-    const d = new Date(raw);
-    if (!isNaN(d)) return d.getTime();
-    return null;
-  }
-
-  if (typeof raw === "number") {
-    if (raw > 1e12) return raw; // ms
-    return raw * 1000; // s
-  }
-  return null;
+  // Assume backend uses ms; if it's too small, treat as seconds
+  const n = Number(raw);
+  if (!Number.isFinite(n)) return null;
+  if (n > 1_000_000_000_000) return n;
+  return n * 1000;
 }
 
-function formatTime(obj) {
-  const ts = getSafeTimestamp(obj);
-  if (!ts) return "-";
-  return new Date(ts).toLocaleString();
+function formatDateTime(tsMs) {
+  if (!tsMs) return "";
+  const d = new Date(tsMs);
+  return d.toLocaleString(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
 
-// Turn tickers into readable markets
+// ------------------------------
+// Human-readable ticker formatter
+// ------------------------------
 function formatTickerReadable(ticker) {
   if (!ticker || typeof ticker !== "string") return "";
 
-  const parts = ticker.split("-");
-  if (parts.length === 1) return ticker;
+  // NFL game example: KXNFLGAME-25NOV28CHIPHI-CHI
+  if (ticker.startsWith("KXNFLGAME-")) {
+    const parts = ticker.split("-");
+    if (parts.length >= 3) {
+      const dateTeams = parts[1]; // e.g. 25NOV28CHIPHI
+      const side = parts[2]; // CHI / PHI
 
-  const prefix = parts[0];
-  const rest = parts.slice(1).join("-");
+      if (dateTeams.length >= 13) {
+        const yy = dateTeams.slice(0, 2);
+        const mon = dateTeams.slice(2, 5).toUpperCase();
+        const dd = dateTeams.slice(5, 7);
+        const team1 = dateTeams.slice(7, 10).toUpperCase();
+        const team2 = dateTeams.slice(10, 13).toUpperCase();
 
-  let label;
-  switch (prefix) {
-    case "KXNFLGAME":
-      label = "NFL Game";
-      break;
-    case "KXNCAAFGAME":
-      label = "NCAA Football";
-      break;
-    case "KXHEISMAN":
-      label = "Heisman";
-      break;
-    case "KXZELENSKYYPUTINMEET":
-      label = "Zelenskyy–Putin Meet";
-      break;
-    case "KXHIGHAUS":
-      label = "HIGHAUS";
-      break;
-    default:
-      label = prefix.replace(/^KX/, "");
-      break;
-  }
-
-  const restPretty = rest.split("-").join(" • ");
-  return `${label} • ${restPretty}`;
-}
-
-function setSignedText(el, value) {
-  if (!el) return;
-  el.textContent = formatCurrency(value, true);
-  el.classList.remove("pos", "neg", "zero");
-  if (value > 0) el.classList.add("pos");
-  else if (value < 0) el.classList.add("neg");
-  else el.classList.add("zero");
-}
-
-// ---------------------- summary ---------------------- //
-
-function renderSummary(data) {
-  const account = data.account || {};
-  const stats = data.summary || {};
-
-  const cash = Number(account.cash || 0);
-  const positionsValue = Number(account.positions_value || 0);
-  const accountValue = Number(account.portfolio_total || 0);
-
-  const totalDeposits = Number(stats.total_deposits || 0);
-  const netProfit = Number(stats.net_profit || 0);
-  const realizedPnl = Number(stats.realized_pnl || 0);
-
-  // Derived on the frontend
-  const unrealizedPnl = netProfit - realizedPnl;
-  const roi =
-    totalDeposits > 0 ? (netProfit / totalDeposits) * 100.0 : 0.0;
-  const housePct =
-    accountValue > 0 ? (netProfit / accountValue) * 100.0 : 0.0;
-
-  // Navbar bubbles
-  const navAccount = document.getElementById("nav-account-value");
-  if (navAccount) navAccount.textContent = formatCurrency(accountValue);
-
-  const navNet = document.getElementById("nav-net-profit");
-  if (navNet) setSignedText(navNet, netProfit);
-
-  // Plain-English summary sentence
-  const summarySentence = document.getElementById("summary-sentence");
-  if (summarySentence) {
-    const depStr = formatCurrency(totalDeposits);
-    const accStr = formatCurrency(accountValue);
-    const profitStr = formatCurrency(netProfit, true);
-    const roiStr = toPercent(roi);
-    const cashStr = formatCurrency(cash);
-    const posStr = formatCurrency(positionsValue);
-
-    if (positionsValue > 0.005) {
-      // You have open bets
-      summarySentence.innerHTML =
-        `You’ve added <strong>${depStr}</strong>. ` +
-        `Right now your account is worth <strong>${accStr}</strong>, so you’re ` +
-        `<strong>${profitStr}</strong> (${roiStr}) overall. ` +
-        `That total is <strong>${cashStr}</strong> in cash and <strong>${posStr}</strong> in open bets.`;
-    } else {
-      // No open bets – everything is cash
-      summarySentence.innerHTML =
-        `You’ve added <strong>${depStr}</strong>. ` +
-        `You have no open bets right now and your cash is <strong>${cashStr}</strong>, ` +
-        `so you’re <strong>${profitStr}</strong> (${roiStr}) up and all of it is withdrawable.`;
+        const monthNames = {
+          JAN: "Jan",
+          FEB: "Feb",
+          MAR: "Mar",
+          APR: "Apr",
+          MAY: "May",
+          JUN: "Jun",
+          JUL: "Jul",
+          AUG: "Aug",
+          SEP: "Sep",
+          OCT: "Oct",
+          NOV: "Nov",
+          DEC: "Dec",
+        };
+        const monthLabel = monthNames[mon] || mon;
+        const dateLabel = `${monthLabel} ${dd}, 20${yy}`;
+        const matchup = `${team1} @ ${team2}`;
+        return `NFL Game • ${matchup} • ${dateLabel} • ${side}`;
+      }
     }
   }
 
-  // Metric cards
-  const elDeposits = document.getElementById("metric-deposits");
-  if (elDeposits) elDeposits.textContent = formatCurrency(totalDeposits);
+  // NCAA football example: KXNCAAFGAME-25NOV28TXAMTEX-TEX
+  if (ticker.startsWith("KXNCAAFGAME-")) {
+    const parts = ticker.split("-");
+    if (parts.length >= 3) {
+      const dateTeams = parts[1];
+      const side = parts[2];
+      if (dateTeams.length >= 13) {
+        const yy = dateTeams.slice(0, 2);
+        const mon = dateTeams.slice(2, 5).toUpperCase();
+        const dd = dateTeams.slice(5, 7);
+        const team1 = dateTeams.slice(7, 10).toUpperCase();
+        const team2 = dateTeams.slice(10, 13).toUpperCase();
 
-  const elAccount = document.getElementById("metric-account-value");
-  if (elAccount) elAccount.textContent = formatCurrency(accountValue);
-
-  const elCash = document.getElementById("metric-cash");
-  if (elCash) elCash.textContent = formatCurrency(cash);
-
-  const elPositions = document.getElementById("metric-positions-value");
-  if (elPositions) elPositions.textContent = formatCurrency(positionsValue);
-
-  setSignedText(document.getElementById("metric-net-profit"), netProfit);
-  setSignedText(
-    document.getElementById("metric-realized-pnl"),
-    realizedPnl
-  );
-  setSignedText(
-    document.getElementById("metric-unrealized-pnl"),
-    unrealizedPnl
-  );
-
-  const elRoi = document.getElementById("metric-roi");
-  if (elRoi) elRoi.textContent = toPercent(roi);
-
-  const elHouse = document.getElementById("metric-house-money");
-  if (elHouse) elHouse.textContent = toPercent(housePct);
-
-  const genEl = document.getElementById("summary-generated-at");
-  if (genEl && data.generated_at) {
-    const d = new Date(data.generated_at);
-    genEl.textContent = `Updated: ${d.toLocaleString()}`;
-  }
-}
-
-// ---------------------- charts ---------------------- //
-
-function renderCharts(data) {
-  const ctxPnl = document.getElementById("pnlChart");
-  const ctxBreakdown = document.getElementById("breakdownChart");
-  if (!ctxPnl || !ctxBreakdown) return;
-
-  const stats = data.summary || {};
-  const account = data.account || {};
-
-  const series = stats.cumulative_series || [];
-  const labels = series.map((p) =>
-    new Date(p.ts).toLocaleDateString()
-  );
-  const values = series.map((p) => Number(p.cumulative || 0));
-
-  if (pnlChart) pnlChart.destroy();
-  pnlChart = new Chart(ctxPnl, {
-    type: "line",
-    data: {
-      labels,
-      datasets: [
-        {
-          label: "Closed Bets P&L",
-          data: values,
-          tension: 0.2,
-        },
-      ],
-    },
-    options: {
-      plugins: {
-        legend: { display: false },
-      },
-      scales: {
-        x: {
-          ticks: { autoSkip: true, maxTicksLimit: 6 },
-        },
-      },
-    },
-  });
-
-  const cash = Number(account.cash || 0);
-  const positionsValue = Number(account.positions_value || 0);
-  const netProfit = Number(stats.net_profit || 0);
-
-  const breakdownLabels = ["Cash", "Money in Bets", "Overall Profit"];
-  const breakdownValues = [cash, positionsValue, netProfit];
-
-  if (breakdownChart) breakdownChart.destroy();
-  breakdownChart = new Chart(ctxBreakdown, {
-    type: "doughnut",
-    data: {
-      labels: breakdownLabels,
-      datasets: [
-        {
-          data: breakdownValues,
-        },
-      ],
-    },
-    options: {
-      plugins: {
-        legend: { position: "bottom" },
-      },
-    },
-  });
-}
-
-// ---------------------- trades (simple + table) ---------------------- //
-
-function renderFillsSimple(fills) {
-  const list = document.getElementById("fills-simple-list");
-  if (!list) return;
-  list.innerHTML = "";
-
-  if (!fills || !fills.length) {
-    const li = document.createElement("li");
-    li.className = "placeholder";
-    li.textContent = "No recent trades.";
-    list.appendChild(li);
-    return;
+        const monthNames = {
+          JAN: "Jan",
+          FEB: "Feb",
+          MAR: "Mar",
+          APR: "Apr",
+          MAY: "May",
+          JUN: "Jun",
+          JUL: "Jul",
+          AUG: "Aug",
+          SEP: "Sep",
+          OCT: "Oct",
+          NOV: "Nov",
+          DEC: "Dec",
+        };
+        const monthLabel = monthNames[mon] || mon;
+        const dateLabel = `${monthLabel} ${dd}, 20${yy}`;
+        const matchup = `${team1} @ ${team2}`;
+        return `NCAA Football • ${matchup} • ${dateLabel} • ${side}`;
+      }
+    }
   }
 
-  const sorted = [...fills].sort(
-    (a, b) => (getSafeTimestamp(b) || 0) - (getSafeTimestamp(a) || 0)
-  );
-  const top = sorted.slice(0, 12);
-
-  for (const f of top) {
-    const li = document.createElement("li");
-
-    const size =
-      f.count ??
-      f.size ??
-      f.quantity ??
-      f.contracts ??
-      f.contracts_count ??
-      0;
-    const price = Number(f.price || 0);
-    const cost = Number(size) * price;
-
-    const main = document.createElement("div");
-    main.className = "trade-main-line";
-
-    const timeSpan = document.createElement("span");
-    timeSpan.className = "trade-time";
-    timeSpan.textContent = formatTime(f);
-
-    const marketSpan = document.createElement("span");
-    marketSpan.className = "trade-market";
-    marketSpan.textContent = formatTickerReadable(
-      f.ticker || f.market || ""
-    );
-
-    const actionSpan = document.createElement("span");
-    actionSpan.className =
-      "trade-action " +
-      ((f.action || "").toLowerCase() === "buy"
-        ? "trade-buy"
-        : "trade-sell");
-    actionSpan.textContent = (f.action || "").toUpperCase();
-
-    main.appendChild(timeSpan);
-    main.appendChild(document.createTextNode(" • "));
-    main.appendChild(marketSpan);
-    main.appendChild(document.createTextNode(" • "));
-    main.appendChild(actionSpan);
-
-    const extra = document.createElement("div");
-    extra.className = "trade-extra";
-    extra.textContent = `${size} contracts at ${price.toFixed(
-      2
-    )}  → cost $${cost.toFixed(2)}`;
-
-    li.appendChild(main);
-    li.appendChild(extra);
-    list.appendChild(li);
-  }
+  // Heisman / politics / other: just return something readable
+  return ticker;
 }
 
+// ------------------------------
+// Fills table
+// ------------------------------
 function renderFillsTable(fills) {
   const tbody = document.getElementById("fills-table-body");
   if (!tbody) return;
+
   tbody.innerHTML = "";
 
-  if (!fills || !fills.length) {
+  if (!fills.length) {
     const tr = document.createElement("tr");
     const td = document.createElement("td");
     td.colSpan = 6;
     td.className = "placeholder";
-    td.textContent = "No recent trades.";
+    td.textContent = "No recent fills in this window";
     tr.appendChild(td);
     tbody.appendChild(tr);
     return;
   }
 
   const sorted = [...fills].sort(
-    (a, b) => (getSafeTimestamp(b) || 0) - (getSafeTimestamp(a) || 0)
+    (a, b) => (getSafeTimestamp(b) || 0) - (getSafeTimestamp(a) || 0),
   );
 
   for (const f of sorted) {
     const tr = document.createElement("tr");
 
-    const size =
-      f.count ??
-      f.size ??
-      f.quantity ??
-      f.contracts ??
-      f.contracts_count ??
-      0;
-    const price = Number(f.price || 0);
-    const cost = Number(size) * price;
+    const tsMs = getSafeTimestamp(f);
+    const timeCell = formatDateTime(tsMs);
 
-    tr.innerHTML = `
-      <td>${formatTime(f)}</td>
-      <td>${formatTickerReadable(f.ticker || f.market || "")}</td>
-      <td>${(f.action || "").toUpperCase()}</td>
-      <td>${size}</td>
-      <td>${price.toFixed(2)}</td>
-      <td>${cost.toFixed(2)}</td>
-    `;
+    const ticker = f.ticker ?? f.market_ticker ?? "";
+    const side = (f.action ?? "").toUpperCase();
+    const size = toNumber(f.size ?? f.count, 0);
+    const price = toNumber(f.price, 0);
+    const cost = size * price;
+
+    const tds = [
+      timeCell,
+      formatTickerReadable(ticker),
+      side || "",
+      size.toString(),
+      price.toFixed(2),
+      formatCurrency(cost),
+    ];
+
+    for (const text of tds) {
+      const td = document.createElement("td");
+      td.textContent = text;
+      tr.appendChild(td);
+    }
 
     tbody.appendChild(tr);
   }
 }
 
+// ------------------------------
+// Settlements table
+// ------------------------------
+function extractCashChange(settlement) {
+  const raw = settlement.cash_change ?? settlement.cashChange;
+  if (raw === null || raw === undefined) return null;
+  return Number(raw);
+}
+
 function renderSettlementsTable(settlements) {
   const tbody = document.getElementById("settlements-table-body");
   if (!tbody) return;
+
   tbody.innerHTML = "";
 
-  if (!settlements || !settlements.length) {
+  if (!settlements.length) {
     const tr = document.createElement("tr");
     const td = document.createElement("td");
     td.colSpan = 4;
     td.className = "placeholder";
-    td.textContent = "No recent settlements.";
+    td.textContent = "No settlements in the selected window";
     tr.appendChild(td);
     tbody.appendChild(tr);
     return;
   }
 
   const sorted = [...settlements].sort(
-    (a, b) => (getSafeTimestamp(b) || 0) - (getSafeTimestamp(a) || 0)
+    (a, b) => (getSafeTimestamp(b) || 0) - (getSafeTimestamp(a) || 0),
   );
 
   for (const s of sorted) {
     const tr = document.createElement("tr");
-    const cashChange =
-      Number(s.cash_change ?? s.cashChange ?? 0);
 
-    const cashCell = document.createElement("td");
-    cashCell.textContent = formatCurrency(cashChange, true);
-    cashCell.classList.add(
-      cashChange > 0 ? "pos" : cashChange < 0 ? "neg" : "zero"
-    );
+    const tsMs = getSafeTimestamp(s);
+    const when = formatDateTime(tsMs);
 
-    tr.innerHTML = `
-      <td>${formatTime(s)}</td>
-      <td>${formatTickerReadable(s.ticker || s.market || "")}</td>
-      <td>${s.outcome || s.final_position || s.finalPosition || ""}</td>
-    `;
-    tr.appendChild(cashCell);
+    const ticker = s.ticker ?? s.market_ticker ?? "";
+    const readableTicker = formatTickerReadable(ticker);
+
+    const rawChange = extractCashChange(s);
+    const isWin = rawChange !== null && rawChange > 0;
+    const isLoss = rawChange !== null && rawChange < 0;
+    const pnlText =
+      rawChange === null ? "" : formatCurrency(rawChange / 100, true); // settlements often in cents
+
+    const tds = [
+      when,
+      readableTicker,
+      isWin ? "Win" : isLoss ? "Loss" : "",
+      pnlText,
+    ];
+
+    for (const text of tds) {
+      const td = document.createElement("td");
+      td.textContent = text;
+      tr.appendChild(td);
+    }
+
     tbody.appendChild(tr);
   }
 }
 
-// ---------------------- fetch + boot ---------------------- //
-
-async function fetchAndRender() {
-  try {
-    const resp = await fetch(`${JSON_URL}?t=${Date.now()}`);
-    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-    const data = await resp.json();
-
-    renderSummary(data);
-    renderCharts(data);
-    renderFillsSimple(data.fills_last_n_days || []);
-    renderFillsTable(data.fills_last_n_days || []);
-    renderSettlementsTable(data.settlements_last_n_days || []);
-  } catch (err) {
-    console.error("Failed to fetch summary JSON:", err);
-  }
-}
-
+// ------------------------------
+// Boot the app
+// ------------------------------
 document.addEventListener("DOMContentLoaded", () => {
   fetchAndRender();
   setInterval(fetchAndRender, REFRESH_MS);
+
+  const refreshButton = document.getElementById("refresh-button");
+  if (refreshButton) {
+    refreshButton.addEventListener("click", () => {
+      fetchAndRender();
+    });
+  }
 });
