@@ -2,14 +2,14 @@ name: Update Kalshi Data
 
 on:
   schedule:
-    - cron: '*/30 * * * *'  # Run every 30 mins
-  workflow_dispatch:        # Allow manual button click
+    - cron: '*/30 * * * *'  # Every 30 minutes
+  workflow_dispatch:        # Manual trigger
 
 jobs:
   update-dashboard:
     runs-on: ubuntu-latest
     permissions:
-      contents: write       # CRITICAL: Allows the bot to write to the repo
+      contents: write       # REQUIRED for git push
 
     steps:
       - name: Checkout Code
@@ -23,6 +23,7 @@ jobs:
       - name: Install Dependencies
         run: |
           pip install --upgrade pip
+          # Including cryptography is critical for Kalshi keys
           pip install kalshi-python python-dotenv cryptography pydantic
 
       - name: Run Backend Script
@@ -32,23 +33,23 @@ jobs:
         run: |
           python backend/kalshi_dashboard.py
 
-      # DEBUG STEP: This will show us if the file was actually created
-      - name: Verify File Generation
+      - name: DEBUG - Verify File Exists
         run: |
-          echo "Listing frontend/data directory:"
-          ls -R frontend/data || echo "Directory not found!"
+          echo "Checking if file was created..."
+          ls -R frontend/data
+          echo "--------------------------------"
 
-      - name: Commit and Push Data
+      - name: Commit and Push
         run: |
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
           
-          # Force add all changes in the data folder
+          # Force add the file
           git add frontend/data/kalshi_summary.json
           
-          # Check status to see if git sees the change
+          # Check if git sees the change
           git status
           
-          # Commit and Push
-          git commit -m "Auto-update dashboard data [skip ci]" || echo "No changes to commit"
+          # Commit and push
+          git commit -m "Auto-update data" || echo "No changes to commit"
           git push
