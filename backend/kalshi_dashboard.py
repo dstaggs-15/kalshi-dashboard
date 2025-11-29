@@ -99,6 +99,7 @@ def load_kalshi_client() -> KalshiClient:
             "KALSHI_PRIVATE_KEY in your environment or .env file."
         )
 
+    # Official host from docs
     config = Configuration(
         host="https://api.elections.kalshi.com/trade-api/v2"
     )
@@ -255,13 +256,14 @@ def generate_summary_json(days: int = 365):
 
     # ----- 1) Account-level numbers: use get_balance directly -----
     balance_resp = client.get_balance()
+
+    # Official response fields: balance, portfolio_value, updated_ts
+    # https://docs.kalshi.com/api-reference/portfolio/get-balance
     balance_cents = getattr(balance_resp, "balance", 0) or 0
     portfolio_cents = getattr(balance_resp, "portfolio_value", None)
     if portfolio_cents is None:
-        # Fallback: treat as cash only (rare / defensive)
         portfolio_cents = balance_cents
 
-    # Money in bets (positions) = portfolio_value - cash
     positions_cents = portfolio_cents - balance_cents
     if positions_cents < 0:
         positions_cents = 0
@@ -273,6 +275,8 @@ def generate_summary_json(days: int = 365):
         "positions_value": positions_cents / 100.0,
         "portfolio_total": portfolio_cents / 100.0,
         "updated_ts": getattr(balance_resp, "updated_ts", None),
+        # debug: see exactly what Kalshi returned if something is weird
+        "raw_balance_response": to_dict(balance_resp),
     }
 
     # ----- 2) Trading activity for realized P&L -----
@@ -284,15 +288,15 @@ def generate_summary_json(days: int = 365):
     settlements_dict = [to_dict(s) for s in settlements]
 
     # ----- 3) Deposits, net profit, unrealized P&L -----
-    # DEFAULT: if env var is missing or invalid, assume you've deposited $40.
+    # DEFAULT: assume you've deposited $40 unless TOTAL_DEPOSITS overrides it.
     total_deposits_env = os.getenv("TOTAL_DEPOSITS")
-    if total_deposits_env:
+    if total_deposits_env is None or total_deposits_env.strip() == "":
+        total_deposits = 40.0
+    else:
         try:
             total_deposits = float(total_deposits_env)
         except Exception:
             total_deposits = 40.0
-    else:
-        total_deposits = 40.0
 
     portfolio_total = account["portfolio_total"]
     realized_pnl = stats.get("realized_pnl", 0.0)
@@ -300,13 +304,13 @@ def generate_summary_json(days: int = 365):
 
     net_profit = portfolio_total - total_deposits
 
-    # If you have no open positions, treat all profit as realized for the UI.
+    # If you have no open positions, treat everything as realized from a UX POV.
     if positions_value <= 1e-6:
         unrealized_pnl = 0.0
     else:
         unrealized_pnl = net_profit - realized_pnl
 
-    # Store ROI as a fraction (e.g. 0.37 = 37%), frontend multiplies by 100.
+    # ROI stored as fraction; frontend multiplies by 100.
     net_profit_percent = (
         (net_profit / total_deposits) if total_deposits > 0 else 0.0
     )
