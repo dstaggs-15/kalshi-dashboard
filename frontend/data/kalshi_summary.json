@@ -1,18 +1,25 @@
 {
     "meta": {
-        "updated_at": "2025-11-29 06:13:22"
+        "updated_at": "2025-11-29 06:47:04"
     },
     "account": {
-        "cash_balance": 61.01,
-        "total_account_value": 61.01,
+        "cash_balance": 56.2,
+        "total_account_value": 56.2,
         "money_in_bets": 0.0
     },
     "summary": {
         "total_deposits": 40.0,
-        "net_profit": 21.009999999999998,
-        "roi_percent": 52.525
+        "net_profit": 16.200000000000003,
+        "roi_percent": 40.50000000000001
     },
     "fills": [
+        {
+            "ticker": "KXNCAAFGAME-25NOV29OSUMICH-MICH",
+            "side": "yes",
+            "count": 19,
+            "price_cents": 0.24,
+            "created_time": "2025-11-29T06:38:58.313193+00:00"
+        },
         {
             "ticker": "KXNCAAFGAME-25NOV28ARIZASU-ASU",
             "side": "yes",
