@@ -1,6 +1,6 @@
 {
     "meta": {
-        "updated_at": "2025-11-29 04:14:03"
+        "updated_at": "2025-11-29 04:18:32"
     },
     "account": {
         "cash_balance": 0.0,
@@ -9,9 +9,12 @@
     },
     "summary": {
         "total_deposits": 40.0,
-        "net_profit": -40.0,
-        "roi_percent": -100.0
+        "net_profit": 0.0,
+        "roi_percent": 0.0
     },
     "fills": [],
-    "settlements": []
+    "settlements": [],
+    "debug_log": [
+        "CRASH: (401)\nReason: Unauthorized\nHTTP response headers: HTTPHeaderDict({'Content-Type': 'application/json; charset=utf-8', 'Content-Length': '90', 'Connection': 'keep-alive', 'Date': 'Sat, 29 Nov 2025 04:18:33 GMT', 'x-content-type-options': 'nosniff', 'content-security-policy': \"default-src 'none';\", 'strict-transport-security': 'max-age=31536000; includeSubDomains', 'X-Cache': 'Error from cloudfront', 'Via': '1.1 a7b67f176c6a9811fa4e156a6a04ab76.cloudfront.net (CloudFront)', 'X-Amz-Cf-Pop': 'PIT50-P2', 'X-Amz-Cf-Id': 'tdewuo_9rz8FDw5W2bTXdwsiNs5g0AdIz-vmxsBNZsPuOiw9WtN9GA=='})\nHTTP response body: error=ErrorResponseError(code='token_authentication_failure', message='token authentication failure', details=None)\n"
+    ]
 }
