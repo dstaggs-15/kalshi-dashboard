@@ -14,11 +14,10 @@ from kalshi_python import Configuration, KalshiClient
 def load_kalshi_client() -> KalshiClient:
     """
     Load Kalshi client using API keys from env / .env.
-    Expects:
 
+    Required env vars:
       KALSHI_API_KEY_ID  - your API key id
       KALSHI_PRIVATE_KEY - your PEM private key (single line or with \n)
-
     """
     load_dotenv()
 
@@ -37,6 +36,28 @@ def load_kalshi_client() -> KalshiClient:
     config.private_key_pem = private_key
 
     return KalshiClient(config)
+
+
+# ============================================================
+# Helpers for balance fields
+# ============================================================
+
+
+def _get_first_field(obj, names, default=0):
+    """
+    Helper: try several possible attribute / dict names and return
+    the first non-None value.
+    """
+    for name in names:
+        # attribute-style
+        if hasattr(obj, name):
+            val = getattr(obj, name)
+            if val is not None:
+                return val
+        # dict-style
+        if isinstance(obj, dict) and name in obj and obj[name] is not None:
+            return obj[name]
+    return default
 
 
 # ============================================================
@@ -77,8 +98,8 @@ def fetch_settlements_last_n_days(client: KalshiClient, days: int = 1):
     """
     Fetch settlements from the last N days.
 
-    The SDK's get_settlements() does NOT support min_ts/max_ts,
-    so we paginate everything and filter by timestamp locally.
+    get_settlements() may not support min_ts/max_ts, so we paginate
+    and filter locally by timestamp.
     """
     now = datetime.utcnow()
     min_ts = int((now - timedelta(days=days)).timestamp())
@@ -95,7 +116,7 @@ def fetch_settlements_last_n_days(client: KalshiClient, days: int = 1):
             if ts_val is None:
                 continue
 
-            # Normalize to seconds if we get ms
+            # Normalize to seconds if needed
             if ts_val > 10_000_000_000:
                 ts_val = int(ts_val / 1000)
 
@@ -152,7 +173,7 @@ def get_ts_ms(obj):
 
 
 # ============================================================
-# Core stats
+# Core stats (invested, realized, etc.)
 # ============================================================
 
 
@@ -177,7 +198,7 @@ def compute_stats(fills, settlements):
     for f in fills:
         size = getattr(f, "size", None)
         if size is None:
-            size = getattr(f, "count", 0)  # Kalshi sometimes uses "count"
+            size = getattr(f, "count", 0)  # some payloads use "count"
         price = float(getattr(f, "price", 0.0) or 0.0)
         cost = float(size) * price
 
@@ -284,15 +305,52 @@ def to_dict(obj):
 def generate_summary_json(days: int = 365):
     """
     Pulls data from Kalshi, computes stats, and writes data/kalshi_summary.json
+
+    JSON structure:
+
+      {
+        "generated_at": "...",
+        "lookback_days": 365,
+        "account": { ... },
+        "fills_last_n_days": [...],
+        "settlements_last_n_days": [...],
+        "summary": { ... }
+      }
     """
     client = load_kalshi_client()
 
-    # ---------- 1) Account-level numbers (matches Kalshi app) ----------
+    # ---------- 1) Account-level numbers ----------
     balance_resp = client.get_balance()
-    balance_cents = getattr(balance_resp, "balance", 0) or 0
-    portfolio_cents = getattr(balance_resp, "portfolio_value", 0) or 0
 
-    # portfolio_value returned by Kalshi already includes cash.
+    # Raw cents from whichever fields the SDK actually uses
+    balance_cents = int(
+        _get_first_field(
+            balance_resp,
+            ["balance", "cash", "cash_balance", "cash_cents"],
+            0,
+        )
+        or 0
+    )
+
+    portfolio_cents = int(
+        _get_first_field(
+            balance_resp,
+            [
+                "portfolio_value",
+                "portfolio_value_cents",
+                "portfolioValue",
+                "account_value",
+                "account_value_cents",
+            ],
+            balance_cents,  # fallback: at least equal to cash
+        )
+        or 0
+    )
+
+    # portfolio_cents should be >= cash; clamp if needed
+    if portfolio_cents < balance_cents:
+        portfolio_cents = balance_cents
+
     positions_cents = max(portfolio_cents - balance_cents, 0)
 
     cash = balance_cents / 100.0
@@ -315,8 +373,8 @@ def generate_summary_json(days: int = 365):
     stats = compute_stats(fills, settlements)
 
     # ---------- 3) Deposits & P&L ----------
-    # For now: hard-code $40 of deposits.
-    # Later: you can override with env var TOTAL_DEPOSITS.
+
+    # For now: default to $40 of deposits unless overridden.
     env_val = os.getenv("TOTAL_DEPOSITS")
     if env_val:
         try:
