@@ -1,12 +1,15 @@
 document.addEventListener("DOMContentLoaded", () => {
-    // FIX: Pointing to the 'data' folder inside 'frontend'
-    // Added ?t=timestamp to prevent the browser from caching old data
-    const dataPath = 'frontend/data/kalshi_summary.json';
+    // LOCATION FIX: 
+    // Since index.html is in 'frontend/' and the json is in 'frontend/data/',
+    // we use the relative path 'data/kalshi_summary.json'.
+    const dataPath = 'data/kalshi_summary.json';
     
+    // We add a timestamp (?t=...) to force the browser to load new data 
+    // instead of showing cached zeros.
     fetch(`${dataPath}?t=${new Date().getTime()}`)
         .then(response => {
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                throw new Error(`Could not find file at ${dataPath}`);
             }
             return response.json();
         })
@@ -14,8 +17,8 @@ document.addEventListener("DOMContentLoaded", () => {
         .catch(err => {
             console.error("Error loading data:", err);
             document.getElementById('narrative-text').innerHTML = 
-                `<span style="color: red;">Error: Could not load data from ${dataPath}.<br>
-                Make sure the backend script has run successfully.</span>`;
+                `<span style="color: red;">Error: Could not read data.<br>
+                Looking for: <strong>frontend/${dataPath}</strong></span>`;
         });
 });
 
@@ -30,16 +33,15 @@ function renderDashboard(data) {
     const acc = data.account;
     const sum = data.summary;
 
-    // 1. HEADER UPDATES
+    // 1. HEADER
     document.getElementById('last-updated').innerText = "Updated: " + data.meta.updated_at;
     document.getElementById('hero-total-val').innerText = formatMoney(acc.total_account_value);
     
-    // Profit coloring
     const profitElem = document.getElementById('hero-profit');
     profitElem.innerText = formatMoney(sum.net_profit);
     profitElem.className = sum.net_profit >= 0 ? "hero-value positive" : "hero-value negative";
 
-    // 2. METRIC CARDS
+    // 2. CARDS
     document.getElementById('val-deposits').innerText = formatMoney(sum.total_deposits);
     document.getElementById('val-cash').innerText = formatMoney(acc.cash_balance);
     document.getElementById('val-bets').innerText = formatMoney(acc.money_in_bets);
@@ -48,10 +50,10 @@ function renderDashboard(data) {
     roiElem.innerText = sum.roi_percent.toFixed(1) + "%";
     roiElem.className = sum.roi_percent >= 0 ? "metric-value positive" : "metric-value negative";
 
-    // 3. NARRATIVE TEXT
+    // 3. NARRATIVE
     const narrative = `
         You have put in <strong>${formatMoney(sum.total_deposits)}</strong>. 
-        Currently, you have <strong>${formatMoney(acc.cash_balance)}</strong> in cash and 
+        You currently have <strong>${formatMoney(acc.cash_balance)}</strong> in cash and 
         <strong>${formatMoney(acc.money_in_bets)}</strong> in active bets.
     `;
     document.getElementById('narrative-text').innerHTML = narrative;
@@ -73,7 +75,7 @@ function renderDashboard(data) {
             fillsTable.appendChild(row);
         });
     } else {
-        fillsTable.innerHTML = '<tr><td colspan="5">No trades found.</td></tr>';
+        fillsTable.innerHTML = '<tr><td colspan="5">No trades found in JSON.</td></tr>';
     }
 
     // 5. SETTLEMENTS TABLE
@@ -93,6 +95,6 @@ function renderDashboard(data) {
             setTable.appendChild(row);
         });
     } else {
-        setTable.innerHTML = '<tr><td colspan="4">No settlements found.</td></tr>';
+        setTable.innerHTML = '<tr><td colspan="4">No settlements found in JSON.</td></tr>';
     }
 }
