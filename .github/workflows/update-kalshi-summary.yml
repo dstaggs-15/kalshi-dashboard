@@ -2,14 +2,14 @@ name: Update Kalshi Data
 
 on:
   schedule:
-    - cron: '*/30 * * * *'  # Runs every 30 minutes
-  workflow_dispatch:        # Allows manual run button
+    - cron: '*/30 * * * *'  # Run every 30 mins
+  workflow_dispatch:        # Allow manual button click
 
 jobs:
   update-dashboard:
     runs-on: ubuntu-latest
     permissions:
-      contents: write       # REQUIRED to push the JSON file back
+      contents: write       # CRITICAL: Allows the bot to write to the repo
 
     steps:
       - name: Checkout Code
@@ -20,21 +20,35 @@ jobs:
         with:
           python-version: '3.11'
 
-      # FIX HERE: Added 'cryptography' to the install list
       - name: Install Dependencies
         run: |
-          pip install kalshi-python python-dotenv cryptography
+          pip install --upgrade pip
+          pip install kalshi-python python-dotenv cryptography pydantic
 
       - name: Run Backend Script
         env:
           KALSHI_API_KEY_ID: ${{ secrets.KALSHI_API_KEY_ID }}
           KALSHI_PRIVATE_KEY: ${{ secrets.KALSHI_PRIVATE_KEY }}
-        run: python backend/kalshi_dashboard.py
+        run: |
+          python backend/kalshi_dashboard.py
 
-      - name: Commit and Push Changes
+      # DEBUG STEP: This will show us if the file was actually created
+      - name: Verify File Generation
+        run: |
+          echo "Listing frontend/data directory:"
+          ls -R frontend/data || echo "Directory not found!"
+
+      - name: Commit and Push Data
         run: |
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
+          
+          # Force add all changes in the data folder
           git add frontend/data/kalshi_summary.json
-          git commit -m "Auto-update dashboard data" || echo "No changes to commit"
+          
+          # Check status to see if git sees the change
+          git status
+          
+          # Commit and Push
+          git commit -m "Auto-update dashboard data [skip ci]" || echo "No changes to commit"
           git push
