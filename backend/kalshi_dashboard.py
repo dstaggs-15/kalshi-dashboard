@@ -16,7 +16,6 @@ def serialize_dates(obj):
     return str(obj)
 
 def save_json(data):
-    """Guaranteed save function"""
     try:
         os.makedirs(os.path.dirname(OUTPUT_FILE), exist_ok=True)
         with open(OUTPUT_FILE, "w") as f:
@@ -27,7 +26,7 @@ def save_json(data):
         traceback.print_exc()
 
 def main():
-    print("--- STARTING FAIL-SAFE SCRIPT ---")
+    print("--- STARTING FINAL FIX SCRIPT ---")
     
     final_data = {
         "meta": {"updated_at": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")},
@@ -45,23 +44,31 @@ def main():
         api_key_id = os.getenv("KALSHI_API_KEY_ID")
         private_key = os.getenv("KALSHI_PRIVATE_KEY")
         
-        if not api_key_id or not private_key:
-            raise ValueError("Missing Environment Variables")
+        if not api_key_id:
+            raise ValueError("Missing KALSHI_API_KEY_ID")
+        if not private_key:
+            raise ValueError("Missing KALSHI_PRIVATE_KEY")
 
-        # Fix Key Newlines
+        # FIX: Handle newlines if they got mashed by GitHub
         if "\\n" in private_key:
             private_key = private_key.replace("\\n", "\n")
 
-        # 2. API CONNECTION
+        # 2. KEY VALIDATION (Debug the 401 error)
+        if "-----BEGIN RSA PRIVATE KEY-----" not in private_key:
+            error_msg = "KEY ERROR: Your Private Key is missing the header '-----BEGIN RSA PRIVATE KEY-----'. You likely pasted only the middle part."
+            final_data["debug_log"].append(error_msg)
+            raise ValueError(error_msg)
+
+        # 3. API CONNECTION
         config = Configuration()
-        # FIX: CHANGED TO STANDARD PRODUCTION API
-        config.host = "https://api.kalshi.com/trade-api/v2"
+        # REVERTED TO THE CORRECT HOST
+        config.host = "https://api.elections.kalshi.com/trade-api/v2"
         config.api_key_id = api_key_id
         config.private_key = private_key
         
         client = KalshiClient(config)
         
-        # 3. FETCH DATA
+        # 4. FETCH DATA
         print("Fetching Balance...")
         balance = client.get_balance()
         
@@ -71,7 +78,7 @@ def main():
         if raw_port == 0 and raw_bal > 0:
             raw_port = raw_bal + getattr(balance, 'collateral', 0)
 
-        # 4. FETCH HISTORY
+        # 5. FETCH HISTORY
         clean_fills = []
         try:
             print("Fetching Fills...")
@@ -85,7 +92,7 @@ def main():
                     "created_time": getattr(f, 'created_time', '')
                 })
         except Exception as e:
-            final_data["debug_log"].append(f"Fills Error: {str(e)}")
+            final_data["debug_log"].append(f"Fills Warning: {str(e)}")
 
         clean_settlements = []
         try:
@@ -99,9 +106,9 @@ def main():
                     "settled_time": getattr(s, 'settled_time', '')
                 })
         except Exception as e:
-            final_data["debug_log"].append(f"Settlements Error: {str(e)}")
+            final_data["debug_log"].append(f"Settlements Warning: {str(e)}")
 
-        # 5. POPULATE DATA
+        # 6. POPULATE DATA
         cash = raw_bal / 100.0
         total = raw_port / 100.0
         bets = max(total - cash, 0.0)
