@@ -2,53 +2,52 @@ name: Update Kalshi Data
 
 on:
   schedule:
-    - cron: '*/30 * * * *'  # Runs every 30 minutes
-  workflow_dispatch:        # Manual trigger
+    - cron: '*/30 * * * *'  # Every 30 minutes
+  workflow_dispatch:        # Manual run button
+
+permissions:
+  contents: write           # CRITICAL: Gives permission to push
 
 jobs:
   update-dashboard:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write       # Requests write access
-
+    
     steps:
+      # 1. Checkout the MAIN branch specifically (prevents "Detached Head" error)
       - name: Checkout Code
         uses: actions/checkout@v3
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          ref: main
 
+      # 2. Setup Python
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
 
+      # 3. Install Libraries (Force reinstall of everything needed)
       - name: Install Dependencies
         run: |
           pip install --upgrade pip
           pip install kalshi-python python-dotenv cryptography pydantic
 
+      # 4. Run the Script
       - name: Run Backend Script
         env:
           KALSHI_API_KEY_ID: ${{ secrets.KALSHI_API_KEY_ID }}
           KALSHI_PRIVATE_KEY: ${{ secrets.KALSHI_PRIVATE_KEY }}
-        run: |
-          python backend/kalshi_dashboard.py
+        run: python backend/kalshi_dashboard.py
 
-      - name: Debug - List Files
+      # 5. DEBUG: Prove the file exists before trying to commit
+      - name: Verify File Generation
         run: |
-          echo "Checking for generated file..."
-          ls -l frontend/data/kalshi_summary.json || echo "File not found!"
+          ls -l frontend/data/kalshi_summary.json || echo "FILE WAS NOT CREATED"
 
+      # 6. THE NUCLEAR COMMIT OPTION
+      # This action handles all the git logic automatically.
       - name: Commit and Push
-        run: |
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "actions@github.com"
-          
-          # Force add the data file
-          git add frontend/data/kalshi_summary.json
-          
-          # Commit (allow empty if no changes)
-          git commit -m "Auto-update Kalshi data" || echo "No changes to commit"
-          
-          # PUSH FIX: Explicitly push to the main branch
-          git push origin HEAD:main
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Auto-update Kalshi dashboard data
+          file_pattern: frontend/data/kalshi_summary.json
+          branch: main
