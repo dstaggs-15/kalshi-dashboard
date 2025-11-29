@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kalshi Portfolio Dashboard</title>
+    <title>Kalshi Dashboard</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -11,65 +11,43 @@
     <div class="container">
         <header>
             <div class="header-content">
-                <h1>Kalshi Portfolio Dashboard</h1>
-                <p class="subtitle">Simple view of where your money is.</p>
+                <h1>Kalshi Dashboard</h1>
                 <div class="last-updated" id="last-updated">Updated: Loading...</div>
             </div>
             
             <div class="hero-stats">
                 <div class="hero-card">
-                    <span class="hero-label">TOTAL ACCOUNT VALUE</span>
+                    <span class="hero-label">TOTAL VALUE</span>
                     <span class="hero-value" id="hero-total-val">$0.00</span>
                 </div>
                 <div class="hero-card">
-                    <span class="hero-label">OVERALL PROFIT / LOSS</span>
+                    <span class="hero-label">PROFIT / LOSS</span>
                     <span class="hero-value" id="hero-profit">$0.00</span>
                 </div>
             </div>
         </header>
 
         <section class="narrative">
-            <p id="narrative-text">Loading account details...</p>
+            <p id="narrative-text">Loading data...</p>
         </section>
 
         <div class="metrics-grid">
-            
             <div class="metric-card">
-                <h3>MONEY YOU ADDED</h3>
+                <h3>DEPOSITED</h3>
                 <p class="metric-value" id="val-deposits">$0.00</p>
-                <details>
-                    <summary>What is this?</summary>
-                    <p>Total cash you have deposited into Kalshi from your bank.</p>
-                </details>
             </div>
-
             <div class="metric-card">
-                <h3>CASH YOU CAN TAKE OUT</h3>
+                <h3>CASH</h3>
                 <p class="metric-value" id="val-cash">$0.00</p>
-                <details>
-                    <summary>What is this?</summary>
-                    <p>Money sitting in your account right now, available to withdraw or bet.</p>
-                </details>
             </div>
-
             <div class="metric-card">
-                <h3>MONEY IN BETS</h3>
+                <h3>IN BETS</h3>
                 <p class="metric-value" id="val-bets">$0.00</p>
-                <details>
-                    <summary>What is this?</summary>
-                    <p>The portion of your account value currently tied up in open contracts.</p>
-                </details>
             </div>
-
             <div class="metric-card">
-                <h3>OVERALL RETURN (%)</h3>
+                <h3>ROI %</h3>
                 <p class="metric-value" id="val-roi">0%</p>
-                <details>
-                    <summary>What is this?</summary>
-                    <p>Your total profit divided by your total deposits.</p>
-                </details>
             </div>
-
         </div>
 
         <section class="data-tables">
@@ -77,36 +55,22 @@
             <div class="table-wrapper">
                 <table id="fills-table">
                     <thead>
-                        <tr>
-                            <th>Time</th>
-                            <th>Market</th>
-                            <th>Side</th>
-                            <th>Count</th>
-                            <th>Price (¢)</th>
-                        </tr>
+                        <tr><th>Date</th><th>Ticker</th><th>Side</th><th>Qty</th><th>Price</th></tr>
                     </thead>
-                    <tbody>
-                        </tbody>
+                    <tbody></tbody>
                 </table>
             </div>
 
-            <h2>Recent Settlements</h2>
+            <h2>Settlements</h2>
             <div class="table-wrapper">
                 <table id="settlements-table">
                     <thead>
-                        <tr>
-                            <th>Time</th>
-                            <th>Ticker</th>
-                            <th>Outcome</th>
-                            <th>Payout ($)</th>
-                        </tr>
+                        <tr><th>Date</th><th>Ticker</th><th>Outcome</th><th>Payout</th></tr>
                     </thead>
-                    <tbody>
-                        </tbody>
+                    <tbody></tbody>
                 </table>
             </div>
         </section>
-
     </div>
 
     <script src="script.js"></script>
