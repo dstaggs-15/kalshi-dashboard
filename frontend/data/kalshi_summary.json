@@ -1,22 +1,38 @@
 {
     "meta": {
-        "updated_at": "2025-11-29 23:08:52"
+        "updated_at": "2025-11-29 23:33:50"
     },
     "account": {
-        "cash_balance": 49.42,
-        "total_account_value": 49.42,
+        "cash_balance": 55.83,
+        "total_account_value": 55.83,
         "money_in_bets": 0.0,
-        "cash_balance_cents": 4942,
-        "portfolio_value_cents_api": 4942,
-        "total_account_value_api": 49.42,
+        "cash_balance_cents": 5583,
+        "portfolio_value_cents_api": 5583,
+        "total_account_value_api": 55.83,
         "positions_exposure_cents": 0
     },
     "summary": {
         "total_deposits": 40.0,
-        "net_profit": 9.420000000000002,
-        "roi_percent": 23.550000000000004
+        "net_profit": 15.829999999999998,
+        "roi_percent": 39.574999999999996
     },
     "fills": [
+        {
+            "ticker": "KXNCAAFGAME-25NOV29LSUOKLA-LSU",
+            "side": "no",
+            "count": 5,
+            "price_cents": 0.6,
+            "price_dollars": "0.0060",
+            "created_time": "2025-11-29T23:11:20.534387+00:00"
+        },
+        {
+            "ticker": "KXNCAAFGAME-25NOV29LSUOKLA-LSU",
+            "side": "no",
+            "count": 6,
+            "price_cents": 0.6,
+            "price_dollars": "0.0060",
+            "created_time": "2025-11-29T23:11:20.534387+00:00"
+        },
         {
             "ticker": "KXNCAAFGAME-25NOV29VANTENN-VAN",
             "side": "yes",
@@ -414,7 +430,7 @@
     },
     "raw": {
         "balance": {
-            "balance": 4942
+            "balance": 5583
         },
         "positions": {
             "cursor": ""
@@ -423,6 +439,6 @@
     "debug_log": [
         "SUCCESS: Authentication Passed",
         "portfolio_value was 0; used balance + collateral as fallback.",
-        "Completed snapshot. Cash=$49.42, API_portfolio=$49.42, Exposure\u2248$0.00, Estimated_total\u2248$49.42"
+        "Completed snapshot. Cash=$55.83, API_portfolio=$55.83, Exposure\u2248$0.00, Estimated_total\u2248$55.83"
     ]
 }
