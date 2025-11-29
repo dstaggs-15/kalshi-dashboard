@@ -26,7 +26,7 @@ def save_json(data):
         traceback.print_exc()
 
 def main():
-    print("--- STARTING FINAL PRODUCTION SCRIPT ---")
+    print("--- STARTING FINAL FIX SCRIPT ---")
     
     final_data = {
         "meta": {"updated_at": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")},
@@ -40,7 +40,7 @@ def main():
     try:
         from kalshi_python import KalshiClient, Configuration
 
-        # 1. AUTH CHECK
+        # 1. LOAD SECRETS
         api_key_id = os.getenv("KALSHI_API_KEY_ID")
         private_key = os.getenv("KALSHI_PRIVATE_KEY")
         
@@ -49,23 +49,19 @@ def main():
         if not private_key:
             raise ValueError("Missing KALSHI_PRIVATE_KEY")
 
-        # 2. KEY FORMATTING
-        # GitHub Secrets often flatten newlines. We MUST fix this.
+        # Fix Key Newlines (GitHub Secrets flattening fix)
         if "\\n" in private_key:
             private_key = private_key.replace("\\n", "\n")
 
-        # Key Validation Log
-        if "-----BEGIN RSA PRIVATE KEY-----" in private_key:
-             final_data["debug_log"].append("Key Format: Valid Header Found")
-        else:
-             final_data["debug_log"].append("Key Format: INVALID (Missing -----BEGIN...)")
-
-        # 3. API CONNECTION
+        # 2. CONFIGURE SDK
         config = Configuration()
-        # CORRECT PRODUCTION URL
+        # PRODUCTION HOST
         config.host = "https://api.elections.kalshi.com/trade-api/v2"
+        
+        # 3. SET CREDENTIALS (THE FIX)
         config.api_key_id = api_key_id
-        config.private_key = private_key
+        # CRITICAL FIX: The attribute MUST be 'private_key_pem', not 'private_key'
+        config.private_key_pem = private_key 
         
         client = KalshiClient(config)
         
@@ -73,9 +69,13 @@ def main():
         print(f"Connecting to {config.host}...")
         balance = client.get_balance()
         
+        print(">>> SUCCESS: AUTHENTICATED <<<")
+        final_data["debug_log"].append("SUCCESS: Authentication Passed")
+
         raw_bal = getattr(balance, 'balance', 0)
         raw_port = getattr(balance, 'portfolio_value', 0)
         
+        # Fallback logic if portfolio_value is zero
         if raw_port == 0 and raw_bal > 0:
             raw_port = raw_bal + getattr(balance, 'collateral', 0)
 
@@ -109,7 +109,7 @@ def main():
         except Exception as e:
             final_data["debug_log"].append(f"Settlements Warning: {str(e)}")
 
-        # 6. POPULATE DATA
+        # 6. CALCULATE & POPULATE
         cash = raw_bal / 100.0
         total = raw_port / 100.0
         bets = max(total - cash, 0.0)
@@ -123,9 +123,8 @@ def main():
         final_data["summary"]["roi_percent"] = ((total - 40.0)/40.0)*100
         final_data["fills"] = clean_fills
         final_data["settlements"] = clean_settlements
-        final_data["debug_log"].append("Success: Connected to Production")
         
-        print(f"Success. Cash: {cash}, Total: {total}")
+        print(f"Data ready. Cash: ${cash}, Total: ${total}")
 
     except Exception as e:
         print("!!! SCRIPT CRASHED - WRITING ERROR LOG !!!")
