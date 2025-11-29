@@ -2,18 +2,19 @@ name: Update Kalshi Data
 
 on:
   schedule:
-    - cron: '*/30 * * * *'  # Every 30 minutes
-  workflow_dispatch:        # Manual run button
+    - cron: '*/30 * * * *'  # Runs every 30 minutes
+  workflow_dispatch:        # Allows you to click "Run workflow" manually
 
+# PERMISSIONS: This is non-negotiable. 
+# You MUST have "Read and write permissions" enabled in Repo Settings > Actions > General.
 permissions:
-  contents: write           # CRITICAL: Gives permission to push
+  contents: write
 
 jobs:
   update-dashboard:
     runs-on: ubuntu-latest
-    
     steps:
-      # 1. Checkout the MAIN branch specifically (prevents "Detached Head" error)
+      # 1. Checkout the MAIN branch specifically
       - name: Checkout Code
         uses: actions/checkout@v3
         with:
@@ -25,8 +26,8 @@ jobs:
         with:
           python-version: '3.11'
 
-      # 3. Install Libraries (Force reinstall of everything needed)
-      - name: Install Dependencies
+      # 3. Install Dependencies
+      - name: Install Libraries
         run: |
           pip install --upgrade pip
           pip install kalshi-python python-dotenv cryptography pydantic
@@ -38,16 +39,18 @@ jobs:
           KALSHI_PRIVATE_KEY: ${{ secrets.KALSHI_PRIVATE_KEY }}
         run: python backend/kalshi_dashboard.py
 
-      # 5. DEBUG: Prove the file exists before trying to commit
+      # 5. DEBUG: Verify the file exists on the runner
       - name: Verify File Generation
         run: |
-          ls -l frontend/data/kalshi_summary.json || echo "FILE WAS NOT CREATED"
+          echo "Checking for frontend/data/kalshi_summary.json..."
+          ls -l frontend/data/kalshi_summary.json || echo "FILE MISSING - Python script failed to save."
 
-      # 6. THE NUCLEAR COMMIT OPTION
-      # This action handles all the git logic automatically.
+      # 6. THE NUCLEAR OPTION: Auto-Add and Commit
+      # This action automatically detects changes and pushes them.
       - name: Commit and Push
-        uses: stefanzweifel/git-auto-commit-action@v4
+        uses: EndBug/add-and-commit@v9
         with:
-          commit_message: Auto-update Kalshi dashboard data
-          file_pattern: frontend/data/kalshi_summary.json
-          branch: main
+          add: 'frontend/data/kalshi_summary.json'
+          default_author: github_actions
+          message: 'Auto-update Kalshi dashboard data'
+          push: true
