@@ -111,6 +111,32 @@ function renderSummary(data) {
   const navNet = document.getElementById("nav-net-profit");
   if (navNet) setSignedText(navNet, netProfit);
 
+  // Plain-English summary sentence
+  const summarySentence = document.getElementById("summary-sentence");
+  if (summarySentence) {
+    const depStr = formatCurrency(totalDeposits);
+    const accStr = formatCurrency(accountValue);
+    const profitStr = formatCurrency(netProfit, true);
+    const roiStr = toPercent(roi);
+    const cashStr = formatCurrency(cash);
+    const posStr = formatCurrency(positionsValue);
+
+    if (positionsValue > 0.005) {
+      // You have open bets
+      summarySentence.innerHTML =
+        `You’ve added <strong>${depStr}</strong>. ` +
+        `Right now your account is worth <strong>${accStr}</strong>, so you’re ` +
+        `<strong>${profitStr}</strong> (${roiStr}) overall. ` +
+        `That total is <strong>${cashStr}</strong> in cash and <strong>${posStr}</strong> in open bets.`;
+    } else {
+      // No open bets – everything is cash
+      summarySentence.innerHTML =
+        `You’ve added <strong>${depStr}</strong>. ` +
+        `You have no open bets right now and your cash is <strong>${cashStr}</strong>, ` +
+        `so you’re <strong>${profitStr}</strong> (${roiStr}) up and all of it is withdrawable.`;
+    }
+  }
+
   // Metric cards
   const elDeposits = document.getElementById("metric-deposits");
   if (elDeposits) elDeposits.textContent = formatCurrency(totalDeposits);
