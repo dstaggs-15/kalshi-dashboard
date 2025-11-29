@@ -1,6 +1,6 @@
 {
     "meta": {
-        "updated_at": "2025-11-29 04:20:07"
+        "updated_at": "2025-11-29 04:27:50"
     },
     "account": {
         "cash_balance": 0.0,
@@ -15,6 +15,6 @@
     "fills": [],
     "settlements": [],
     "debug_log": [
-        "CRASH: (401)\nReason: Unauthorized\nHTTP response headers: HTTPHeaderDict({'Content-Type': 'application/json; charset=utf-8', 'Content-Length': '90', 'Connection': 'keep-alive', 'Date': 'Sat, 29 Nov 2025 04:20:08 GMT', 'x-content-type-options': 'nosniff', 'content-security-policy': \"default-src 'none';\", 'strict-transport-security': 'max-age=31536000; includeSubDomains', 'X-Cache': 'Error from cloudfront', 'Via': '1.1 f497fa2422d5b3ba3b34ed87ffef89a6.cloudfront.net (CloudFront)', 'X-Amz-Cf-Pop': 'ORD56-P1', 'X-Amz-Cf-Id': '7rlgjm1B0A6Q14jVDnwUKKlc8TCDwmHwGsj0EYJU5OF0DQAWfDw5kw=='})\nHTTP response body: error=ErrorResponseError(code='token_authentication_failure', message='token authentication failure', details=None)\n"
+        "CRASH: HTTPSConnectionPool(host='api.kalshi.com', port=443): Max retries exceeded with url: /trade-api/v2/portfolio/balance (Caused by NameResolutionError(\"<urllib3.connection.HTTPSConnection object at 0x7f6b70965210>: Failed to resolve 'api.kalshi.com' ([Errno -2] Name or service not known)\"))"
     ]
 }
