@@ -97,12 +97,15 @@ function renderSummary(data) {
   const accountValue = Number(account.portfolio_total || 0);
 
   const totalDeposits = Number(stats.total_deposits || 0);
-  const realizedPnl = Number(stats.realized_pnl || 0);
-  const unrealizedPnl = Number(stats.unrealized_pnl || 0);
   const netProfit = Number(stats.net_profit || 0);
-  const housePct = Number(stats.house_money_pct || 0);
+  const realizedPnl = Number(stats.realized_pnl || 0);
+
+  // Derived on the frontend
+  const unrealizedPnl = netProfit - realizedPnl;
   const roi =
     totalDeposits > 0 ? (netProfit / totalDeposits) * 100.0 : 0.0;
+  const housePct =
+    accountValue > 0 ? (netProfit / accountValue) * 100.0 : 0.0;
 
   // Navbar bubbles
   const navAccount = document.getElementById("nav-account-value");
