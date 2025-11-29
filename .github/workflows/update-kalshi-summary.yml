@@ -2,14 +2,14 @@ name: Update Kalshi Data
 
 on:
   schedule:
-    - cron: '*/10 * * * *'  # Runs every 10 minutes
+    - cron: '*/30 * * * *'  # Runs every 30 minutes
   workflow_dispatch:        # Allows manual run button
 
 jobs:
   update-dashboard:
     runs-on: ubuntu-latest
     permissions:
-      contents: write       # IMPORTANT: Allows pushing changes
+      contents: write       # REQUIRED to push the JSON file back
 
     steps:
       - name: Checkout Code
@@ -20,9 +20,10 @@ jobs:
         with:
           python-version: '3.11'
 
+      # FIX HERE: Added 'cryptography' to the install list
       - name: Install Dependencies
         run: |
-          pip install kalshi-python python-dotenv
+          pip install kalshi-python python-dotenv cryptography
 
       - name: Run Backend Script
         env:
