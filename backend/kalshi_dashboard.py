@@ -4,7 +4,7 @@ Generate a JSON summary of your Kalshi portfolio for the dashboard.
 Key ideas:
 - We pull:
     * Cash balance
-    * Open positions value
+    * Open positions value (using event_exposure_dollars)
     * Fills (trades)
     * Settlements (closed/settled markets)
 - We compute:
@@ -45,7 +45,7 @@ def get_ts_ms(obj: Any) -> Optional[int]:
         if value is None:
             continue
         if isinstance(value, int):
-            # Heuristic: if it's > 1e12, assume it's already ms; else seconds.
+            # If it's > 1e12, assume ms; otherwise treat as seconds.
             return value if value > 1_000_000_000_000 else value * 1000
         if isinstance(value, float):
             return int(value * 1000)
@@ -140,7 +140,7 @@ def fetch_settlements_last_n_days(client: KalshiClient, days: int = 365):
     Fetch settlements from the last `days` days.
 
     Your SDK does NOT support min_ts as a keyword arg on get_settlements,
-    so we just paginate everything and filter client-side by timestamp.
+    so we paginate everything and filter client-side by timestamp.
     """
     now = datetime.now(timezone.utc)
     min_dt = now - timedelta(days=days)
@@ -153,7 +153,6 @@ def fetch_settlements_last_n_days(client: KalshiClient, days: int = 365):
         resp = client.get_settlements(limit=200, cursor=cursor)
         page_settlements = getattr(resp, "settlements", None) or []
 
-        # Filter in Python by timestamp
         for s in page_settlements:
             ts = get_ts_ms(s)
             if ts is None:
@@ -253,24 +252,6 @@ def compute_stats(fills, settlements):
 def generate_summary_json(days: int = 365):
     """
     Pull data from Kalshi, compute stats, and write data/kalshi_summary.json.
-
-    Structure:
-
-    {
-      "generated_at": "...",
-      "lookback_days": 365,
-      "account": {cash, positions_value, portfolio_total, ...},
-      "fills_last_n_days": [...],
-      "settlements_last_n_days": [...],
-      "summary": {
-        total_deposits,
-        net_profit,
-        net_profit_percent,
-        realized_pnl,
-        unrealized_pnl,
-        ...
-      }
-    }
     """
     client = load_kalshi_client()
 
@@ -280,7 +261,7 @@ def generate_summary_json(days: int = 365):
 
     # Get open positions from /portfolio/positions
     try:
-        positions_resp = client.get_positions()
+        positions_resp = client.get_positions(settlement_status="unsettled")
     except Exception:
         positions_resp = None
 
@@ -289,17 +270,26 @@ def generate_summary_json(days: int = 365):
         event_positions = (
             getattr(positions_resp, "event_positions", None) or []
         )
+
+        # Helper to add a dollars string to positions_cents
+        def add_dollars(dollars_str: Optional[str]):
+            nonlocal positions_cents
+            if not dollars_str:
+                return
+            try:
+                positions_cents += int(round(float(dollars_str) * 100))
+            except Exception:
+                pass
+
+        # Use event_exposure_dollars as the primary source – this matches
+        # the "Positions" line Kalshi shows on the portfolio page.
         for ep in event_positions:
-            cents = getattr(ep, "total_cost", None)
-            if cents is None:
-                dollars_str = getattr(ep, "total_cost_dollars", None)
-                if dollars_str is not None:
-                    try:
-                        cents = int(round(float(dollars_str) * 100))
-                    except Exception:
-                        cents = 0
-            if cents:
-                positions_cents += int(cents)
+            exposure_dollars = getattr(ep, "event_exposure_dollars", None)
+            if exposure_dollars:
+                add_dollars(exposure_dollars)
+            else:
+                # Fallbacks: total_cost_dollars if exposure is missing
+                add_dollars(getattr(ep, "total_cost_dollars", None))
 
     portfolio_cents = balance_cents + positions_cents
 
