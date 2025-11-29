@@ -1,19 +1,19 @@
 """
 Generate a JSON summary of your Kalshi portfolio for the dashboard.
 
-Key ideas:
-- We pull:
+What this script does:
+- Pulls from Kalshi:
     * Cash balance
-    * Open positions value (using event_exposure_dollars)
+    * Open positions exposure
     * Fills (trades)
     * Settlements (closed/settled markets)
-- We compute:
-    * Total deposits (from env TOTAL_DEPOSITS)
+- Computes:
+    * Total deposits (env TOTAL_DEPOSITS, default 40.0)
     * Net profit = portfolio_value - deposits
-    * Realized P&L (from settlements)
-    * Unrealized P&L = net_profit - realized_pnl
-    * A cumulative P&L time series for the chart
-- We write everything to data/kalshi_summary.json
+    * Realized P&L (closed bets)
+    * Unrealized P&L (open bets) – but forced to 0 when you have no positions
+    * Cumulative P&L series for a chart
+- Writes everything to data/kalshi_summary.json for the frontend.
 """
 
 from __future__ import annotations
@@ -30,22 +30,21 @@ from kalshi_python import Configuration, KalshiClient
 
 
 # ---------------------------------------------------------------------------
-# Shared helpers
+# Utility helpers
 # ---------------------------------------------------------------------------
 
 
 def get_ts_ms(obj: Any) -> Optional[int]:
     """
-    Best-effort extraction of a timestamp in milliseconds from a Kalshi
-    SDK object. Different endpoints use different field names; we try
-    several and normalize to ms.
+    Extract a timestamp in milliseconds from a Kalshi SDK object.
+    Handles several possible field names and formats.
     """
     for attr in ("time", "ts", "created_time", "created_ts", "settled_time"):
         value = getattr(obj, attr, None)
         if value is None:
             continue
         if isinstance(value, int):
-            # If it's > 1e12, assume ms; otherwise treat as seconds.
+            # If it's > 1e12, assume ms; otherwise it's seconds.
             return value if value > 1_000_000_000_000 else value * 1000
         if isinstance(value, float):
             return int(value * 1000)
@@ -115,8 +114,7 @@ def load_kalshi_client() -> KalshiClient:
 
 def fetch_fills_last_n_days(client: KalshiClient, days: int = 365):
     """
-    Fetch fills from the last `days` days. Your SDK supports min_ts on
-    get_fills, so we use that.
+    Fetch fills from the last `days` days using min_ts on get_fills.
     """
     now_ms = int(time.time() * 1000)
     min_ts = now_ms - int(days * 24 * 60 * 60 * 1000)
@@ -139,7 +137,7 @@ def fetch_settlements_last_n_days(client: KalshiClient, days: int = 365):
     """
     Fetch settlements from the last `days` days.
 
-    Your SDK does NOT support min_ts as a keyword arg on get_settlements,
+    get_settlements in your SDK does NOT accept min_ts keyword arg,
     so we paginate everything and filter client-side by timestamp.
     """
     now = datetime.now(timezone.utc)
@@ -259,7 +257,7 @@ def generate_summary_json(days: int = 365):
     balance_resp = client.get_balance()
     balance_cents = getattr(balance_resp, "balance", 0) or 0
 
-    # Get open positions from /portfolio/positions
+    # Try to grab open positions (unsettled exposure)
     try:
         positions_resp = client.get_positions(settlement_status="unsettled")
     except Exception:
@@ -267,11 +265,8 @@ def generate_summary_json(days: int = 365):
 
     positions_cents = 0
     if positions_resp is not None:
-        event_positions = (
-            getattr(positions_resp, "event_positions", None) or []
-        )
+        event_positions = getattr(positions_resp, "event_positions", None) or []
 
-        # Helper to add a dollars string to positions_cents
         def add_dollars(dollars_str: Optional[str]):
             nonlocal positions_cents
             if not dollars_str:
@@ -281,14 +276,12 @@ def generate_summary_json(days: int = 365):
             except Exception:
                 pass
 
-        # Use event_exposure_dollars as the primary source – this matches
-        # the "Positions" line Kalshi shows on the portfolio page.
+        # Use event_exposure_dollars as main source, fallback to total_cost_dollars
         for ep in event_positions:
             exposure_dollars = getattr(ep, "event_exposure_dollars", None)
             if exposure_dollars:
                 add_dollars(exposure_dollars)
             else:
-                # Fallbacks: total_cost_dollars if exposure is missing
                 add_dollars(getattr(ep, "total_cost_dollars", None))
 
     portfolio_cents = balance_cents + positions_cents
@@ -311,17 +304,30 @@ def generate_summary_json(days: int = 365):
     settlements_dict = [to_dict(s) for s in settlements]
 
     # ----- 3) Net profit / ROI based on TOTAL_DEPOSITS -----
+    # DEFAULT: if env var is missing or invalid, assume you've deposited $40.
     total_deposits_env = os.getenv("TOTAL_DEPOSITS")
-    try:
-        total_deposits = float(total_deposits_env) if total_deposits_env else 0.0
-    except Exception:
-        total_deposits = 0.0
+    if total_deposits_env:
+        try:
+            total_deposits = float(total_deposits_env)
+        except Exception:
+            total_deposits = 40.0
+    else:
+        total_deposits = 40.0
 
     portfolio_total = account["portfolio_total"]
     realized_pnl = stats.get("realized_pnl", 0.0)
+    positions_value = account["positions_value"]
 
+    # Core numbers
     net_profit = portfolio_total - total_deposits
-    unrealized_pnl = net_profit - realized_pnl
+
+    # If you have no open positions, unrealized P&L should just be 0,
+    # even if you're up – everything is realized into cash.
+    if positions_value <= 1e-6:
+        unrealized_pnl = 0.0
+    else:
+        unrealized_pnl = net_profit - realized_pnl
+
     net_profit_percent = (
         (net_profit / total_deposits) if total_deposits > 0 else 0.0
     )
