@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
     // FIX: Pointing to the 'data' folder inside 'frontend'
     // Added ?t=timestamp to prevent the browser from caching old data
-    const dataPath = 'data/kalshi_summary.json';
+    const dataPath = 'frontend/data/kalshi_summary.json';
     
     fetch(`${dataPath}?t=${new Date().getTime()}`)
         .then(response => {
