@@ -85,6 +85,17 @@ body {
   font-weight: 600;
 }
 
+.summary-sentence {
+  margin: 4px 0 10px;
+  font-size: 0.85rem;
+  color: var(--color-muted);
+}
+
+.summary-sentence strong {
+  color: var(--color-text);
+}
+
+
 /* Layout */
 
 .main {
