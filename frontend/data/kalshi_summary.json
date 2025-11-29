@@ -1,6 +1,6 @@
 {
     "meta": {
-        "updated_at": "2025-11-29 04:41:25"
+        "updated_at": "2025-11-29 05:09:18"
     },
     "account": {
         "cash_balance": 0.0,
@@ -16,6 +16,6 @@
     "settlements": [],
     "debug_log": [
         "Key Format: Valid Header Found",
-        "CRASH: (401)\nReason: Unauthorized\nHTTP response headers: HTTPHeaderDict({'Content-Type': 'application/json; charset=utf-8', 'Content-Length': '90', 'Connection': 'keep-alive', 'Date': 'Sat, 29 Nov 2025 04:41:26 GMT', 'x-content-type-options': 'nosniff', 'content-security-policy': \"default-src 'none';\", 'strict-transport-security': 'max-age=31536000; includeSubDomains', 'X-Cache': 'Error from cloudfront', 'Via': '1.1 9112f917b5d446937bb37b520eab286c.cloudfront.net (CloudFront)', 'X-Amz-Cf-Pop': 'SFO53-P1', 'X-Amz-Cf-Id': 'srWDM5Wre3v27IF4VP22EOI_4QNLFa9rpNVgMGBFzSStX6Ng5DMCXw=='})\nHTTP response body: error=ErrorResponseError(code='token_authentication_failure', message='token authentication failure', details=None)\n"
+        "CRASH: (401)\nReason: Unauthorized\nHTTP response headers: HTTPHeaderDict({'Content-Type': 'application/json; charset=utf-8', 'Content-Length': '90', 'Connection': 'keep-alive', 'Date': 'Sat, 29 Nov 2025 05:09:19 GMT', 'x-content-type-options': 'nosniff', 'content-security-policy': \"default-src 'none';\", 'strict-transport-security': 'max-age=31536000; includeSubDomains', 'X-Cache': 'Error from cloudfront', 'Via': '1.1 3012ddbe1e0b202ca1166bf892a3d200.cloudfront.net (CloudFront)', 'X-Amz-Cf-Pop': 'DFW56-P9', 'X-Amz-Cf-Id': 'UBLa53xqWm-aPVTp8Bv5fAp5Pkn_jTZSnvi4z2AL5hraqsIKwUelqw=='})\nHTTP response body: error=ErrorResponseError(code='token_authentication_failure', message='token authentication failure', details=None)\n"
     ]
 }
