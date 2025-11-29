@@ -7,7 +7,6 @@ import sys
 # ------------------------------------------------------------------
 # CONFIGURATION
 # ------------------------------------------------------------------
-# Path logic: Go up two levels from 'backend/script.py' to get to root
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUTPUT_FILE = os.path.join(ROOT_DIR, "frontend", "data", "kalshi_summary.json")
 
@@ -19,9 +18,7 @@ def serialize_dates(obj):
 def save_json(data):
     """Guaranteed save function"""
     try:
-        # Ensure directory exists
         os.makedirs(os.path.dirname(OUTPUT_FILE), exist_ok=True)
-        
         with open(OUTPUT_FILE, "w") as f:
             json.dump(data, f, indent=4, default=serialize_dates)
         print(f"SUCCESS: Wrote data to {OUTPUT_FILE}")
@@ -32,7 +29,6 @@ def save_json(data):
 def main():
     print("--- STARTING FAIL-SAFE SCRIPT ---")
     
-    # Placeholder data structure
     final_data = {
         "meta": {"updated_at": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")},
         "account": {"cash_balance": 0.0, "total_account_value": 0.0, "money_in_bets": 0.0},
@@ -43,46 +39,39 @@ def main():
     }
 
     try:
-        # 1. IMPORT CHECK
-        try:
-            from kalshi_python import KalshiClient, Configuration
-            print("Import successful.")
-        except ImportError as e:
-            final_data["debug_log"].append(f"Import Error: {str(e)}")
-            raise e
+        from kalshi_python import KalshiClient, Configuration
 
-        # 2. AUTH CHECK
+        # 1. AUTH CHECK
         api_key_id = os.getenv("KALSHI_API_KEY_ID")
         private_key = os.getenv("KALSHI_PRIVATE_KEY")
         
         if not api_key_id or not private_key:
-            raise ValueError("Missing Environment Variables (KALSHI_API_KEY_ID or KALSHI_PRIVATE_KEY)")
+            raise ValueError("Missing Environment Variables")
 
         # Fix Key Newlines
         if "\\n" in private_key:
             private_key = private_key.replace("\\n", "\n")
 
-        # 3. API CONNECTION
+        # 2. API CONNECTION
         config = Configuration()
-        config.host = "https://api.elections.kalshi.com/trade-api/v2"
+        # FIX: CHANGED TO STANDARD PRODUCTION API
+        config.host = "https://api.kalshi.com/trade-api/v2"
         config.api_key_id = api_key_id
         config.private_key = private_key
         
         client = KalshiClient(config)
         
-        # 4. FETCH DATA
+        # 3. FETCH DATA
         print("Fetching Balance...")
         balance = client.get_balance()
         
-        # Parse Balance (Handle Cents)
         raw_bal = getattr(balance, 'balance', 0)
         raw_port = getattr(balance, 'portfolio_value', 0)
         
-        # Fallback if portfolio value is missing
         if raw_port == 0 and raw_bal > 0:
             raw_port = raw_bal + getattr(balance, 'collateral', 0)
 
-        # 5. FETCH HISTORY (Safe Mode)
+        # 4. FETCH HISTORY
         clean_fills = []
         try:
             print("Fetching Fills...")
@@ -112,7 +101,7 @@ def main():
         except Exception as e:
             final_data["debug_log"].append(f"Settlements Error: {str(e)}")
 
-        # 6. CALCULATE & POPULATE
+        # 5. POPULATE DATA
         cash = raw_bal / 100.0
         total = raw_port / 100.0
         bets = max(total - cash, 0.0)
@@ -128,16 +117,13 @@ def main():
         final_data["settlements"] = clean_settlements
         final_data["debug_log"].append("Success")
         
-        print(f"Data process complete. Cash: {cash}, Total: {total}")
+        print(f"Success. Cash: {cash}, Total: {total}")
 
     except Exception as e:
-        print("!!! SCRIPT CRASHED - WRITING ERROR LOG TO JSON !!!")
+        print("!!! SCRIPT CRASHED - WRITING ERROR LOG !!!")
         traceback.print_exc()
         final_data["debug_log"].append(f"CRASH: {str(e)}")
-        # We DO NOT exit(1) here because we want the file to be saved/committed
-        # so you can see the error in the repo.
 
-    # 7. ALWAYS SAVE THE FILE
     save_json(final_data)
 
 if __name__ == "__main__":
