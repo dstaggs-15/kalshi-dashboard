@@ -1,222 +1,114 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kalshi Portfolio Dashboard</title>
-    <link rel="stylesheet" href="styles.css" />
-    <!-- Charts -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  </head>
-  <body>
-    <!-- Top bar -->
-    <header class="navbar">
-      <div class="navbar-left">
-        <h1 class="app-title">Kalshi Portfolio Dashboard</h1>
-        <p class="app-subtitle">
-          Simple view of how much you’ve put in, how much you’ve made, and where your money is.
-        </p>
-      </div>
-      <div class="navbar-right">
-        <div class="nav-pill">
-          <span class="nav-pill-label">Total Account Value</span>
-          <span id="nav-account-value" class="nav-pill-value">$0.00</span>
-        </div>
-        <div class="nav-pill">
-          <span class="nav-pill-label">Overall Profit / Loss</span>
-          <span id="nav-net-profit" class="nav-pill-value">$0.00</span>
-        </div>
-      </div>
-    </header>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
 
-    <main class="main">
-      <!-- Quick summary cards -->
-      <section class="card quick-summary">
-        <div class="card-header">
-          <h2>At-a-Glance Summary</h2>
-          <span id="summary-generated-at" class="timestamp">Updated: –</span>
-        </div>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <h1>Kalshi Portfolio Dashboard</h1>
+                <p class="subtitle">Simple view of where your money is.</p>
+                <div class="last-updated" id="last-updated">Updated: Loading...</div>
+            </div>
+            
+            <div class="hero-stats">
+                <div class="hero-card">
+                    <span class="hero-label">TOTAL ACCOUNT VALUE</span>
+                    <span class="hero-value" id="hero-total-val">$0.00</span>
+                </div>
+                <div class="hero-card">
+                    <span class="hero-label">OVERALL PROFIT / LOSS</span>
+                    <span class="hero-value" id="hero-profit">$0.00</span>
+                </div>
+            </div>
+        </header>
 
-        <!-- Plain-English sentence that ties it all together -->
-        <p id="summary-sentence" class="summary-sentence">
-          Loading your account summary…
-        </p>
+        <section class="narrative">
+            <p id="narrative-text">Loading account details...</p>
+        </section>
 
         <div class="metrics-grid">
-          <!-- Money You Added -->
-          <div class="metric-card">
-            <div class="metric-label">Money You Added</div>
-            <div id="metric-deposits" class="metric-value">$0.00</div>
-            <details class="metric-details">
-              <summary>What is this?</summary>
-              <p>Total money you have moved into Kalshi. Think of this as your “initial investment.”</p>
-            </details>
-          </div>
+            
+            <div class="metric-card">
+                <h3>MONEY YOU ADDED</h3>
+                <p class="metric-value" id="val-deposits">$0.00</p>
+                <details>
+                    <summary>What is this?</summary>
+                    <p>Total cash you have deposited into Kalshi from your bank.</p>
+                </details>
+            </div>
 
-          <!-- Total Account Value -->
-          <div class="metric-card">
-            <div class="metric-label">Total Account Value</div>
-            <div id="metric-account-value" class="metric-value">$0.00</div>
-            <details class="metric-details">
-              <summary>What is this?</summary>
-              <p>If you cashed everything out right now, this is roughly what your account would be worth.</p>
-            </details>
-          </div>
+            <div class="metric-card">
+                <h3>CASH YOU CAN TAKE OUT</h3>
+                <p class="metric-value" id="val-cash">$0.00</p>
+                <details>
+                    <summary>What is this?</summary>
+                    <p>Money sitting in your account right now, available to withdraw or bet.</p>
+                </details>
+            </div>
 
-          <!-- Cash You Can Take Out -->
-          <div class="metric-card">
-            <div class="metric-label">Cash You Can Take Out</div>
-            <div id="metric-cash" class="metric-value">$0.00</div>
-            <details class="metric-details">
-              <summary>What is this?</summary>
-              <p>Money that is not tied up in any bets. You can withdraw this today.</p>
-            </details>
-          </div>
+            <div class="metric-card">
+                <h3>MONEY IN BETS</h3>
+                <p class="metric-value" id="val-bets">$0.00</p>
+                <details>
+                    <summary>What is this?</summary>
+                    <p>The portion of your account value currently tied up in open contracts.</p>
+                </details>
+            </div>
 
-          <!-- Money in Bets -->
-          <div class="metric-card">
-            <div class="metric-label">Money in Bets</div>
-            <div id="metric-positions-value" class="metric-value">$0.00</div>
-            <details class="metric-details">
-              <summary>What is this?</summary>
-              <p>What your open bets are worth right now, based on current market prices.</p>
-            </details>
-          </div>
+            <div class="metric-card">
+                <h3>OVERALL RETURN (%)</h3>
+                <p class="metric-value" id="val-roi">0%</p>
+                <details>
+                    <summary>What is this?</summary>
+                    <p>Your total profit divided by your total deposits.</p>
+                </details>
+            </div>
 
-          <!-- Overall Profit / Loss -->
-          <div class="metric-card">
-            <div class="metric-label">Overall Profit / Loss</div>
-            <div id="metric-net-profit" class="metric-value signed">$0.00</div>
-            <details class="metric-details">
-              <summary>What is this?</summary>
-              <p>
-                Total Account Value minus Money You Added. This is how much you are up or down overall after everything.
-              </p>
-            </details>
-          </div>
-
-          <!-- Closed Bets Profit / Loss -->
-          <div class="metric-card">
-            <div class="metric-label">Closed Bets Profit / Loss</div>
-            <div id="metric-realized-pnl" class="metric-value signed">$0.00</div>
-            <details class="metric-details">
-              <summary>What is this?</summary>
-              <p>Money you have already won or lost from bets that are completely finished.</p>
-            </details>
-          </div>
-
-          <!-- Open Bets Profit / Loss -->
-          <div class="metric-card">
-            <div class="metric-label">Open Bets Profit / Loss</div>
-            <div id="metric-unrealized-pnl" class="metric-value signed">$0.00</div>
-            <details class="metric-details">
-              <summary>What is this?</summary>
-              <p>
-                How much you are currently up or down on open bets. This can change as prices move or results come in.
-              </p>
-            </details>
-          </div>
-
-          <!-- Overall Return (%) -->
-          <div class="metric-card">
-            <div class="metric-label">Overall Return (%)</div>
-            <div id="metric-roi" class="metric-value">0%</div>
-            <details class="metric-details">
-              <summary>What is this?</summary>
-              <p>
-                Overall Profit / Loss divided by Money You Added. Example: you put in $40 and now have $80 → that’s +100%.
-              </p>
-            </details>
-          </div>
-
-          <!-- “House Money” Share -->
-          <div class="metric-card">
-            <div class="metric-label">“House Money” Share</div>
-            <div id="metric-house-money" class="metric-value">0%</div>
-            <details class="metric-details">
-              <summary>What is this?</summary>
-              <p>
-                What percentage of your account is winnings instead of your own cash. If this says 60%, most of your account
-                is profit.
-              </p>
-            </details>
-          </div>
         </div>
-      </section>
 
-      <!-- Charts -->
-      <section class="charts-row">
-        <section class="card chart-card">
-          <div class="card-header">
-            <h2>Profit Over Time (Closed Bets)</h2>
-          </div>
-          <canvas id="pnlChart"></canvas>
+        <section class="data-tables">
+            <h2>Recent Trades</h2>
+            <div class="table-wrapper">
+                <table id="fills-table">
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Market</th>
+                            <th>Side</th>
+                            <th>Count</th>
+                            <th>Price (¢)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        </tbody>
+                </table>
+            </div>
+
+            <h2>Recent Settlements</h2>
+            <div class="table-wrapper">
+                <table id="settlements-table">
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Ticker</th>
+                            <th>Outcome</th>
+                            <th>Payout ($)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        </tbody>
+                </table>
+            </div>
         </section>
 
-        <section class="card chart-card">
-          <div class="card-header">
-            <h2>Account Breakdown</h2>
-          </div>
-          <canvas id="breakdownChart"></canvas>
-        </section>
-      </section>
+    </div>
 
-      <!-- Simple recent trades list -->
-      <section class="card">
-        <div class="card-header">
-          <h2>Recent Trades (Simple View)</h2>
-        </div>
-        <ul id="fills-simple-list" class="trade-list">
-          <li class="placeholder">Loading…</li>
-        </ul>
-      </section>
-
-      <!-- Detailed tables -->
-      <section class="card">
-        <div class="card-header">
-          <h2>Detailed Trades Table</h2>
-        </div>
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>Time</th>
-              <th>Market</th>
-              <th>Side</th>
-              <th>Contracts</th>
-              <th>Price</th>
-              <th>Cost</th>
-            </tr>
-          </thead>
-          <tbody id="fills-table-body">
-            <tr>
-              <td colspan="6" class="placeholder">Loading…</td>
-            </tr>
-          </tbody>
-        </table>
-      </section>
-
-      <section class="card">
-        <div class="card-header">
-          <h2>Recent Settlements</h2>
-        </div>
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>Time</th>
-              <th>Market</th>
-              <th>Outcome</th>
-              <th>Cash Change</th>
-            </tr>
-          </thead>
-          <tbody id="settlements-table-body">
-            <tr>
-              <td colspan="4" class="placeholder">Loading…</td>
-            </tr>
-          </tbody>
-        </table>
-      </section>
-    </main>
-
-    <script src="app.js"></script>
-  </body>
+    <script src="script.js"></script>
+</body>
 </html>
