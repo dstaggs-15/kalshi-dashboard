@@ -1,16 +1,16 @@
-/* Dark theme for the Kalshi Portfolio Tracker */
-
+/* Root theme */
 :root {
-  --color-bg: #0e1624;
-  --color-surface: #1b2b40;
-  --color-surface-alt: #162337;
-  --color-border: #28364a;
-  --color-text: #e6eaf1;
-  --color-muted: #8f9bb3;
+  --color-bg: #050814;
+  --color-surface: #121c30;
+  --color-surface-alt: #19253a;
+  --color-border: #273654;
+  --color-text: #f3f6ff;
+  --color-muted: #9aa4c2;
   --color-accent: #2ecc71;
-  --color-danger: #e74c3c;
+  --color-danger: #ff5c5c;
   --radius-lg: 18px;
-  --shadow-soft: 0 16px 30px rgba(0, 0, 0, 0.45);
+  --radius-sm: 12px;
+  --shadow-soft: 0 18px 40px rgba(0, 0, 0, 0.55);
 }
 
 *,
@@ -33,38 +33,54 @@ body {
 
 .navbar {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  padding: 14px 24px;
-  background: linear-gradient(90deg, #0f1b2d, #15223a);
+  gap: 18px;
+  padding: 14px 18px 10px;
+  background: radial-gradient(circle at top left, #1b2642, #060815 55%);
   border-bottom: 1px solid var(--color-border);
+}
+
+.navbar-left {
+  max-width: 500px;
 }
 
 .app-title {
   margin: 0;
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   font-weight: 600;
 }
 
-.nav-metrics {
-  display: flex;
-  gap: 18px;
+.app-subtitle {
+  margin: 4px 0 0;
+  font-size: 0.85rem;
+  color: var(--color-muted);
 }
 
-.nav-metric {
+.navbar-right {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.nav-pill {
+  padding: 6px 12px;
+  border-radius: 999px;
+  background-color: rgba(16, 32, 64, 0.9);
+  border: 1px solid var(--color-border);
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  min-width: 140px;
 }
 
-.nav-metric .label {
-  font-size: 0.75rem;
-  color: var(--color-muted);
+.nav-pill-label {
+  font-size: 0.72rem;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
+  color: var(--color-muted);
 }
 
-.nav-metric .value {
+.nav-pill-value {
   font-size: 0.95rem;
   font-weight: 600;
 }
@@ -72,19 +88,19 @@ body {
 /* Layout */
 
 .main {
-  max-width: 1100px;
-  margin: 18px auto 32px;
+  max-width: 1200px;
+  margin: 14px auto 28px;
   padding: 0 12px;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 14px;
 }
 
 .card {
   background-color: var(--color-surface);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-soft);
-  padding: 16px 18px 20px;
+  padding: 14px 16px 18px;
 }
 
 /* Card header */
@@ -93,6 +109,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 10px;
   margin-bottom: 10px;
 }
 
@@ -101,31 +118,142 @@ body {
   font-size: 1rem;
 }
 
-.card-header-right {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
 .timestamp {
   font-size: 0.8rem;
   color: var(--color-muted);
 }
 
-/* Buttons */
+/* Quick summary metrics */
 
-.btn {
-  padding: 6px 12px;
-  border-radius: 999px;
-  border: 1px solid var(--color-border);
+.quick-summary {
+  padding-bottom: 18px;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 6px;
+}
+
+.metric-card {
   background-color: var(--color-surface-alt);
-  color: var(--color-text);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.metric-label {
+  font-size: 0.8rem;
+  color: var(--color-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+.metric-value {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.metric-value.signed {
+  font-variant-numeric: tabular-nums;
+}
+
+.metric-details {
+  margin: 2px 0 0;
+}
+
+.metric-details summary {
   font-size: 0.78rem;
+  color: var(--color-muted);
   cursor: pointer;
 }
 
-.btn:hover {
-  border-color: var(--color-accent);
+.metric-details p {
+  margin: 4px 0 0;
+  font-size: 0.78rem;
+  color: var(--color-muted);
+}
+
+/* Charts row */
+
+.charts-row {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 14px;
+}
+
+.chart-card {
+  padding-bottom: 16px;
+}
+
+.chart-card canvas {
+  width: 100%;
+  max-height: 260px;
+}
+
+/* Trade list */
+
+.trade-list {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.trade-list li {
+  font-size: 0.85rem;
+  padding: 6px 8px;
+  border-radius: 8px;
+  background-color: var(--color-surface-alt);
+  border: 1px solid rgba(255, 255, 255, 0.02);
+  display: flex;
+  flex-direction: column;
+}
+
+.trade-main-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: baseline;
+}
+
+.trade-time {
+  font-size: 0.78rem;
+  color: var(--color-muted);
+}
+
+.trade-market {
+  font-weight: 500;
+}
+
+.trade-action {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+}
+
+.trade-buy {
+  color: var(--color-accent);
+}
+
+.trade-sell {
+  color: var(--color-danger);
+}
+
+.trade-extra {
+  font-size: 0.78rem;
+  color: var(--color-muted);
+}
+
+.placeholder {
+  text-align: center;
+  color: var(--color-muted);
+  padding: 12px 0;
 }
 
 /* Tables */
@@ -135,20 +263,11 @@ table {
   border-collapse: collapse;
 }
 
-.summary-table th,
-.summary-table td,
 .data-table th,
 .data-table td {
-  padding: 8px 10px;
-  font-size: 0.85rem;
+  padding: 7px 8px;
+  font-size: 0.82rem;
   border-bottom: 1px solid var(--color-border);
-}
-
-.summary-table thead th {
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--color-muted);
 }
 
 .data-table thead th {
@@ -158,53 +277,47 @@ table {
   color: var(--color-muted);
 }
 
-.summary-table tbody tr:nth-child(even),
 .data-table tbody tr:nth-child(even) {
   background-color: var(--color-surface-alt);
 }
 
-.summary-table td:nth-child(1) {
+/* Positive / negative colours */
+
+.pos {
+  color: var(--color-accent);
+}
+
+.neg {
+  color: var(--color-danger);
+}
+
+.zero {
   color: var(--color-muted);
-}
-
-.placeholder {
-  text-align: center;
-  padding: 14px 0;
-  color: var(--color-muted);
-}
-
-/* Positive / negative coloring */
-
-#cell-realized-pnl,
-#cell-unrealized-pnl,
-#cell-net-profit,
-#metric-net-profit {
-  font-weight: 600;
-}
-
-#cell-realized-pnl,
-#cell-unrealized-pnl,
-#cell-net-profit {
-  min-width: 80px;
 }
 
 /* Responsive */
 
-@media (max-width: 720px) {
+@media (max-width: 900px) {
+  .metrics-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .charts-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
   .navbar {
     flex-direction: column;
     align-items: flex-start;
-    gap: 8px;
   }
 
-  .nav-metrics {
+  .navbar-right {
     width: 100%;
-    flex-wrap: wrap;
-    justify-content: flex-start;
-    gap: 10px 18px;
   }
 
-  .nav-metric {
-    align-items: flex-start;
+  .metrics-grid {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
