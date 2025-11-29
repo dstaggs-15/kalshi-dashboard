@@ -116,7 +116,7 @@ def fetch_settlements_last_n_days(client: KalshiClient, days: int = 1):
             if ts_val is None:
                 continue
 
-            # Normalize to seconds if needed
+            # Normalize seconds vs milliseconds
             if ts_val > 10_000_000_000:
                 ts_val = int(ts_val / 1000)
 
@@ -322,7 +322,7 @@ def generate_summary_json(days: int = 365):
     # ---------- 1) Account-level numbers ----------
     balance_resp = client.get_balance()
 
-    # Raw cents from whichever fields the SDK actually uses
+    # Cash in cents
     balance_cents = int(
         _get_first_field(
             balance_resp,
@@ -332,6 +332,22 @@ def generate_summary_json(days: int = 365):
         or 0
     )
 
+    # Positions (value of open bets) in cents, if the API exposes it
+    positions_cents = int(
+        _get_first_field(
+            balance_resp,
+            [
+                "positions",
+                "positions_cents",
+                "positionsValue",
+                "positions_value",
+            ],
+            0,
+        )
+        or 0
+    )
+
+    # Portfolio / account total in cents
     portfolio_cents = int(
         _get_first_field(
             balance_resp,
@@ -342,16 +358,15 @@ def generate_summary_json(days: int = 365):
                 "account_value",
                 "account_value_cents",
             ],
-            balance_cents,  # fallback: at least equal to cash
+            balance_cents + positions_cents,  # fallback: cash + positions
         )
-        or 0
+        or (balance_cents + positions_cents)
     )
 
-    # portfolio_cents should be >= cash; clamp if needed
-    if portfolio_cents < balance_cents:
-        portfolio_cents = balance_cents
-
-    positions_cents = max(portfolio_cents - balance_cents, 0)
+    # Make sure portfolio is at least cash + positions
+    min_portfolio = balance_cents + positions_cents
+    if portfolio_cents < min_portfolio:
+        portfolio_cents = min_portfolio
 
     cash = balance_cents / 100.0
     positions_value = positions_cents / 100.0
@@ -374,7 +389,7 @@ def generate_summary_json(days: int = 365):
 
     # ---------- 3) Deposits & P&L ----------
 
-    # For now: default to $40 of deposits unless overridden.
+    # For now: default to $40 of deposits unless overridden
     env_val = os.getenv("TOTAL_DEPOSITS")
     if env_val:
         try:
@@ -385,7 +400,11 @@ def generate_summary_json(days: int = 365):
         total_deposits = 40.0
 
     realized_pnl = stats.get("realized_pnl", 0.0)
+
+    # Net profit = current account value - deposits
     net_profit = portfolio_total - total_deposits
+
+    # Unrealized P&L here = "everything that's not from resolved markets"
     unrealized_pnl = net_profit - realized_pnl
 
     if portfolio_total > 0:
