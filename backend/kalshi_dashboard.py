@@ -3,15 +3,15 @@ Generate a JSON summary of your Kalshi portfolio for the dashboard.
 
 What this script does:
 - Pulls from Kalshi:
-    * Cash balance
-    * Open positions exposure
+    * Cash balance (balance)
+    * Total account value (portfolio_value)
     * Fills (trades)
     * Settlements (closed/settled markets)
 - Computes:
     * Total deposits (env TOTAL_DEPOSITS, default 40.0)
     * Net profit = portfolio_value - deposits
     * Realized P&L (closed bets)
-    * Unrealized P&L (open bets) – but forced to 0 when you have no positions
+    * Unrealized P&L (open bets, forced to 0 if no open bets)
     * Cumulative P&L series for a chart
 - Writes everything to data/kalshi_summary.json for the frontend.
 """
@@ -85,7 +85,6 @@ def to_dict(obj: Any) -> Any:
 def load_kalshi_client() -> KalshiClient:
     """
     Load credentials from env/.env and return an authenticated Kalshi client.
-
     Env vars:
       - KALSHI_API_KEY_ID
       - KALSHI_PRIVATE_KEY  (PEM string)
@@ -137,8 +136,8 @@ def fetch_settlements_last_n_days(client: KalshiClient, days: int = 365):
     """
     Fetch settlements from the last `days` days.
 
-    get_settlements in your SDK does NOT accept min_ts keyword arg,
-    so we paginate everything and filter client-side by timestamp.
+    get_settlements in your SDK choked on min_ts as a keyword arg before,
+    so here we paginate everything and filter client-side by timestamp.
     """
     now = datetime.now(timezone.utc)
     min_dt = now - timedelta(days=days)
@@ -253,38 +252,16 @@ def generate_summary_json(days: int = 365):
     """
     client = load_kalshi_client()
 
-    # ----- 1) Account-level numbers: cash + open positions = portfolio -----
+    # ----- 1) Account-level numbers: use get_balance directly -----
     balance_resp = client.get_balance()
     balance_cents = getattr(balance_resp, "balance", 0) or 0
+    portfolio_cents = getattr(balance_resp, "portfolio_value", None)
+    if portfolio_cents is None:
+        # Fallback: if SDK or env is weird, treat portfolio as pure cash.
+        portfolio_cents = balance_cents
 
-    # Try to grab open positions (unsettled exposure)
-    try:
-        positions_resp = client.get_positions(settlement_status="unsettled")
-    except Exception:
-        positions_resp = None
-
-    positions_cents = 0
-    if positions_resp is not None:
-        event_positions = getattr(positions_resp, "event_positions", None) or []
-
-        def add_dollars(dollars_str: Optional[str]):
-            nonlocal positions_cents
-            if not dollars_str:
-                return
-            try:
-                positions_cents += int(round(float(dollars_str) * 100))
-            except Exception:
-                pass
-
-        # Use event_exposure_dollars as main source, fallback to total_cost_dollars
-        for ep in event_positions:
-            exposure_dollars = getattr(ep, "event_exposure_dollars", None)
-            if exposure_dollars:
-                add_dollars(exposure_dollars)
-            else:
-                add_dollars(getattr(ep, "total_cost_dollars", None))
-
-    portfolio_cents = balance_cents + positions_cents
+    # Money in bets is whatever part of portfolio is not cash.
+    positions_cents = max(portfolio_cents - balance_cents, 0)
 
     account = {
         "cash_cents": balance_cents,
@@ -295,7 +272,7 @@ def generate_summary_json(days: int = 365):
         "updated_ts": getattr(balance_resp, "updated_ts", None),
     }
 
-    # ----- 2) Trading activity -----
+    # ----- 2) Trading activity for realized P&L -----
     fills = fetch_fills_last_n_days(client, days=days)
     settlements = fetch_settlements_last_n_days(client, days=days)
     stats = compute_stats(fills, settlements)
@@ -303,7 +280,7 @@ def generate_summary_json(days: int = 365):
     fills_dict = [to_dict(f) for f in fills]
     settlements_dict = [to_dict(s) for s in settlements]
 
-    # ----- 3) Net profit / ROI based on TOTAL_DEPOSITS -----
+    # ----- 3) Deposits, net profit, unrealized P&L -----
     # DEFAULT: if env var is missing or invalid, assume you've deposited $40.
     total_deposits_env = os.getenv("TOTAL_DEPOSITS")
     if total_deposits_env:
@@ -318,11 +295,9 @@ def generate_summary_json(days: int = 365):
     realized_pnl = stats.get("realized_pnl", 0.0)
     positions_value = account["positions_value"]
 
-    # Core numbers
     net_profit = portfolio_total - total_deposits
 
-    # If you have no open positions, unrealized P&L should just be 0,
-    # even if you're up – everything is realized into cash.
+    # If you have no open positions, don't pretend any of your profit is "open".
     if positions_value <= 1e-6:
         unrealized_pnl = 0.0
     else:
