@@ -1,11 +1,10 @@
-// JavaScript for the Kalshi Portfolio Tracker
-
 const JSON_URL = "../data/kalshi_summary.json";
 const REFRESH_MS = 60_000;
 
-// --------------------------------------------------
-// Helpers
-// --------------------------------------------------
+let pnlChart = null;
+let breakdownChart = null;
+
+// ---------------------- helpers ---------------------- //
 
 function formatCurrency(value, withSign = false) {
   const n = Number(value || 0);
@@ -30,11 +29,9 @@ function getSafeTimestamp(obj) {
   }
 
   if (typeof raw === "number") {
-    // seconds vs ms
-    if (raw > 1e12) return raw;
-    return raw * 1000;
+    if (raw > 1e12) return raw; // ms
+    return raw * 1000; // s
   }
-
   return null;
 }
 
@@ -44,10 +41,7 @@ function formatTime(obj) {
   return new Date(ts).toLocaleString();
 }
 
-// Rough ticker cleaner: turn
-//   KXNFLGAME-25NOV27CINBAL-CIN
-// into
-//   NFL Game • 25NOV27CINBAL • CIN
+// Turn tickers into readable markets
 function formatTickerReadable(ticker) {
   if (!ticker || typeof ticker !== "string") return "";
 
@@ -71,21 +65,20 @@ function formatTickerReadable(ticker) {
     case "KXZELENSKYYPUTINMEET":
       label = "Zelenskyy–Putin Meet";
       break;
+    case "KXHIGHAUS":
+      label = "HIGHAUS";
+      break;
     default:
       label = prefix.replace(/^KX/, "");
       break;
   }
 
-  // Split remaining components for readability
   const restPretty = rest.split("-").join(" • ");
   return `${label} • ${restPretty}`;
 }
 
-// apply sign + color class
-function setSignedCell(id, value) {
-  const el = document.getElementById(id);
+function setSignedText(el, value) {
   if (!el) return;
-
   el.textContent = formatCurrency(value, true);
   el.classList.remove("pos", "neg", "zero");
   if (value > 0) el.classList.add("pos");
@@ -93,9 +86,7 @@ function setSignedCell(id, value) {
   else el.classList.add("zero");
 }
 
-// --------------------------------------------------
-// Rendering summary
-// --------------------------------------------------
+// ---------------------- summary ---------------------- //
 
 function renderSummary(data) {
   const account = data.account || {};
@@ -110,45 +101,187 @@ function renderSummary(data) {
   const unrealizedPnl = Number(stats.unrealized_pnl || 0);
   const netProfit = Number(stats.net_profit || 0);
   const housePct = Number(stats.house_money_pct || 0);
-
   const roi =
     totalDeposits > 0 ? (netProfit / totalDeposits) * 100.0 : 0.0;
 
-  // Header metrics
+  // Navbar bubbles
+  document.getElementById("nav-account-value").textContent =
+    formatCurrency(accountValue);
+  const navNet = document.getElementById("nav-net-profit");
+  setSignedText(navNet, netProfit);
+
+  // Metric cards
+  document.getElementById("metric-deposits").textContent =
+    formatCurrency(totalDeposits);
   document.getElementById("metric-account-value").textContent =
     formatCurrency(accountValue);
   document.getElementById("metric-cash").textContent =
     formatCurrency(cash);
-  document.getElementById("metric-deposits").textContent =
-    formatCurrency(totalDeposits);
-  setSignedCell("metric-net-profit", netProfit);
-
-  // Summary table
-  document.getElementById("cell-total-deposits").textContent =
-    formatCurrency(totalDeposits);
-  document.getElementById("cell-cash").textContent =
-    formatCurrency(cash);
-  document.getElementById("cell-positions-value").textContent =
+  document.getElementById("metric-positions-value").textContent =
     formatCurrency(positionsValue);
-  document.getElementById("cell-account-value").textContent =
-    formatCurrency(accountValue);
-  setSignedCell("cell-realized-pnl", realizedPnl);
-  setSignedCell("cell-unrealized-pnl", unrealizedPnl);
-  setSignedCell("cell-net-profit", netProfit);
-  document.getElementById("cell-roi").textContent = toPercent(roi);
+
+  setSignedText(
+    document.getElementById("metric-net-profit"),
+    netProfit
+  );
+  setSignedText(
+    document.getElementById("metric-realized-pnl"),
+    realizedPnl
+  );
+  setSignedText(
+    document.getElementById("metric-unrealized-pnl"),
+    unrealizedPnl
+  );
+
+  document.getElementById("metric-roi").textContent = toPercent(roi);
+  document.getElementById("metric-house-money").textContent =
+    toPercent(housePct);
 
   const genEl = document.getElementById("summary-generated-at");
   if (genEl && data.generated_at) {
     const d = new Date(data.generated_at);
-    genEl.textContent = `Updated: ${d.toLocaleString()}  |  House money: ${toPercent(
-      housePct
-    )} of portfolio`;
+    genEl.textContent = `Updated: ${d.toLocaleString()}`;
   }
 }
 
-// --------------------------------------------------
-// Rendering tables
-// --------------------------------------------------
+// ---------------------- charts ---------------------- //
+
+function renderCharts(data) {
+  const ctxPnl = document.getElementById("pnlChart");
+  const ctxBreakdown = document.getElementById("breakdownChart");
+  if (!ctxPnl || !ctxBreakdown) return;
+
+  const stats = data.summary || {};
+  const account = data.account || {};
+
+  const series = stats.cumulative_series || [];
+  const labels = series.map((p) =>
+    new Date(p.ts).toLocaleDateString()
+  );
+  const values = series.map((p) => Number(p.cumulative || 0));
+
+  if (pnlChart) pnlChart.destroy();
+  pnlChart = new Chart(ctxPnl, {
+    type: "line",
+    data: {
+      labels,
+      datasets: [
+        {
+          label: "Realized P&L",
+          data: values,
+          tension: 0.2,
+        },
+      ],
+    },
+    options: {
+      plugins: {
+        legend: { display: false },
+      },
+      scales: {
+        x: {
+          ticks: { autoSkip: true, maxTicksLimit: 6 },
+        },
+      },
+    },
+  });
+
+  const cash = Number(account.cash || 0);
+  const positionsValue = Number(account.positions_value || 0);
+  const netProfit = Number(stats.net_profit || 0);
+
+  const breakdownLabels = ["Cash", "Positions", "Net Profit"];
+  const breakdownValues = [cash, positionsValue, netProfit];
+
+  if (breakdownChart) breakdownChart.destroy();
+  breakdownChart = new Chart(ctxBreakdown, {
+    type: "doughnut",
+    data: {
+      labels: breakdownLabels,
+      datasets: [
+        {
+          data: breakdownValues,
+        },
+      ],
+    },
+    options: {
+      plugins: {
+        legend: { position: "bottom" },
+      },
+    },
+  });
+}
+
+// ---------------------- trades (simple + table) ---------------------- //
+
+function renderFillsSimple(fills) {
+  const list = document.getElementById("fills-simple-list");
+  if (!list) return;
+  list.innerHTML = "";
+
+  if (!fills || !fills.length) {
+    const li = document.createElement("li");
+    li.className = "placeholder";
+    li.textContent = "No recent trades.";
+    list.appendChild(li);
+    return;
+  }
+
+  const sorted = [...fills].sort(
+    (a, b) => (getSafeTimestamp(b) || 0) - (getSafeTimestamp(a) || 0)
+  );
+  const top = sorted.slice(0, 12);
+
+  for (const f of top) {
+    const li = document.createElement("li");
+
+    const size =
+      f.count ??
+      f.size ??
+      f.quantity ??
+      f.contracts ??
+      f.contracts_count ??
+      0;
+    const price = Number(f.price || 0);
+    const cost = Number(size) * price;
+
+    const main = document.createElement("div");
+    main.className = "trade-main-line";
+
+    const timeSpan = document.createElement("span");
+    timeSpan.className = "trade-time";
+    timeSpan.textContent = formatTime(f);
+
+    const marketSpan = document.createElement("span");
+    marketSpan.className = "trade-market";
+    marketSpan.textContent = formatTickerReadable(
+      f.ticker || f.market || ""
+    );
+
+    const actionSpan = document.createElement("span");
+    actionSpan.className =
+      "trade-action " +
+      ((f.action || "").toLowerCase() === "buy"
+        ? "trade-buy"
+        : "trade-sell");
+    actionSpan.textContent = (f.action || "").toUpperCase();
+
+    main.appendChild(timeSpan);
+    main.appendChild(document.createTextNode(" • "));
+    main.appendChild(marketSpan);
+    main.appendChild(document.createTextNode(" • "));
+    main.appendChild(actionSpan);
+
+    const extra = document.createElement("div");
+    extra.className = "trade-extra";
+    extra.textContent = `${size} contracts at ${price.toFixed(
+      2
+    )}  → cost $${cost.toFixed(2)}`;
+
+    li.appendChild(main);
+    li.appendChild(extra);
+    list.appendChild(li);
+  }
+}
 
 function renderFillsTable(fills) {
   const tbody = document.getElementById("fills-table-body");
@@ -160,7 +293,7 @@ function renderFillsTable(fills) {
     const td = document.createElement("td");
     td.colSpan = 6;
     td.className = "placeholder";
-    td.textContent = "No fills in the selected window";
+    td.textContent = "No recent trades.";
     tr.appendChild(td);
     tbody.appendChild(tr);
     return;
@@ -206,7 +339,7 @@ function renderSettlementsTable(settlements) {
     const td = document.createElement("td");
     td.colSpan = 4;
     td.className = "placeholder";
-    td.textContent = "No settlements in the selected window";
+    td.textContent = "No recent settlements.";
     tr.appendChild(td);
     tbody.appendChild(tr);
     return;
@@ -217,10 +350,10 @@ function renderSettlementsTable(settlements) {
   );
 
   for (const s of sorted) {
+    const tr = document.createElement("tr");
     const cashChange =
       Number(s.cash_change ?? s.cashChange ?? 0);
 
-    const tr = document.createElement("tr");
     const cashCell = document.createElement("td");
     cashCell.textContent = formatCurrency(cashChange, true);
     cashCell.classList.add(
@@ -233,23 +366,21 @@ function renderSettlementsTable(settlements) {
       <td>${s.outcome || s.final_position || s.finalPosition || ""}</td>
     `;
     tr.appendChild(cashCell);
-
     tbody.appendChild(tr);
   }
 }
 
-// --------------------------------------------------
-// Fetch + boot
-// --------------------------------------------------
+// ---------------------- fetch + boot ---------------------- //
 
 async function fetchAndRender() {
   try {
-    const url = `${JSON_URL}?t=${Date.now()}`;
-    const resp = await fetch(url);
+    const resp = await fetch(`${JSON_URL}?t=${Date.now()}`);
     if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
     const data = await resp.json();
 
     renderSummary(data);
+    renderCharts(data);
+    renderFillsSimple(data.fills_last_n_days || []);
     renderFillsTable(data.fills_last_n_days || []);
     renderSettlementsTable(data.settlements_last_n_days || []);
   } catch (err) {
@@ -260,11 +391,4 @@ async function fetchAndRender() {
 document.addEventListener("DOMContentLoaded", () => {
   fetchAndRender();
   setInterval(fetchAndRender, REFRESH_MS);
-
-  const refreshButton = document.getElementById("refresh-button");
-  if (refreshButton) {
-    refreshButton.addEventListener("click", () => {
-      fetchAndRender();
-    });
-  }
 });
