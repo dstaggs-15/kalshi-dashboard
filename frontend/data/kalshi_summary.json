@@ -1,6 +1,6 @@
 {
     "meta": {
-        "updated_at": "2025-11-29 04:00:40"
+        "updated_at": "2025-11-29 04:07:06"
     },
     "account": {
         "cash_balance": 0.0,
@@ -10,8 +10,7 @@
     "summary": {
         "total_deposits": 40.0,
         "net_profit": -40.0,
-        "roi_percent": -100.0,
-        "house_money_share": 0.0
+        "roi_percent": -100.0
     },
     "fills": [],
     "settlements": []
