@@ -105,25 +105,26 @@ function renderSummary(data) {
     totalDeposits > 0 ? (netProfit / totalDeposits) * 100.0 : 0.0;
 
   // Navbar bubbles
-  document.getElementById("nav-account-value").textContent =
-    formatCurrency(accountValue);
+  const navAccount = document.getElementById("nav-account-value");
+  if (navAccount) navAccount.textContent = formatCurrency(accountValue);
+
   const navNet = document.getElementById("nav-net-profit");
-  setSignedText(navNet, netProfit);
+  if (navNet) setSignedText(navNet, netProfit);
 
   // Metric cards
-  document.getElementById("metric-deposits").textContent =
-    formatCurrency(totalDeposits);
-  document.getElementById("metric-account-value").textContent =
-    formatCurrency(accountValue);
-  document.getElementById("metric-cash").textContent =
-    formatCurrency(cash);
-  document.getElementById("metric-positions-value").textContent =
-    formatCurrency(positionsValue);
+  const elDeposits = document.getElementById("metric-deposits");
+  if (elDeposits) elDeposits.textContent = formatCurrency(totalDeposits);
 
-  setSignedText(
-    document.getElementById("metric-net-profit"),
-    netProfit
-  );
+  const elAccount = document.getElementById("metric-account-value");
+  if (elAccount) elAccount.textContent = formatCurrency(accountValue);
+
+  const elCash = document.getElementById("metric-cash");
+  if (elCash) elCash.textContent = formatCurrency(cash);
+
+  const elPositions = document.getElementById("metric-positions-value");
+  if (elPositions) elPositions.textContent = formatCurrency(positionsValue);
+
+  setSignedText(document.getElementById("metric-net-profit"), netProfit);
   setSignedText(
     document.getElementById("metric-realized-pnl"),
     realizedPnl
@@ -133,9 +134,11 @@ function renderSummary(data) {
     unrealizedPnl
   );
 
-  document.getElementById("metric-roi").textContent = toPercent(roi);
-  document.getElementById("metric-house-money").textContent =
-    toPercent(housePct);
+  const elRoi = document.getElementById("metric-roi");
+  if (elRoi) elRoi.textContent = toPercent(roi);
+
+  const elHouse = document.getElementById("metric-house-money");
+  if (elHouse) elHouse.textContent = toPercent(housePct);
 
   const genEl = document.getElementById("summary-generated-at");
   if (genEl && data.generated_at) {
@@ -167,7 +170,7 @@ function renderCharts(data) {
       labels,
       datasets: [
         {
-          label: "Realized P&L",
+          label: "Closed Bets P&L",
           data: values,
           tension: 0.2,
         },
@@ -189,7 +192,7 @@ function renderCharts(data) {
   const positionsValue = Number(account.positions_value || 0);
   const netProfit = Number(stats.net_profit || 0);
 
-  const breakdownLabels = ["Cash", "Positions", "Net Profit"];
+  const breakdownLabels = ["Cash", "Money in Bets", "Overall Profit"];
   const breakdownValues = [cash, positionsValue, netProfit];
 
   if (breakdownChart) breakdownChart.destroy();
