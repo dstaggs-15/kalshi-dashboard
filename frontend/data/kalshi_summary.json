@@ -1,11 +1,15 @@
 {
     "meta": {
-        "updated_at": "2025-11-29 15:34:55"
+        "updated_at": "2025-11-29 15:52:05"
     },
     "account": {
         "cash_balance": 56.2,
         "total_account_value": 56.2,
-        "money_in_bets": 0.0
+        "money_in_bets": 0.0,
+        "cash_balance_cents": 5620,
+        "portfolio_value_cents_api": 5620,
+        "total_account_value_api": 56.2,
+        "positions_exposure_cents": 0
     },
     "summary": {
         "total_deposits": 40.0,
@@ -18,6 +22,7 @@
             "side": "yes",
             "count": 19,
             "price_cents": 0.24,
+            "price_dollars": "0.0024",
             "created_time": "2025-11-29T06:38:58.313193+00:00"
         },
         {
@@ -25,6 +30,7 @@
             "side": "yes",
             "count": 13,
             "price_cents": 0.14,
+            "price_dollars": "0.0014",
             "created_time": "2025-11-29T04:58:51.554180+00:00"
         },
         {
@@ -32,6 +38,7 @@
             "side": "no",
             "count": 11,
             "price_cents": 0.75,
+            "price_dollars": "0.0075",
             "created_time": "2025-11-29T03:22:56.016284+00:00"
         },
         {
@@ -39,6 +46,7 @@
             "side": "yes",
             "count": 6,
             "price_cents": 0.3,
+            "price_dollars": "0.0030",
             "created_time": "2025-11-28T22:23:06.945268+00:00"
         },
         {
@@ -46,6 +54,7 @@
             "side": "no",
             "count": 10,
             "price_cents": 0.7,
+            "price_dollars": "0.0070",
             "created_time": "2025-11-28T22:22:44.292196+00:00"
         },
         {
@@ -53,6 +62,7 @@
             "side": "yes",
             "count": 11,
             "price_cents": 0.43,
+            "price_dollars": "0.0043",
             "created_time": "2025-11-28T21:35:03.014094+00:00"
         },
         {
@@ -60,6 +70,7 @@
             "side": "yes",
             "count": 10,
             "price_cents": 0.44,
+            "price_dollars": "0.0044",
             "created_time": "2025-11-28T20:52:29.669822+00:00"
         },
         {
@@ -67,6 +78,7 @@
             "side": "no",
             "count": 36,
             "price_cents": 0.46,
+            "price_dollars": "0.0046",
             "created_time": "2025-11-28T20:52:00.558443+00:00"
         },
         {
@@ -74,6 +86,7 @@
             "side": "yes",
             "count": 36,
             "price_cents": 0.26,
+            "price_dollars": "0.0026",
             "created_time": "2025-11-28T17:02:24.325077+00:00"
         },
         {
@@ -81,6 +94,7 @@
             "side": "no",
             "count": 56,
             "price_cents": 0.9,
+            "price_dollars": "0.0090",
             "created_time": "2025-11-28T04:04:38.396853+00:00"
         },
         {
@@ -88,6 +102,7 @@
             "side": "yes",
             "count": 56,
             "price_cents": 0.87,
+            "price_dollars": "0.0087",
             "created_time": "2025-11-28T04:00:45.219963+00:00"
         },
         {
@@ -95,6 +110,7 @@
             "side": "no",
             "count": 16,
             "price_cents": 0.12,
+            "price_dollars": "0.0012",
             "created_time": "2025-11-28T03:59:14.380169+00:00"
         },
         {
@@ -102,6 +118,7 @@
             "side": "yes",
             "count": 16,
             "price_cents": 0.31,
+            "price_dollars": "0.0031",
             "created_time": "2025-11-28T03:45:41.116022+00:00"
         },
         {
@@ -109,6 +126,7 @@
             "side": "no",
             "count": 10,
             "price_cents": 0.43,
+            "price_dollars": "0.0043",
             "created_time": "2025-11-28T03:45:14.095041+00:00"
         },
         {
@@ -116,6 +134,7 @@
             "side": "yes",
             "count": 10,
             "price_cents": 0.45,
+            "price_dollars": "0.0045",
             "created_time": "2025-11-28T03:26:44.959173+00:00"
         },
         {
@@ -123,6 +142,7 @@
             "side": "no",
             "count": 61,
             "price_cents": 0.55,
+            "price_dollars": "0.0055",
             "created_time": "2025-11-28T03:24:47.367796+00:00"
         },
         {
@@ -130,6 +150,7 @@
             "side": "yes",
             "count": 61,
             "price_cents": 0.31,
+            "price_dollars": "0.0031",
             "created_time": "2025-11-28T01:29:50.351649+00:00"
         },
         {
@@ -137,6 +158,7 @@
             "side": "no",
             "count": 20,
             "price_cents": 0.32,
+            "price_dollars": "0.0032",
             "created_time": "2025-11-28T01:29:34.990498+00:00"
         },
         {
@@ -144,6 +166,7 @@
             "side": "yes",
             "count": 20,
             "price_cents": 0.23,
+            "price_dollars": "0.0023",
             "created_time": "2025-11-28T01:00:40.475852+00:00"
         },
         {
@@ -151,6 +174,7 @@
             "side": "no",
             "count": 7,
             "price_cents": 0.15,
+            "price_dollars": "0.0015",
             "created_time": "2025-11-28T00:35:09.560656+00:00"
         },
         {
@@ -158,6 +182,7 @@
             "side": "yes",
             "count": 7,
             "price_cents": 0.26,
+            "price_dollars": "0.0026",
             "created_time": "2025-11-28T00:31:17.504684+00:00"
         },
         {
@@ -165,6 +190,7 @@
             "side": "no",
             "count": 11,
             "price_cents": 0.75,
+            "price_dollars": "0.0075",
             "created_time": "2025-11-28T00:30:26.661602+00:00"
         },
         {
@@ -172,6 +198,7 @@
             "side": "yes",
             "count": 11,
             "price_cents": 0.43,
+            "price_dollars": "0.0043",
             "created_time": "2025-11-28T00:09:16.121810+00:00"
         },
         {
@@ -179,6 +206,7 @@
             "side": "no",
             "count": 16,
             "price_cents": 0.57,
+            "price_dollars": "0.0057",
             "created_time": "2025-11-28T00:08:53.379465+00:00"
         },
         {
@@ -186,6 +214,7 @@
             "side": "yes",
             "count": 16,
             "price_cents": 0.29,
+            "price_dollars": "0.0029",
             "created_time": "2025-11-27T23:49:25.829229+00:00"
         },
         {
@@ -193,6 +222,7 @@
             "side": "no",
             "count": 12,
             "price_cents": 0.71,
+            "price_dollars": "0.0071",
             "created_time": "2025-11-27T23:49:04.151506+00:00"
         },
         {
@@ -200,6 +230,7 @@
             "side": "yes",
             "count": 12,
             "price_cents": 0.38,
+            "price_dollars": "0.0038",
             "created_time": "2025-11-27T21:01:59.389914+00:00"
         },
         {
@@ -207,6 +238,7 @@
             "side": "no",
             "count": 24,
             "price_cents": 0.9,
+            "price_dollars": "0.0090",
             "created_time": "2025-11-27T20:58:21.786990+00:00"
         },
         {
@@ -214,6 +246,7 @@
             "side": "yes",
             "count": 24,
             "price_cents": 0.41,
+            "price_dollars": "0.0041",
             "created_time": "2025-11-27T15:47:02.267362+00:00"
         },
         {
@@ -221,6 +254,7 @@
             "side": "yes",
             "count": 11,
             "price_cents": 0.82,
+            "price_dollars": "0.0082",
             "created_time": "2025-11-26T20:57:58.067594+00:00"
         },
         {
@@ -228,6 +262,7 @@
             "side": "yes",
             "count": 6,
             "price_cents": 0.14,
+            "price_dollars": "0.0014",
             "created_time": "2025-11-26T20:42:04.716006+00:00"
         },
         {
@@ -235,6 +270,7 @@
             "side": "yes",
             "count": 54,
             "price_cents": 0.14,
+            "price_dollars": "0.0014",
             "created_time": "2025-11-26T20:42:04.716006+00:00"
         },
         {
@@ -242,6 +278,7 @@
             "side": "yes",
             "count": 6,
             "price_cents": 0.14,
+            "price_dollars": "0.0014",
             "created_time": "2025-11-26T20:42:04.716006+00:00"
         },
         {
@@ -249,6 +286,7 @@
             "side": "yes",
             "count": 45,
             "price_cents": 0.1,
+            "price_dollars": "0.0010",
             "created_time": "2025-11-25T19:45:40.618516+00:00"
         },
         {
@@ -256,6 +294,7 @@
             "side": "yes",
             "count": 26,
             "price_cents": 0.18,
+            "price_dollars": "0.0018",
             "created_time": "2025-11-25T19:45:03.871428+00:00"
         }
     ],
@@ -264,70 +303,95 @@
             "ticker": "KXNCAAFGAME-25NOV28ARIZASU-ASU",
             "outcome": "",
             "received_cents": 0,
+            "received_dollars": "0.00",
             "settled_time": "2025-11-29T05:45:40.350750+00:00"
         },
         {
             "ticker": "KXNCAAFGAME-25NOV28TXAMTEX-TEX",
             "outcome": "",
             "received_cents": 0,
+            "received_dollars": "0.00",
             "settled_time": "2025-11-29T04:25:38.287023+00:00"
         },
         {
             "ticker": "KXNCAAFGAME-25NOV28UGAGT-GT",
             "outcome": "",
             "received_cents": 0,
+            "received_dollars": "0.00",
             "settled_time": "2025-11-29T00:01:01.363191+00:00"
         },
         {
             "ticker": "KXNFLGAME-25NOV28CHIPHI-CHI",
             "outcome": "",
             "received_cents": 0,
+            "received_dollars": "0.00",
             "settled_time": "2025-11-28T23:10:52.457390+00:00"
         },
         {
             "ticker": "KXNFLGAME-25NOV28CHIPHI-PHI",
             "outcome": "",
             "received_cents": 0,
+            "received_dollars": "0.00",
             "settled_time": "2025-11-28T23:10:52.453367+00:00"
         },
         {
             "ticker": "KXNFLGAME-25NOV27CINBAL-CIN",
             "outcome": "",
             "received_cents": 0,
+            "received_dollars": "0.00",
             "settled_time": "2025-11-28T04:50:45.537271+00:00"
         },
         {
             "ticker": "KXNFLGAME-25NOV27CINBAL-BAL",
             "outcome": "",
             "received_cents": 0,
+            "received_dollars": "0.00",
             "settled_time": "2025-11-28T04:50:45.537271+00:00"
         },
         {
             "ticker": "KXNFLGAME-25NOV27KCDAL-KC",
             "outcome": "",
             "received_cents": 0,
+            "received_dollars": "0.00",
             "settled_time": "2025-11-28T01:06:05.271076+00:00"
         },
         {
             "ticker": "KXNFLGAME-25NOV27KCDAL-DAL",
             "outcome": "",
             "received_cents": 0,
+            "received_dollars": "0.00",
             "settled_time": "2025-11-28T01:06:05.271076+00:00"
         },
         {
             "ticker": "KXNFLGAME-25NOV27GBDET-GB",
             "outcome": "",
             "received_cents": 0,
+            "received_dollars": "0.00",
             "settled_time": "2025-11-27T21:25:55.771683+00:00"
         },
         {
             "ticker": "KXHIGHAUS-25NOV26-B65.5",
             "outcome": "",
             "received_cents": 0,
+            "received_dollars": "0.00",
             "settled_time": "2025-11-27T19:00:03.958499+00:00"
         }
     ],
+    "positions": {
+        "market_positions": [],
+        "event_positions": []
+    },
+    "raw": {
+        "balance": {
+            "balance": 5620
+        },
+        "positions": {
+            "cursor": ""
+        }
+    },
     "debug_log": [
-        "SUCCESS: Authentication Passed"
+        "SUCCESS: Authentication Passed",
+        "portfolio_value was 0; used balance + collateral as fallback.",
+        "Completed snapshot. Cash=$56.20, API_portfolio=$56.20, Exposure\u2248$0.00, Estimated_total\u2248$56.20"
     ]
 }
