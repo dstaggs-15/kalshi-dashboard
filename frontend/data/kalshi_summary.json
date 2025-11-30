@@ -1,22 +1,62 @@
 {
     "meta": {
-        "updated_at": "2025-11-30 19:02:49"
+        "updated_at": "2025-11-30 19:31:27"
     },
     "account": {
-        "cash_balance": 45.93,
-        "total_account_value": 45.93,
+        "cash_balance": 68.04,
+        "total_account_value": 68.04,
         "money_in_bets": 0.0,
-        "cash_balance_cents": 4593,
-        "portfolio_value_cents_api": 4593,
-        "total_account_value_api": 45.93,
+        "cash_balance_cents": 6804,
+        "portfolio_value_cents_api": 6804,
+        "total_account_value_api": 68.04,
         "positions_exposure_cents": 0
     },
     "summary": {
         "total_deposits": 40.0,
-        "net_profit": 5.93,
-        "roi_percent": 14.825
+        "net_profit": 28.040000000000006,
+        "roi_percent": 70.10000000000002
     },
     "fills": [
+        {
+            "ticker": "KXNFLGAME-25NOV30HOUIND-IND",
+            "side": "yes",
+            "count": 1,
+            "price_cents": 0.47,
+            "price_dollars": "0.0047",
+            "created_time": "2025-11-30T19:13:31.899313+00:00"
+        },
+        {
+            "ticker": "KXNFLGAME-25NOV30HOUIND-IND",
+            "side": "yes",
+            "count": 9,
+            "price_cents": 0.47,
+            "price_dollars": "0.0047",
+            "created_time": "2025-11-30T19:13:31.899313+00:00"
+        },
+        {
+            "ticker": "KXNFLGAME-25NOV30ATLNYJ-ATL",
+            "side": "yes",
+            "count": 8,
+            "price_cents": 0.34,
+            "price_dollars": "0.0034",
+            "created_time": "2025-11-30T19:04:24.073631+00:00"
+        },
+        {
+            "ticker": "KXNFLGAME-25NOV30LACAR-CAR",
+            "side": "yes",
+            "count": 3,
+            "price_cents": 0.29,
+            "price_dollars": "0.0029",
+            "created_time": "2025-11-30T19:04:01.385513+00:00"
+        },
+        {
+            "ticker": "KXNFLGAME-25NOV30ARITB-TB",
+            "side": "no",
+            "count": 38,
+            "price_cents": 0.82,
+            "price_dollars": "0.0082",
+            "created_time": "2025-11-30T19:03:03.171864+00:00"
+        },
         {
             "ticker": "KXNFLGAME-25NOV30ARITB-TB",
             "side": "yes",
@@ -491,7 +531,7 @@
     },
     "raw": {
         "balance": {
-            "balance": 4593
+            "balance": 6804
         },
         "positions": {
             "cursor": ""
@@ -500,6 +540,6 @@
     "debug_log": [
         "SUCCESS: Authentication Passed",
         "portfolio_value was 0; used balance + collateral as fallback.",
-        "Completed snapshot. Cash=$45.93, API_portfolio=$45.93, Exposure\u2248$0.00, Estimated_total\u2248$45.93"
+        "Completed snapshot. Cash=$68.04, API_portfolio=$68.04, Exposure\u2248$0.00, Estimated_total\u2248$68.04"
     ]
 }
