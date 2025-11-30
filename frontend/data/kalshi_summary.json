@@ -1,20 +1,20 @@
 {
     "meta": {
-        "updated_at": "2025-11-29 23:33:50"
+        "updated_at": "2025-11-30 00:50:49"
     },
     "account": {
-        "cash_balance": 55.83,
-        "total_account_value": 55.83,
+        "cash_balance": 65.83,
+        "total_account_value": 65.83,
         "money_in_bets": 0.0,
-        "cash_balance_cents": 5583,
-        "portfolio_value_cents_api": 5583,
-        "total_account_value_api": 55.83,
+        "cash_balance_cents": 6583,
+        "portfolio_value_cents_api": 6583,
+        "total_account_value_api": 65.83,
         "positions_exposure_cents": 0
     },
     "summary": {
         "total_deposits": 40.0,
-        "net_profit": 15.829999999999998,
-        "roi_percent": 39.574999999999996
+        "net_profit": 25.83,
+        "roi_percent": 64.57499999999999
     },
     "fills": [
         {
@@ -340,6 +340,20 @@
     ],
     "settlements": [
         {
+            "ticker": "KXNCAAFGAME-25NOV29LSUOKLA-LSU",
+            "outcome": "",
+            "received_cents": 0,
+            "received_dollars": "0.00",
+            "settled_time": "2025-11-30T00:16:51.593679+00:00"
+        },
+        {
+            "ticker": "KXNCAAFGAME-25NOV29VANTENN-VAN",
+            "outcome": "",
+            "received_cents": 0,
+            "received_dollars": "0.00",
+            "settled_time": "2025-11-30T00:16:19.371583+00:00"
+        },
+        {
             "ticker": "KXNCAAFGAME-25NOV29OSUMICH-MICH",
             "outcome": "",
             "received_cents": 0,
@@ -430,7 +444,7 @@
     },
     "raw": {
         "balance": {
-            "balance": 5583
+            "balance": 6583
         },
         "positions": {
             "cursor": ""
@@ -439,6 +453,6 @@
     "debug_log": [
         "SUCCESS: Authentication Passed",
         "portfolio_value was 0; used balance + collateral as fallback.",
-        "Completed snapshot. Cash=$55.83, API_portfolio=$55.83, Exposure\u2248$0.00, Estimated_total\u2248$55.83"
+        "Completed snapshot. Cash=$65.83, API_portfolio=$65.83, Exposure\u2248$0.00, Estimated_total\u2248$65.83"
     ]
 }
