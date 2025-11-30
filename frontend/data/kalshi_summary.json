@@ -1,6 +1,6 @@
 {
     "meta": {
-        "updated_at": "2025-11-30 20:38:35"
+        "updated_at": "2025-11-30 21:07:42"
     },
     "account": {
         "cash_balance": 74.76,
@@ -419,6 +419,20 @@
         }
     ],
     "settlements": [
+        {
+            "ticker": "KXNFLGAME-25NOV30ARITB-TB",
+            "outcome": "",
+            "received_cents": 0,
+            "received_dollars": "0.00",
+            "settled_time": "2025-11-30T21:01:05.999471+00:00"
+        },
+        {
+            "ticker": "KXNFLGAME-25NOV30LACAR-CAR",
+            "outcome": "",
+            "received_cents": 0,
+            "received_dollars": "0.00",
+            "settled_time": "2025-11-30T20:56:14.270960+00:00"
+        },
         {
             "ticker": "KXNCAAFGAME-25NOV29ALAAUB-AUB",
             "outcome": "",
