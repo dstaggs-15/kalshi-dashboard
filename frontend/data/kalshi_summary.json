@@ -1,6 +1,6 @@
 {
     "meta": {
-        "updated_at": "2025-11-30 04:24:12"
+        "updated_at": "2025-11-30 04:49:50"
     },
     "account": {
         "cash_balance": 64.96,
@@ -355,6 +355,13 @@
         }
     ],
     "settlements": [
+        {
+            "ticker": "KXNCAAFGAME-25NOV29ALAAUB-AUB",
+            "outcome": "",
+            "received_cents": 0,
+            "received_dollars": "0.00",
+            "settled_time": "2025-11-30T04:35:44.981096+00:00"
+        },
         {
             "ticker": "KXNCAAFGAME-25NOV29LSUOKLA-LSU",
             "outcome": "",
