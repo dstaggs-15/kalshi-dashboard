@@ -1,22 +1,38 @@
 {
     "meta": {
-        "updated_at": "2025-11-30 15:08:06"
+        "updated_at": "2025-11-30 15:34:33"
     },
     "account": {
-        "cash_balance": 64.96,
-        "total_account_value": 64.96,
+        "cash_balance": 70.87,
+        "total_account_value": 70.87,
         "money_in_bets": 0.0,
-        "cash_balance_cents": 6496,
-        "portfolio_value_cents_api": 6496,
-        "total_account_value_api": 64.96,
+        "cash_balance_cents": 7087,
+        "portfolio_value_cents_api": 7087,
+        "total_account_value_api": 70.87,
         "positions_exposure_cents": 0
     },
     "summary": {
         "total_deposits": 40.0,
-        "net_profit": 24.959999999999994,
-        "roi_percent": 62.39999999999999
+        "net_profit": 30.870000000000005,
+        "roi_percent": 77.17500000000001
     },
     "fills": [
+        {
+            "ticker": "KXHEISMAN-26-DPAV",
+            "side": "no",
+            "count": 22,
+            "price_cents": 0.15,
+            "price_dollars": "0.0015",
+            "created_time": "2025-11-30T15:24:31.266358+00:00"
+        },
+        {
+            "ticker": "KXHEISMAN-26-DPAV",
+            "side": "no",
+            "count": 23,
+            "price_cents": 0.13,
+            "price_dollars": "0.0013",
+            "created_time": "2025-11-30T15:24:31.266358+00:00"
+        },
         {
             "ticker": "KXNCAAFGAME-25NOV29ALAAUB-AUB",
             "side": "no",
@@ -467,7 +483,7 @@
     },
     "raw": {
         "balance": {
-            "balance": 6496
+            "balance": 7087
         },
         "positions": {
             "cursor": ""
@@ -476,6 +492,6 @@
     "debug_log": [
         "SUCCESS: Authentication Passed",
         "portfolio_value was 0; used balance + collateral as fallback.",
-        "Completed snapshot. Cash=$64.96, API_portfolio=$64.96, Exposure\u2248$0.00, Estimated_total\u2248$64.96"
+        "Completed snapshot. Cash=$70.87, API_portfolio=$70.87, Exposure\u2248$0.00, Estimated_total\u2248$70.87"
     ]
 }
