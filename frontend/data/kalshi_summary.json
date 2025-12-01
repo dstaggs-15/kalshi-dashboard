@@ -1,22 +1,30 @@
 {
     "meta": {
-        "updated_at": "2025-11-30 23:34:05"
+        "updated_at": "2025-12-01 00:55:04"
     },
     "account": {
-        "cash_balance": 76.19,
-        "total_account_value": 76.19,
+        "cash_balance": 26.27,
+        "total_account_value": 26.27,
         "money_in_bets": 0.0,
-        "cash_balance_cents": 7619,
-        "portfolio_value_cents_api": 7619,
-        "total_account_value_api": 76.19,
+        "cash_balance_cents": 2627,
+        "portfolio_value_cents_api": 2627,
+        "total_account_value_api": 26.27,
         "positions_exposure_cents": 0
     },
     "summary": {
         "total_deposits": 40.0,
-        "net_profit": 36.19,
-        "roi_percent": 90.475
+        "net_profit": -13.73,
+        "roi_percent": -34.325
     },
     "fills": [
+        {
+            "ticker": "KXNFLGAME-25NOV30DENWAS-DEN",
+            "side": "yes",
+            "count": 68,
+            "price_cents": 0.72,
+            "price_dollars": "0.0072",
+            "created_time": "2025-12-01T00:44:12.503360+00:00"
+        },
         {
             "ticker": "KXNFLGAME-25NOV30MINSEA-SEA",
             "side": "no",
@@ -408,17 +416,16 @@
             "price_cents": 0.82,
             "price_dollars": "0.0082",
             "created_time": "2025-11-26T20:57:58.067594+00:00"
-        },
-        {
-            "ticker": "KXZELENSKYYPUTINMEET-26",
-            "side": "yes",
-            "count": 6,
-            "price_cents": 0.14,
-            "price_dollars": "0.0014",
-            "created_time": "2025-11-26T20:42:04.716006+00:00"
         }
     ],
     "settlements": [
+        {
+            "ticker": "KXNFLGAME-25NOV30MINSEA-SEA",
+            "outcome": "",
+            "received_cents": 0,
+            "received_dollars": "0.00",
+            "settled_time": "2025-12-01T00:00:36.155981+00:00"
+        },
         {
             "ticker": "KXNFLGAME-25NOV30ATLNYJ-ATL",
             "outcome": "",
@@ -559,7 +566,7 @@
     },
     "raw": {
         "balance": {
-            "balance": 7619
+            "balance": 2627
         },
         "positions": {
             "cursor": ""
@@ -568,6 +575,6 @@
     "debug_log": [
         "SUCCESS: Authentication Passed",
         "portfolio_value was 0; used balance + collateral as fallback.",
-        "Completed snapshot. Cash=$76.19, API_portfolio=$76.19, Exposure\u2248$0.00, Estimated_total\u2248$76.19"
+        "Completed snapshot. Cash=$26.27, API_portfolio=$26.27, Exposure\u2248$0.00, Estimated_total\u2248$26.27"
     ]
 }
