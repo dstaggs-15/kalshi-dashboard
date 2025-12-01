@@ -1,6 +1,6 @@
 {
     "meta": {
-        "updated_at": "2025-12-01 04:31:24"
+        "updated_at": "2025-12-01 05:19:16"
     },
     "account": {
         "cash_balance": 81.32,
@@ -419,6 +419,13 @@
         }
     ],
     "settlements": [
+        {
+            "ticker": "KXNFLGAME-25NOV30DENWAS-DEN",
+            "outcome": "",
+            "received_cents": 0,
+            "received_dollars": "0.00",
+            "settled_time": "2025-12-01T05:08:02.756037+00:00"
+        },
         {
             "ticker": "KXNFLGAME-25NOV30MINSEA-SEA",
             "outcome": "",
