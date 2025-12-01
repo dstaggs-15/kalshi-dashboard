@@ -1,22 +1,30 @@
 {
     "meta": {
-        "updated_at": "2025-12-01 22:40:10"
+        "updated_at": "2025-12-01 23:09:19"
     },
     "account": {
-        "cash_balance": 81.32,
-        "total_account_value": 81.32,
+        "cash_balance": 1.72,
+        "total_account_value": 1.72,
         "money_in_bets": 0.0,
-        "cash_balance_cents": 8132,
-        "portfolio_value_cents_api": 8132,
-        "total_account_value_api": 81.32,
+        "cash_balance_cents": 172,
+        "portfolio_value_cents_api": 172,
+        "total_account_value_api": 1.72,
         "positions_exposure_cents": 0
     },
     "summary": {
         "total_deposits": 40.0,
-        "net_profit": 41.31999999999999,
-        "roi_percent": 103.3
+        "net_profit": -38.28,
+        "roi_percent": -95.7
     },
     "fills": [
+        {
+            "ticker": "KXNFLGAME-25DEC01NYGNE-NE",
+            "side": "yes",
+            "count": 103,
+            "price_cents": 0.76,
+            "price_dollars": "0.0076",
+            "created_time": "2025-12-01T22:54:42.385107+00:00"
+        },
         {
             "ticker": "KXNFLGAME-25NOV30DENWAS-DEN",
             "side": "no",
@@ -408,14 +416,6 @@
             "price_cents": 0.9,
             "price_dollars": "0.0090",
             "created_time": "2025-11-27T20:58:21.786990+00:00"
-        },
-        {
-            "ticker": "KXNFLGAME-25NOV27GBDET-GB",
-            "side": "yes",
-            "count": 24,
-            "price_cents": 0.41,
-            "price_dollars": "0.0041",
-            "created_time": "2025-11-27T15:47:02.267362+00:00"
         }
     ],
     "settlements": [
@@ -573,7 +573,7 @@
     },
     "raw": {
         "balance": {
-            "balance": 8132
+            "balance": 172
         },
         "positions": {
             "cursor": ""
@@ -582,6 +582,6 @@
     "debug_log": [
         "SUCCESS: Authentication Passed",
         "portfolio_value was 0; used balance + collateral as fallback.",
-        "Completed snapshot. Cash=$81.32, API_portfolio=$81.32, Exposure\u2248$0.00, Estimated_total\u2248$81.32"
+        "Completed snapshot. Cash=$1.72, API_portfolio=$1.72, Exposure\u2248$0.00, Estimated_total\u2248$1.72"
     ]
 }
