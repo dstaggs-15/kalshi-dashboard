@@ -1,6 +1,6 @@
 {
     "meta": {
-        "updated_at": "2025-12-05 04:46:42"
+        "updated_at": "2025-12-05 05:10:38"
     },
     "account": {
         "cash_balance": 8.47,
@@ -419,6 +419,13 @@
         }
     ],
     "settlements": [
+        {
+            "ticker": "KXNFLGAME-25DEC04DALDET-DAL",
+            "outcome": "",
+            "received_cents": 0,
+            "received_dollars": "0.00",
+            "settled_time": "2025-12-05T04:46:06.505138+00:00"
+        },
         {
             "ticker": "KXNFLGAME-25DEC01NYGNE-NE",
             "outcome": "",
