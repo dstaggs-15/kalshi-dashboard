@@ -1,22 +1,46 @@
 {
     "meta": {
-        "updated_at": "2025-12-06 20:37:35"
+        "updated_at": "2025-12-06 21:07:35"
     },
     "account": {
-        "cash_balance": 18.4,
-        "total_account_value": 18.4,
+        "cash_balance": 3.61,
+        "total_account_value": 3.61,
         "money_in_bets": 0.0,
-        "cash_balance_cents": 1840,
-        "portfolio_value_cents_api": 1840,
-        "total_account_value_api": 18.4,
+        "cash_balance_cents": 361,
+        "portfolio_value_cents_api": 361,
+        "total_account_value_api": 3.61,
         "positions_exposure_cents": 0
     },
     "summary": {
         "total_deposits": 40.0,
-        "net_profit": -21.6,
-        "roi_percent": -54.0
+        "net_profit": -36.39,
+        "roi_percent": -90.97500000000001
     },
     "fills": [
+        {
+            "ticker": "KXNCAAFGAME-25DEC06UGAALA-UGA",
+            "side": "yes",
+            "count": 9,
+            "price_cents": 0.53,
+            "price_dollars": "0.0053",
+            "created_time": "2025-12-06T21:07:13.044074+00:00"
+        },
+        {
+            "ticker": "KXNCAAMENTION-25DEC06UGAALA-ROUG",
+            "side": "yes",
+            "count": 15,
+            "price_cents": 0.31,
+            "price_dollars": "0.0031",
+            "created_time": "2025-12-06T21:06:53.440455+00:00"
+        },
+        {
+            "ticker": "KXNCAAFGAME-25DEC06UGAALA-ALA",
+            "side": "yes",
+            "count": 10,
+            "price_cents": 0.48,
+            "price_dollars": "0.0048",
+            "created_time": "2025-12-06T21:05:21.766852+00:00"
+        },
         {
             "ticker": "KXNCAAFGAME-25DEC06BYUTTU-BYU",
             "side": "yes",
@@ -392,30 +416,6 @@
             "price_cents": 0.55,
             "price_dollars": "0.0055",
             "created_time": "2025-11-28T03:24:47.367796+00:00"
-        },
-        {
-            "ticker": "KXNFLGAME-25NOV27CINBAL-CIN",
-            "side": "yes",
-            "count": 61,
-            "price_cents": 0.31,
-            "price_dollars": "0.0031",
-            "created_time": "2025-11-28T01:29:50.351649+00:00"
-        },
-        {
-            "ticker": "KXNFLGAME-25NOV27CINBAL-CIN",
-            "side": "no",
-            "count": 20,
-            "price_cents": 0.32,
-            "price_dollars": "0.0032",
-            "created_time": "2025-11-28T01:29:34.990498+00:00"
-        },
-        {
-            "ticker": "KXNFLGAME-25NOV27CINBAL-CIN",
-            "side": "yes",
-            "count": 20,
-            "price_cents": 0.23,
-            "price_dollars": "0.0023",
-            "created_time": "2025-11-28T01:00:40.475852+00:00"
         }
     ],
     "settlements": [
@@ -608,7 +608,7 @@
     },
     "raw": {
         "balance": {
-            "balance": 1840
+            "balance": 361
         },
         "positions": {
             "cursor": ""
@@ -617,6 +617,6 @@
     "debug_log": [
         "SUCCESS: Authentication Passed",
         "portfolio_value was 0; used balance + collateral as fallback.",
-        "Completed snapshot. Cash=$18.40, API_portfolio=$18.40, Exposure\u2248$0.00, Estimated_total\u2248$18.40"
+        "Completed snapshot. Cash=$3.61, API_portfolio=$3.61, Exposure\u2248$0.00, Estimated_total\u2248$3.61"
     ]
 }
