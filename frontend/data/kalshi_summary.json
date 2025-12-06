@@ -1,22 +1,38 @@
 {
     "meta": {
-        "updated_at": "2025-12-06 17:35:03"
+        "updated_at": "2025-12-06 18:12:08"
     },
     "account": {
-        "cash_balance": 16.03,
-        "total_account_value": 16.03,
+        "cash_balance": 18.4,
+        "total_account_value": 18.4,
         "money_in_bets": 0.0,
-        "cash_balance_cents": 1603,
-        "portfolio_value_cents_api": 1603,
-        "total_account_value_api": 16.03,
+        "cash_balance_cents": 1840,
+        "portfolio_value_cents_api": 1840,
+        "total_account_value_api": 18.4,
         "positions_exposure_cents": 0
     },
     "summary": {
         "total_deposits": 40.0,
-        "net_profit": -23.97,
-        "roi_percent": -59.925
+        "net_profit": -21.6,
+        "roi_percent": -54.0
     },
     "fills": [
+        {
+            "ticker": "KXNCAAFGAME-25DEC06BYUTTU-BYU",
+            "side": "yes",
+            "count": 13,
+            "price_cents": 0.35,
+            "price_dollars": "0.0035",
+            "created_time": "2025-12-06T17:47:02.644048+00:00"
+        },
+        {
+            "ticker": "KXNCAAFGAME-25DEC06BYUTTU-BYU",
+            "side": "no",
+            "count": 22,
+            "price_cents": 0.34,
+            "price_dollars": "0.0034",
+            "created_time": "2025-12-06T17:46:44.986081+00:00"
+        },
         {
             "ticker": "KXNCAAFGAME-25DEC06BYUTTU-BYU",
             "side": "yes",
@@ -400,22 +416,6 @@
             "price_cents": 0.23,
             "price_dollars": "0.0023",
             "created_time": "2025-11-28T01:00:40.475852+00:00"
-        },
-        {
-            "ticker": "KXNFLGAME-25NOV27KCDAL-KC",
-            "side": "no",
-            "count": 7,
-            "price_cents": 0.15,
-            "price_dollars": "0.0015",
-            "created_time": "2025-11-28T00:35:09.560656+00:00"
-        },
-        {
-            "ticker": "KXNFLGAME-25NOV27KCDAL-KC",
-            "side": "yes",
-            "count": 7,
-            "price_cents": 0.26,
-            "price_dollars": "0.0026",
-            "created_time": "2025-11-28T00:31:17.504684+00:00"
         }
     ],
     "settlements": [
@@ -601,7 +601,7 @@
     },
     "raw": {
         "balance": {
-            "balance": 1603
+            "balance": 1840
         },
         "positions": {
             "cursor": ""
@@ -610,6 +610,6 @@
     "debug_log": [
         "SUCCESS: Authentication Passed",
         "portfolio_value was 0; used balance + collateral as fallback.",
-        "Completed snapshot. Cash=$16.03, API_portfolio=$16.03, Exposure\u2248$0.00, Estimated_total\u2248$16.03"
+        "Completed snapshot. Cash=$18.40, API_portfolio=$18.40, Exposure\u2248$0.00, Estimated_total\u2248$18.40"
     ]
 }
