@@ -1,6 +1,6 @@
 {
     "meta": {
-        "updated_at": "2025-12-06 04:40:40"
+        "updated_at": "2025-12-06 05:09:14"
     },
     "account": {
         "cash_balance": 20.91,
@@ -419,6 +419,20 @@
         }
     ],
     "settlements": [
+        {
+            "ticker": "KXNCAAFGAME-25DEC05UNTTULN-UNT",
+            "outcome": "",
+            "received_cents": 0,
+            "received_dollars": "0.00",
+            "settled_time": "2025-12-06T04:55:41.840397+00:00"
+        },
+        {
+            "ticker": "KXNCAAFGAME-25DEC05UNTTULN-TULN",
+            "outcome": "",
+            "received_cents": 0,
+            "received_dollars": "0.00",
+            "settled_time": "2025-12-06T04:55:41.840397+00:00"
+        },
         {
             "ticker": "KXNFLGAME-25DEC04DALDET-DAL",
             "outcome": "",
