@@ -1,6 +1,6 @@
 {
     "meta": {
-        "updated_at": "2025-12-07 19:31:05"
+        "updated_at": "2025-12-07 20:09:21"
     },
     "account": {
         "cash_balance": 18.87,
@@ -419,6 +419,13 @@
         }
     ],
     "settlements": [
+        {
+            "ticker": "KXNCAAMENTION-25DEC06UGAALA-ROUG",
+            "outcome": "",
+            "received_cents": 0,
+            "received_dollars": "0.00",
+            "settled_time": "2025-12-07T20:04:42.341158+00:00"
+        },
         {
             "ticker": "KXNCAAFPLAYOFF-25-MIA",
             "outcome": "",
