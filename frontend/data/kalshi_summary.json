@@ -1,20 +1,20 @@
 {
     "meta": {
-        "updated_at": "2025-12-07 18:12:25"
+        "updated_at": "2025-12-07 18:43:58"
     },
     "account": {
-        "cash_balance": 12.87,
-        "total_account_value": 12.87,
+        "cash_balance": 18.87,
+        "total_account_value": 18.87,
         "money_in_bets": 0.0,
-        "cash_balance_cents": 1287,
-        "portfolio_value_cents_api": 1287,
-        "total_account_value_api": 12.87,
+        "cash_balance_cents": 1887,
+        "portfolio_value_cents_api": 1887,
+        "total_account_value_api": 18.87,
         "positions_exposure_cents": 0
     },
     "summary": {
         "total_deposits": 40.0,
-        "net_profit": -27.130000000000003,
-        "roi_percent": -67.825
+        "net_profit": -21.13,
+        "roi_percent": -52.825
     },
     "fills": [
         {
@@ -420,6 +420,13 @@
     ],
     "settlements": [
         {
+            "ticker": "KXNCAAFPLAYOFF-25-MIA",
+            "outcome": "",
+            "received_cents": 0,
+            "received_dollars": "0.00",
+            "settled_time": "2025-12-07T18:35:38.393822+00:00"
+        },
+        {
             "ticker": "KXNCAAFGAME-25DEC06UGAALA-UGA",
             "outcome": "",
             "received_cents": 0,
@@ -622,7 +629,7 @@
     },
     "raw": {
         "balance": {
-            "balance": 1287
+            "balance": 1887
         },
         "positions": {
             "cursor": ""
@@ -631,6 +638,6 @@
     "debug_log": [
         "SUCCESS: Authentication Passed",
         "portfolio_value was 0; used balance + collateral as fallback.",
-        "Completed snapshot. Cash=$12.87, API_portfolio=$12.87, Exposure\u2248$0.00, Estimated_total\u2248$12.87"
+        "Completed snapshot. Cash=$18.87, API_portfolio=$18.87, Exposure\u2248$0.00, Estimated_total\u2248$18.87"
     ]
 }
