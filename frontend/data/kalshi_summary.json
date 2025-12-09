@@ -1,6 +1,6 @@
 {
     "meta": {
-        "updated_at": "2025-12-09 04:45:58"
+        "updated_at": "2025-12-09 05:10:20"
     },
     "account": {
         "cash_balance": 30.03,
@@ -419,6 +419,20 @@
         }
     ],
     "settlements": [
+        {
+            "ticker": "KXNFLGAME-25DEC08PHILAC-PHI",
+            "outcome": "",
+            "received_cents": 0,
+            "received_dollars": "0.00",
+            "settled_time": "2025-12-09T04:56:06.240457+00:00"
+        },
+        {
+            "ticker": "KXNFLGAME-25DEC08PHILAC-LAC",
+            "outcome": "",
+            "received_cents": 0,
+            "received_dollars": "0.00",
+            "settled_time": "2025-12-09T04:56:06.240457+00:00"
+        },
         {
             "ticker": "KXNFLGAME-25DEC07CHIGB-CHI",
             "outcome": "",
