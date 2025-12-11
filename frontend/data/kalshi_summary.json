@@ -1,6 +1,6 @@
 {
     "meta": {
-        "updated_at": "2025-12-11 08:48:41"
+        "updated_at": "2025-12-11 09:14:55"
     },
     "account": {
         "cash_balance": 0.0,
@@ -27,6 +27,6 @@
         "positions": {}
     },
     "debug_log": [
-        "CRASH: (401)\nReason: Unauthorized\nHTTP response headers: HTTPHeaderDict({'Content-Type': 'application/json; charset=utf-8', 'Content-Length': '82', 'Connection': 'keep-alive', 'Date': 'Thu, 11 Dec 2025 08:49:11 GMT', 'x-content-type-options': 'nosniff', 'content-security-policy': \"default-src 'none';\", 'strict-transport-security': 'max-age=31536000; includeSubDomains', 'X-Cache': 'Error from cloudfront', 'Via': '1.1 6f067a3fd6e721a7db2a2901701a65d8.cloudfront.net (CloudFront)', 'X-Amz-Cf-Pop': 'IAD12-P1', 'X-Amz-Cf-Id': 'obmyTeE-WbHvwbobFkO6p7he4lwHnKeWhCxhDMLlODlD2ef3kV4GSg=='})\nHTTP response body: error=ErrorResponseError(code='header_timestamp_expired', message='header timestamp expired', details=None)\n"
+        "CRASH: (401)\nReason: Unauthorized\nHTTP response headers: HTTPHeaderDict({'Content-Type': 'application/json; charset=utf-8', 'Content-Length': '82', 'Connection': 'keep-alive', 'Date': 'Thu, 11 Dec 2025 09:15:26 GMT', 'x-content-type-options': 'nosniff', 'content-security-policy': \"default-src 'none';\", 'strict-transport-security': 'max-age=31536000; includeSubDomains', 'X-Cache': 'Error from cloudfront', 'Via': '1.1 ffd639fe55ad689097e5ac53454a5504.cloudfront.net (CloudFront)', 'X-Amz-Cf-Pop': 'SFO53-P1', 'X-Amz-Cf-Id': '7odkiIR74mQwDTHGfU3xSD-HHviIHCt07aLzjy20qBtoZYhIjR73iA=='})\nHTTP response body: error=ErrorResponseError(code='header_timestamp_expired', message='header timestamp expired', details=None)\n"
     ]
 }
