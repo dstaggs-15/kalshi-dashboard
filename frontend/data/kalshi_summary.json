@@ -1,32 +1,269 @@
 {
     "meta": {
-        "updated_at": "2025-12-11 09:14:55"
+        "updated_at": "2025-12-11 09:43:47"
     },
     "account": {
-        "cash_balance": 0.0,
-        "total_account_value": 0.0,
+        "cash_balance": 30.03,
+        "total_account_value": 30.03,
         "money_in_bets": 0.0,
-        "total_account_value_api": 0.0,
-        "cash_balance_cents": 0,
-        "portfolio_value_cents_api": 0,
+        "cash_balance_cents": 3003,
+        "portfolio_value_cents_api": 3003,
+        "total_account_value_api": 30.03,
         "positions_exposure_cents": 0
     },
     "summary": {
         "total_deposits": 40.0,
-        "net_profit": 0.0,
-        "roi_percent": 0.0
+        "net_profit": -9.969999999999999,
+        "roi_percent": -24.924999999999997
     },
     "fills": [],
-    "settlements": [],
+    "settlements": [
+        {
+            "ticker": "KXNFLGAME-25DEC08PHILAC-PHI",
+            "outcome": "",
+            "received_cents": 0,
+            "received_dollars": "0.00",
+            "settled_time": "2025-12-09T04:56:06.240457+00:00"
+        },
+        {
+            "ticker": "KXNFLGAME-25DEC08PHILAC-LAC",
+            "outcome": "",
+            "received_cents": 0,
+            "received_dollars": "0.00",
+            "settled_time": "2025-12-09T04:56:06.240457+00:00"
+        },
+        {
+            "ticker": "KXNFLGAME-25DEC07CHIGB-CHI",
+            "outcome": "",
+            "received_cents": 0,
+            "received_dollars": "0.00",
+            "settled_time": "2025-12-08T00:52:20.926706+00:00"
+        },
+        {
+            "ticker": "KXNCAAMENTION-25DEC06UGAALA-ROUG",
+            "outcome": "",
+            "received_cents": 0,
+            "received_dollars": "0.00",
+            "settled_time": "2025-12-07T20:04:42.341158+00:00"
+        },
+        {
+            "ticker": "KXNCAAFPLAYOFF-25-MIA",
+            "outcome": "",
+            "received_cents": 0,
+            "received_dollars": "0.00",
+            "settled_time": "2025-12-07T18:35:38.393822+00:00"
+        },
+        {
+            "ticker": "KXNCAAFGAME-25DEC06UGAALA-UGA",
+            "outcome": "",
+            "received_cents": 0,
+            "received_dollars": "0.00",
+            "settled_time": "2025-12-07T00:36:18.575863+00:00"
+        },
+        {
+            "ticker": "KXNCAAFGAME-25DEC06UGAALA-ALA",
+            "outcome": "",
+            "received_cents": 0,
+            "received_dollars": "0.00",
+            "settled_time": "2025-12-07T00:36:18.573010+00:00"
+        },
+        {
+            "ticker": "KXNCAAFGAME-25DEC06BYUTTU-BYU",
+            "outcome": "",
+            "received_cents": 0,
+            "received_dollars": "0.00",
+            "settled_time": "2025-12-06T20:30:42.292831+00:00"
+        },
+        {
+            "ticker": "KXNCAAFGAME-25DEC05UNTTULN-UNT",
+            "outcome": "",
+            "received_cents": 0,
+            "received_dollars": "0.00",
+            "settled_time": "2025-12-06T04:55:41.840397+00:00"
+        },
+        {
+            "ticker": "KXNCAAFGAME-25DEC05UNTTULN-TULN",
+            "outcome": "",
+            "received_cents": 0,
+            "received_dollars": "0.00",
+            "settled_time": "2025-12-06T04:55:41.840397+00:00"
+        },
+        {
+            "ticker": "KXNFLGAME-25DEC04DALDET-DAL",
+            "outcome": "",
+            "received_cents": 0,
+            "received_dollars": "0.00",
+            "settled_time": "2025-12-05T04:46:06.505138+00:00"
+        },
+        {
+            "ticker": "KXNFLGAME-25DEC01NYGNE-NE",
+            "outcome": "",
+            "received_cents": 0,
+            "received_dollars": "0.00",
+            "settled_time": "2025-12-02T04:15:51.304529+00:00"
+        },
+        {
+            "ticker": "KXNFLGAME-25NOV30DENWAS-DEN",
+            "outcome": "",
+            "received_cents": 0,
+            "received_dollars": "0.00",
+            "settled_time": "2025-12-01T05:08:02.756037+00:00"
+        },
+        {
+            "ticker": "KXNFLGAME-25NOV30MINSEA-SEA",
+            "outcome": "",
+            "received_cents": 0,
+            "received_dollars": "0.00",
+            "settled_time": "2025-12-01T00:00:36.155981+00:00"
+        },
+        {
+            "ticker": "KXNFLGAME-25NOV30ATLNYJ-ATL",
+            "outcome": "",
+            "received_cents": 0,
+            "received_dollars": "0.00",
+            "settled_time": "2025-11-30T21:21:19.076823+00:00"
+        },
+        {
+            "ticker": "KXNFLGAME-25NOV30HOUIND-IND",
+            "outcome": "",
+            "received_cents": 0,
+            "received_dollars": "0.00",
+            "settled_time": "2025-11-30T21:10:46.912785+00:00"
+        },
+        {
+            "ticker": "KXNFLGAME-25NOV30ARITB-TB",
+            "outcome": "",
+            "received_cents": 0,
+            "received_dollars": "0.00",
+            "settled_time": "2025-11-30T21:01:05.999471+00:00"
+        },
+        {
+            "ticker": "KXNFLGAME-25NOV30LACAR-CAR",
+            "outcome": "",
+            "received_cents": 0,
+            "received_dollars": "0.00",
+            "settled_time": "2025-11-30T20:56:14.270960+00:00"
+        },
+        {
+            "ticker": "KXNCAAFGAME-25NOV29ALAAUB-AUB",
+            "outcome": "",
+            "received_cents": 0,
+            "received_dollars": "0.00",
+            "settled_time": "2025-11-30T04:35:44.981096+00:00"
+        },
+        {
+            "ticker": "KXNCAAFGAME-25NOV29LSUOKLA-LSU",
+            "outcome": "",
+            "received_cents": 0,
+            "received_dollars": "0.00",
+            "settled_time": "2025-11-30T00:16:51.593679+00:00"
+        },
+        {
+            "ticker": "KXNCAAFGAME-25NOV29VANTENN-VAN",
+            "outcome": "",
+            "received_cents": 0,
+            "received_dollars": "0.00",
+            "settled_time": "2025-11-30T00:16:19.371583+00:00"
+        },
+        {
+            "ticker": "KXNCAAFGAME-25NOV29OSUMICH-MICH",
+            "outcome": "",
+            "received_cents": 0,
+            "received_dollars": "0.00",
+            "settled_time": "2025-11-29T20:37:34.369530+00:00"
+        },
+        {
+            "ticker": "KXNCAAFGAME-25NOV28ARIZASU-ASU",
+            "outcome": "",
+            "received_cents": 0,
+            "received_dollars": "0.00",
+            "settled_time": "2025-11-29T05:45:40.350750+00:00"
+        },
+        {
+            "ticker": "KXNCAAFGAME-25NOV28TXAMTEX-TEX",
+            "outcome": "",
+            "received_cents": 0,
+            "received_dollars": "0.00",
+            "settled_time": "2025-11-29T04:25:38.287023+00:00"
+        },
+        {
+            "ticker": "KXNCAAFGAME-25NOV28UGAGT-GT",
+            "outcome": "",
+            "received_cents": 0,
+            "received_dollars": "0.00",
+            "settled_time": "2025-11-29T00:01:01.363191+00:00"
+        },
+        {
+            "ticker": "KXNFLGAME-25NOV28CHIPHI-CHI",
+            "outcome": "",
+            "received_cents": 0,
+            "received_dollars": "0.00",
+            "settled_time": "2025-11-28T23:10:52.457390+00:00"
+        },
+        {
+            "ticker": "KXNFLGAME-25NOV28CHIPHI-PHI",
+            "outcome": "",
+            "received_cents": 0,
+            "received_dollars": "0.00",
+            "settled_time": "2025-11-28T23:10:52.453367+00:00"
+        },
+        {
+            "ticker": "KXNFLGAME-25NOV27CINBAL-CIN",
+            "outcome": "",
+            "received_cents": 0,
+            "received_dollars": "0.00",
+            "settled_time": "2025-11-28T04:50:45.537271+00:00"
+        },
+        {
+            "ticker": "KXNFLGAME-25NOV27CINBAL-BAL",
+            "outcome": "",
+            "received_cents": 0,
+            "received_dollars": "0.00",
+            "settled_time": "2025-11-28T04:50:45.537271+00:00"
+        },
+        {
+            "ticker": "KXNFLGAME-25NOV27KCDAL-KC",
+            "outcome": "",
+            "received_cents": 0,
+            "received_dollars": "0.00",
+            "settled_time": "2025-11-28T01:06:05.271076+00:00"
+        },
+        {
+            "ticker": "KXNFLGAME-25NOV27KCDAL-DAL",
+            "outcome": "",
+            "received_cents": 0,
+            "received_dollars": "0.00",
+            "settled_time": "2025-11-28T01:06:05.271076+00:00"
+        },
+        {
+            "ticker": "KXNFLGAME-25NOV27GBDET-GB",
+            "outcome": "",
+            "received_cents": 0,
+            "received_dollars": "0.00",
+            "settled_time": "2025-11-27T21:25:55.771683+00:00"
+        },
+        {
+            "ticker": "KXHIGHAUS-25NOV26-B65.5",
+            "outcome": "",
+            "received_cents": 0,
+            "received_dollars": "0.00",
+            "settled_time": "2025-11-27T19:00:03.958499+00:00"
+        }
+    ],
     "positions": {
         "market_positions": [],
         "event_positions": []
     },
     "raw": {
-        "balance": {},
+        "balance": {
+            "balance": 3003
+        },
         "positions": {}
     },
     "debug_log": [
-        "CRASH: (401)\nReason: Unauthorized\nHTTP response headers: HTTPHeaderDict({'Content-Type': 'application/json; charset=utf-8', 'Content-Length': '82', 'Connection': 'keep-alive', 'Date': 'Thu, 11 Dec 2025 09:15:26 GMT', 'x-content-type-options': 'nosniff', 'content-security-policy': \"default-src 'none';\", 'strict-transport-security': 'max-age=31536000; includeSubDomains', 'X-Cache': 'Error from cloudfront', 'Via': '1.1 ffd639fe55ad689097e5ac53454a5504.cloudfront.net (CloudFront)', 'X-Amz-Cf-Pop': 'SFO53-P1', 'X-Amz-Cf-Id': '7odkiIR74mQwDTHGfU3xSD-HHviIHCt07aLzjy20qBtoZYhIjR73iA=='})\nHTTP response body: error=ErrorResponseError(code='header_timestamp_expired', message='header timestamp expired', details=None)\n"
+        "SUCCESS: Authentication Passed",
+        "portfolio_value was 0; used balance + collateral as fallback.",
+        "Fills Warning: (401)\nReason: Unauthorized\nHTTP response headers: HTTPHeaderDict({'Content-Type': 'application/json; charset=utf-8', 'Content-Length': '82', 'Connection': 'keep-alive', 'Date': 'Thu, 11 Dec 2025 09:44:19 GMT', 'x-content-type-options': 'nosniff', 'content-security-policy': \"default-src 'none';\", 'strict-transport-security': 'max-age=31536000; includeSubDomains', 'X-Cache': 'Error from cloudfront', 'Via': '1.1 fdfef4416a2144ecb1660f70dad57e94.cloudfront.net (CloudFront)', 'X-Amz-Cf-Pop': 'SFO53-P1', 'X-Amz-Cf-Id': 'DUKflqsDWDWHsAPbDrt_XXgERuMG-EJz2CGIo1B5cfxvqUeg4kzsiQ=='})\nHTTP response body: error=ErrorResponseError(code='header_timestamp_expired', message='header timestamp expired', details=None)\n",
+        "Completed snapshot. Cash=$30.03, API_portfolio=$30.03, Exposure\u2248$0.00, Estimated_total\u2248$30.03"
     ]
 }
