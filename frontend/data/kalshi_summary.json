@@ -1,6 +1,6 @@
 {
     "meta": {
-        "updated_at": "2025-12-11 07:40:44"
+        "updated_at": "2025-12-11 08:15:12"
     },
     "account": {
         "cash_balance": 30.03,
@@ -659,9 +659,7 @@
         "balance": {
             "balance": 3003
         },
-        "positions": {
-            "cursor": ""
-        }
+        "positions": {}
     },
     "debug_log": [
         "SUCCESS: Authentication Passed",
