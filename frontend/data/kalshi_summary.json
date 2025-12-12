@@ -1,6 +1,6 @@
 {
     "meta": {
-        "updated_at": "2025-12-12 04:49:28"
+        "updated_at": "2025-12-12 05:11:58"
     },
     "account": {
         "cash_balance": 3.46,
@@ -419,6 +419,20 @@
         }
     ],
     "settlements": [
+        {
+            "ticker": "KXNFLGAME-25DEC11ATLTB-TB",
+            "outcome": "",
+            "received_cents": 0,
+            "received_dollars": "0.00",
+            "settled_time": "2025-12-12T05:01:51.093439+00:00"
+        },
+        {
+            "ticker": "KXNFLSPREAD-25DEC11ATLTB-TB6",
+            "outcome": "",
+            "received_cents": 0,
+            "received_dollars": "0.00",
+            "settled_time": "2025-12-12T05:01:50.289671+00:00"
+        },
         {
             "ticker": "KXNFLGAME-25DEC08PHILAC-PHI",
             "outcome": "",
