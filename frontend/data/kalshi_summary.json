@@ -1,22 +1,46 @@
 {
     "meta": {
-        "updated_at": "2025-12-12 02:45:21"
+        "updated_at": "2025-12-12 03:50:59"
     },
     "account": {
-        "cash_balance": 0.38,
-        "total_account_value": 0.38,
+        "cash_balance": 3.46,
+        "total_account_value": 3.46,
         "money_in_bets": 0.0,
-        "cash_balance_cents": 38,
-        "portfolio_value_cents_api": 38,
-        "total_account_value_api": 0.38,
+        "cash_balance_cents": 346,
+        "portfolio_value_cents_api": 346,
+        "total_account_value_api": 3.46,
         "positions_exposure_cents": 0
     },
     "summary": {
         "total_deposits": 40.0,
-        "net_profit": -39.62,
-        "roi_percent": -99.05
+        "net_profit": -36.54,
+        "roi_percent": -91.35
     },
     "fills": [
+        {
+            "ticker": "KXNFLGAME-25DEC11ATLTB-TB",
+            "side": "yes",
+            "count": 49,
+            "price_cents": 0.8,
+            "price_dollars": "0.0080",
+            "created_time": "2025-12-12T03:29:31.313129+00:00"
+        },
+        {
+            "ticker": "KXNFLSPREAD-25DEC11ATLTB-TB6",
+            "side": "no",
+            "count": 38,
+            "price_cents": 0.45,
+            "price_dollars": "0.0045",
+            "created_time": "2025-12-12T03:28:58.257440+00:00"
+        },
+        {
+            "ticker": "KXNFLSPREAD-25DEC11ATLTB-TB6",
+            "side": "no",
+            "count": 61,
+            "price_cents": 0.45,
+            "price_dollars": "0.0045",
+            "created_time": "2025-12-12T03:28:58.257440+00:00"
+        },
         {
             "ticker": "KXNFLSPREAD-25DEC11ATLTB-TB6",
             "side": "yes",
@@ -392,30 +416,6 @@
             "price_cents": 0.3,
             "price_dollars": "0.0030",
             "created_time": "2025-11-28T22:23:06.945268+00:00"
-        },
-        {
-            "ticker": "KXNFLGAME-25NOV28CHIPHI-CHI",
-            "side": "no",
-            "count": 10,
-            "price_cents": 0.7,
-            "price_dollars": "0.0070",
-            "created_time": "2025-11-28T22:22:44.292196+00:00"
-        },
-        {
-            "ticker": "KXNCAAFGAME-25NOV28TXAMTEX-TEX",
-            "side": "yes",
-            "count": 11,
-            "price_cents": 0.43,
-            "price_dollars": "0.0043",
-            "created_time": "2025-11-28T21:35:03.014094+00:00"
-        },
-        {
-            "ticker": "KXNFLGAME-25NOV28CHIPHI-CHI",
-            "side": "yes",
-            "count": 10,
-            "price_cents": 0.44,
-            "price_dollars": "0.0044",
-            "created_time": "2025-11-28T20:52:29.669822+00:00"
         }
     ],
     "settlements": [
@@ -657,13 +657,13 @@
     },
     "raw": {
         "balance": {
-            "balance": 38
+            "balance": 346
         },
         "positions": {}
     },
     "debug_log": [
         "SUCCESS: Authentication Passed",
         "portfolio_value was 0; used balance + collateral as fallback.",
-        "Completed snapshot. Cash=$0.38, API_portfolio=$0.38, Exposure\u2248$0.00, Estimated_total\u2248$0.38"
+        "Completed snapshot. Cash=$3.46, API_portfolio=$3.46, Exposure\u2248$0.00, Estimated_total\u2248$3.46"
     ]
 }
