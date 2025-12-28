@@ -2,27 +2,49 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>KLAX Quant Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KLAX Weather Quant Dashboard</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="container">
-        <h1>KLAX Weather Bot</h1>
-        <div id="status-badge" class="badge">Checking...</div>
-        <p id="update-text">Initializing...</p>
-
-        <div class="metrics">
-            <div class="card">
-                <h3>High Temp Forecast</h3>
-                <div id="temp-val" class="big-text">--°F</div>
-                <p id="sigma-val">Confidence: --</p>
+        <header>
+            <div class="header-main">
+                <h1>KLAX Weather Bot</h1>
+                <div id="status-badge" class="badge">INITIALIZING</div>
             </div>
-        </div>
+            <p id="target-date" class="date-header">Target Market: Loading...</p>
+        </header>
 
-        <h2>High Edge Opportunities</h2>
-        <div id="trade-list">
-            <p>Scanning for market edges > 5%...</p>
-        </div>
+        <section class="top-row">
+            <div class="card prediction-card">
+                <h3>Bot's Daily Prediction</h3>
+                <div class="temp-display">
+                    <span id="temp-val">--</span><span class="unit">°F</span>
+                </div>
+                <p id="uncertainty-desc">Uncertainty: ±-- (Confidence Range)</p>
+            </div>
+            
+            <div class="card strategy-card">
+                <h3>Today's Best Bet</h3>
+                <div id="best-bet-action" class="action-highlight">SCANNING...</div>
+                <p id="bet-details">Waiting for market data</p>
+            </div>
+        </section>
+
+        <section class="graph-section card">
+            <h3>Probability Distribution</h3>
+            <p class="graph-hint">The "±2.5" means we expect the temp to fall within this blue curve.</p>
+            <canvas id="probChart"></canvas>
+        </section>
+
+        <section class="trades-section">
+            <h2>Market Edge Analysis</h2>
+            <div id="trade-list">
+                <p class="loading">Fetching latest Kalshi order books...</p>
+            </div>
+        </section>
     </div>
     <script src="script.js"></script>
 </body>
