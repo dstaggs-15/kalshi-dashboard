@@ -3,84 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <title>KLAX Quant Dashboard</title>
-    <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0f172a; color: #f8fafc; padding: 40px; text-align: center; }
-        .container { max-width: 900px; margin: auto; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin: 30px 0; }
-        .card { background: #1e293b; padding: 25px; border-radius: 12px; border: 1px solid #334155; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
-        .status-tag { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; text-transform: uppercase; }
-        .dry-run { background: #f59e0b; color: #000; }
-        .live { background: #10b981; color: #fff; }
-        .recommendation { background: #1e293b; border-left: 4px solid #38bdf8; text-align: left; padding: 15px; margin: 10px 0; display: flex; justify-content: space-between; align-items: center; }
-        .edge-val { color: #4ade80; font-weight: bold; font-size: 1.2rem; }
-        h1 { color: #38bdf8; margin-bottom: 5px; }
-        #last-run { color: #94a3b8; font-size: 0.9rem; margin-bottom: 30px; }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
         <h1>KLAX Weather Bot</h1>
-        <div id="last-run">Waiting for data...</div>
-        <div id="mode-tag"></div>
+        <div id="status-badge" class="badge">Checking...</div>
+        <p id="update-text">Initializing...</p>
 
-        <div class="grid">
+        <div class="metrics">
             <div class="card">
-                <h3>Current Forecast</h3>
-                <p id="temp-display" style="font-size: 2.5rem; margin: 10px 0; font-weight: bold;">--°F</p>
-                <p id="sigma-display" style="color: #94a3b8;">Uncertainty: --</p>
-            </div>
-            <div class="card">
-                <h3>Edge Statistics</h3>
-                <p>Analyzing KLAX Daily High buckets against Kalshi implied probabilities.</p>
+                <h3>High Temp Forecast</h3>
+                <div id="temp-val" class="big-text">--°F</div>
+                <p id="sigma-val">Confidence: --</p>
             </div>
         </div>
 
-        <h2 style="text-align: left;">Live Opportunities</h2>
-        <div id="trade-container">
-            <p style="color: #94a3b8;">Scanning markets for edge > 5%...</p>
+        <h2>High Edge Opportunities</h2>
+        <div id="trade-list">
+            <p>Scanning for market edges > 5%...</p>
         </div>
     </div>
-
-    <script>
-        async function updateDashboard() {
-            try {
-                // IMPORTANT: '../' goes UP to root, then we go DOWN into frontend/data
-                const response = await fetch('../frontend/data/kalshi_summary.json');
-                if (!response.ok) throw new Error("Check path: ../frontend/data/kalshi_summary.json");
-                const data = await response.json();
-
-                // Update UI
-                document.getElementById('last-run').innerText = "Last Bot Pulse: " + data.last_updated;
-                document.getElementById('temp-display').innerText = data.forecast.mu + "°F";
-                document.getElementById('sigma-display').innerText = "Confidence Interval (σ): " + data.forecast.sigma;
-                
-                const modeTag = document.getElementById('mode-tag');
-                modeTag.innerText = data.dry_run ? "Paper Trading Mode" : "Live Execution Active";
-                modeTag.className = "status-tag " + (data.dry_run ? "dry-run" : "live");
-
-                const container = document.getElementById('trade-container');
-                if (data.recommendations.length > 0) {
-                    container.innerHTML = "";
-                    data.recommendations.forEach(trade => {
-                        container.innerHTML += `
-                            <div class="recommendation">
-                                <div>
-                                    <div style="font-weight: bold; font-size: 1.1rem;">${trade.ticker}</div>
-                                    <div style="color: #94a3b8; font-size: 0.85rem;">Entry Ask: $${trade.price.toFixed(2)}</div>
-                                </div>
-                                <div class="edge-val">+${(trade.edge * 100).toFixed(1)}% Edge</div>
-                            </div>
-                        `;
-                    });
-                } else {
-                    container.innerHTML = "<div class='card'>No markets currently meet the 5% edge threshold.</div>";
-                }
-            } catch (err) {
-                console.error(err);
-                document.getElementById('last-run').innerHTML = "<span style='color: #ef4444;'>Error: Could not find data file. Ensure the bot has run at least once.</span>";
-            }
-        }
-        updateDashboard();
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
