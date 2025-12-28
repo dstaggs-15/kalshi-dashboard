@@ -1,17 +1,17 @@
 name: Kalshi Weather Quant Bot
 on:
   schedule:
-    - cron: '0 * * * *'
-  workflow_dispatch:
+    - cron: '0 * * * *' # This tells GitHub to run the bot at the start of every hour
+  workflow_dispatch: # This allows you to click "Run workflow" manually for testing
 
 permissions:
-  contents: write
+  contents: write # This gives the bot permission to save and push the JSON data back to your repo
 
 jobs:
   run-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout Code
         uses: actions/checkout@v4
 
       - name: Setup Python
@@ -22,18 +22,23 @@ jobs:
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
+          # Explicitly installing cryptography to prevent the 'ModuleNotFoundError'
+          pip install cryptography 
           pip install kalshi-python scipy numpy requests
 
       - name: Execute Strategy
         env:
+          # These link your GitHub Secrets to the Python script
           KALSHI_API_KEY_ID: ${{ secrets.KALSHI_API_KEY_ID }}
           KALSHI_PRIVATE_KEY: ${{ secrets.KALSHI_PRIVATE_KEY }}
         run: python backend/kalshi_dashboard.py
 
-      - name: Save Results to Frontend
+      - name: Commit and Push Results
         run: |
           git config --global user.name "WeatherQuantBot"
           git config --global user.email "bot@github.com"
-          git add frontend/data/kalshi_summary.json
+          # This ensures the new data file is added to the repository
+          git add docs/data/kalshi_summary.json
+          # If nothing changed, the '|| exit 0' prevents the action from marking itself as 'failed'
           git commit -m "Update quant data: $(date)" || exit 0
           git push
