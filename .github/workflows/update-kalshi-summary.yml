@@ -1,37 +1,36 @@
-name: Kalshi Weather Bot Update
+name: Run Weather Quant Bot
 on:
   schedule:
-    - cron: '0 * * * *' # Runs every hour
+    - cron: '0 * * * *' # Hourly
   workflow_dispatch:
 
-permissions:
-  contents: write  # Crucial for allowing the bot to save results
-
 jobs:
-  run-bot:
+  trade_and_update:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
-      - name: Checkout Code
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Python
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
 
-      - name: Install dependencies
-        run: pip install -r requirements.txt
+      - name: Install
+        run: pip install kalshi-python scipy numpy requests
 
-      - name: Run Bot and Save Data
+      - name: Run Bot
         env:
           KALSHI_API_KEY_ID: ${{ secrets.KALSHI_API_KEY_ID }}
           KALSHI_PRIVATE_KEY: ${{ secrets.KALSHI_PRIVATE_KEY }}
         run: python backend/kalshi_dashboard.py
 
-      - name: Commit and Push Changes
+      - name: Commit Data
         run: |
-          git config --global user.name "GitHub Action Bot"
-          git config --global user.email "actions@github.com"
+          git config --global user.name "QuantBot"
+          git config --global user.email "bot@github.com"
           git add frontend/data/kalshi_summary.json
-          git commit -m "Auto-update trade data: $(date)" || echo "No changes to commit"
+          git commit -m "Automated update: $(date)" || exit 0
           git push
