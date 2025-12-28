@@ -1,7 +1,8 @@
 name: Kalshi Weather Quant Bot
 on:
   schedule:
-    - cron: '0 * * * *' # This tells GitHub to run the bot at the start of every hour
+    - cron: '0,5,15 15 * * *' # Runs at 10:00, 10:05, and 10:15 AM EST (15:00 UTC)
+    - cron: '30 * * * *'     # Runs every hour to check for the 20% Profit Sell
   workflow_dispatch: # This allows you to click "Run workflow" manually for testing
 
 permissions:
