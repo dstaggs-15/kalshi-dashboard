@@ -1,1 +1,10 @@
-{"last_updated": "2025-12-28 03:36:55", "forecast": {"mu": 66.0, "sigma": 2.5}, "recommendations": [], "dry_run": true}
+{
+  "timestamp": "2025-12-28 03:48:21.152441",
+  "forecast": {
+    "mu": 66.0,
+    "sigma": 2.5
+  },
+  "best_market": null,
+  "best_edge": -1,
+  "dry_run": false
+}
