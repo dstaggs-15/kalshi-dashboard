@@ -1,56 +1,37 @@
-name: Update Kalshi Data
-
+name: Kalshi Weather Bot Update
 on:
   schedule:
-    - cron: '*/30 * * * *'  # Runs every 30 minutes
-  workflow_dispatch:        # Allows you to click "Run workflow" manually
+    - cron: '0 * * * *' # Runs every hour
+  workflow_dispatch:
 
-# PERMISSIONS: This is non-negotiable. 
-# You MUST have "Read and write permissions" enabled in Repo Settings > Actions > General.
 permissions:
-  contents: write
+  contents: write  # Crucial for allowing the bot to save results
 
 jobs:
-  update-dashboard:
+  run-bot:
     runs-on: ubuntu-latest
     steps:
-      # 1. Checkout the MAIN branch specifically
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
-          ref: main
+          python-version: '3.10'
 
-      # 2. Setup Python
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
+      - name: Install dependencies
+        run: pip install -r requirements.txt
 
-      # 3. Install Dependencies
-      - name: Install Libraries
-        run: |
-          pip install --upgrade pip
-          pip install kalshi-python python-dotenv cryptography pydantic
-
-      # 4. Run the Script
-      - name: Run Backend Script
+      - name: Run Bot and Save Data
         env:
           KALSHI_API_KEY_ID: ${{ secrets.KALSHI_API_KEY_ID }}
           KALSHI_PRIVATE_KEY: ${{ secrets.KALSHI_PRIVATE_KEY }}
         run: python backend/kalshi_dashboard.py
 
-      # 5. DEBUG: Verify the file exists on the runner
-      - name: Verify File Generation
+      - name: Commit and Push Changes
         run: |
-          echo "Checking for frontend/data/kalshi_summary.json..."
-          ls -l frontend/data/kalshi_summary.json || echo "FILE MISSING - Python script failed to save."
-
-      # 6. THE NUCLEAR OPTION: Auto-Add and Commit
-      # This action automatically detects changes and pushes them.
-      - name: Commit and Push
-        uses: EndBug/add-and-commit@v9
-        with:
-          add: 'frontend/data/kalshi_summary.json'
-          default_author: github_actions
-          message: 'Auto-update Kalshi dashboard data'
-          push: true
+          git config --global user.name "GitHub Action Bot"
+          git config --global user.email "actions@github.com"
+          git add frontend/data/kalshi_summary.json
+          git commit -m "Auto-update trade data: $(date)" || echo "No changes to commit"
+          git push
