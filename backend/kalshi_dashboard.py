@@ -1,86 +1,86 @@
 import os
 import uuid
+import json
 import requests
 import numpy as np
+from datetime import datetime
 from scipy.stats import norm
 from kalshi_python import Configuration, KalshiClient
 from kalshi_python.models import CreateOrderRequest
 
-# --- CONFIGURATION ---
-KLAX_FORECAST_URL = "https://api.weather.gov/gridpoints/LOX/154,44/forecast"
-DRY_RUN = True  # CHANGE TO False ONLY WHEN READY TO SPEND REAL MONEY
-EDGE_THRESHOLD = 0.05  # 5% edge required to place a trade
-STOP_LOSS = 0.20       # Exit if price drops 20%
-TAKE_PROFIT = 0.15     # Exit if price rises 15%
+# --- SETTINGS ---
+DRY_RUN = True  # Set to False to trade real money
+EDGE_THRESHOLD = 0.05
+STATION_ID = "KLAX" # Los Angeles International Airport
+WEATHER_URL = "https://api.weather.gov/gridpoints/LOX/154,44/forecast"
 
-def get_nws_forecast():
-    """Fetches the official high temperature forecast for KLAX."""
-    headers = {'User-Agent': 'KalshiWeatherBot/1.0 (contact@example.com)'}
-    try:
-        res = requests.get(KLAX_FORECAST_URL, headers=headers).json()
-        # Look for the first 'daytime' period which contains the High Temp
-        for period in res['properties']['periods']:
-            if period['isDaytime']:
-                return float(period['temperature']), 2.5  # Returns (Mean, Sigma)
-    except Exception as e:
-        print(f"Error fetching weather: {e}")
+def get_forecast():
+    """Gets NWS temperature forecast for KLAX."""
+    headers = {'User-Agent': '(myweatherbot.com, contact@email.com)'}
+    res = requests.get(WEATHER_URL, headers=headers).json()
+    # Grab the first daytime high
+    for period in res['properties']['periods']:
+        if period['isDaytime']:
+            return float(period['temperature']), 2.5 # Mean, StdDev
     return None, None
 
-def calculate_probability(low, high, mu, sigma):
-    """The Math: Calculates probability of temp falling in a bucket range."""
-    if high is None: # For 'Above X' buckets
-        return 1 - norm.cdf(low, mu, sigma)
-    if low is None: # For 'Below X' buckets
-        return norm.cdf(high, mu, sigma)
-    return norm.cdf(high, mu, sigma) - norm.cdf(low, mu, sigma)
-
-def main():
-    # 1. Setup Kalshi Connection using your existing secret names
+def get_client():
     config = Configuration(host="https://api.elections.kalshi.com/trade-api/v2")
     config.api_key_id = os.getenv("KALSHI_API_KEY_ID")
     config.private_key_pem = os.getenv("KALSHI_PRIVATE_KEY")
-    client = KalshiClient(config)
+    return KalshiClient(config)
 
-    # 2. Get the "Brain" data (Forecast)
-    mu, sigma = get_nws_forecast()
-    if not mu: return
-    print(f"--- KLAX Forecast: {mu}°F (Uncertainty: {sigma}) ---")
+def main():
+    client = get_client()
+    mu, sigma = get_forecast()
+    if mu is None: return
 
-    # 3. Find relevant markets (Filtering for Today's High Temp)
-    # Note: We filter for 'KXHIGH' which is the typical Kalshi ticker prefix for LAX High
-    markets = client.get_markets(limit=10, series_ticker="KXHIGH").markets
+    # Fetch relevant weather markets
+    # Kalshi often uses 'KXHIGH' for daily high temperature series
+    markets = client.get_markets(series_ticker="KXHIGH", status="open").markets
+    
+    trade_log = []
     
     for m in markets:
-        # Example: 'KXHIGH-25DEC-T75' means High Temp 75-76
-        # We extract the 'T75' part to define our math boundaries
         ticker = m.ticker
-        price = m.yes_ask / 100
+        yes_price = m.yes_ask / 100
         
-        # Simplified parser: extract temperature from title/subtitle
-        # For a real bot, you'd want a robust 'if/else' based on title strings
-        # Here we assume a 1-degree bucket for the demo
-        floor = float(m.subtitle.replace('° or above', '').replace('°', '').split('-')[0])
-        cap = floor + 1 
+        # Determine bucket range from title (e.g., "75° to 76°")
+        # Note: This parser is simplified for the example
+        try:
+            parts = m.subtitle.replace('°', '').split('-')
+            low = float(parts[0])
+            high = float(parts[1]) if len(parts) > 1 else low + 1
+        except: continue
 
-        our_prob = calculate_probability(floor, cap, mu, sigma)
-        edge = our_prob - price
+        # Calculate Edge
+        prob = norm.cdf(high, mu, sigma) - norm.cdf(low, mu, sigma)
+        edge = prob - yes_price
 
-        print(f"Market: {ticker} | Price: {price:.2f} | Our Prob: {our_prob:.2f} | Edge: {edge:.2f}")
-
-        # 4. Automate Investing
         if edge > EDGE_THRESHOLD:
-            print(f"!!! EDGE DETECTED ({edge:.2f}) !!!")
+            print(f"Edge found for {ticker}: {edge:.2f}")
             if not DRY_RUN:
                 order = CreateOrderRequest(
                     ticker=ticker, action="buy", side="yes", count=1,
                     type="limit", yes_price=m.yes_ask, client_order_id=str(uuid.uuid4())
                 )
                 client.user_order_create(order)
-                print(f"Order placed for {ticker}")
+            
+            trade_log.append({"ticker": ticker, "edge": round(edge, 3), "price": yes_price})
 
-        # 5. Automate Early Exit
-        # Logic: Check positions you already own and sell if profit target hit
-        # (This section requires fetching user positions from client)
+    # Prepare data for Frontend
+    summary_data = {
+        "last_updated": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "forecast": {"mu": mu, "sigma": sigma},
+        "recommendations": trade_log,
+        "dry_run": DRY_RUN
+    }
+
+    # Save to the directory GitHub Pages reads
+    output_path = "frontend/data/kalshi_summary.json"
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    with open(output_path, "w") as f:
+        json.dump(summary_data, f, indent=4)
 
 if __name__ == "__main__":
     main()
