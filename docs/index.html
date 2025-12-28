@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>KLAX Weather Quant</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #0f172a; color: #f8fafc; padding: 40px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        .card { background: #1e293b; padding: 20px; border-radius: 12px; border: 1px solid #334155; }
+        .edge-list { margin-top: 20px; }
+        .green { color: #4ade80; font-weight: bold; }
+        h1 { color: #38bdf8; }
+    </style>
+</head>
+<body>
+    <h1>KLAX Weather Trading Bot</h1>
+    <p>Last Update: <span id="time">--</span></p>
+    
+    <div class="grid">
+        <div class="card">
+            <h3>NWS Forecast</h3>
+            <p id="forecast">Loading...</p>
+        </div>
+        <div class="card">
+            <h3>Mode</h3>
+            <p id="mode">--</p>
+        </div>
+    </div>
+
+    <h2>Top Recommended Trades (By Edge)</h2>
+    <div id="trades" class="edge-list"></div>
+
+    <script>
+        fetch('data/kalshi_summary.json')
+            .then(r => r.json())
+            .then(data => {
+                document.getElementById('time').innerText = data.last_updated;
+                document.getElementById('mode').innerText = data.dry_run ? "PAPER TRADING (DRY RUN)" : "LIVE TRADING";
+                document.getElementById('forecast').innerText = data.forecast.mu + "°F (±" + data.forecast.sigma + ")";
+                
+                const tradeDiv = document.getElementById('trades');
+                data.recommendations.forEach(t => {
+                    tradeDiv.innerHTML += `
+                        <div class="card" style="margin-bottom:10px">
+                            <strong>${t.ticker}</strong> | 
+                            Price: $${t.price} | 
+                            <span class="green">Edge: +${(t.edge * 100).toFixed(1)}%</span>
+                        </div>`;
+                });
+            });
+    </script>
+</body>
+</html>
