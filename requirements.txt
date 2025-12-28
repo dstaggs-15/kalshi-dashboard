@@ -1,0 +1,6 @@
+kalshi-python
+scipy
+numpy
+requests
+cryptography
+python-dotenv
