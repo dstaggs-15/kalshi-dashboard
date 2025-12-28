@@ -1,6 +1,6 @@
 async function loadQuantData() {
     try {
-        const response = await fetch('data/kalshi_summary.json');
+        const response = await fetch('frontend/data/kalshi_summary.json');
         const data = await response.json();
 
         document.getElementById('temp-val').innerText = `${data.forecast.mu}°F`;
