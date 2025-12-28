@@ -11,8 +11,8 @@ from kalshi_python.models import CreateOrderRequest
 # STRATEGY SETTINGS
 # =====================
 DRY_RUN = False                  # TRUE = no real trades
-BET_AMOUNT_CENTS = 500           # $5 per trade
-PROFIT_TARGET = 1.20             # +20% take profit
+BET_AMOUNT_CENTS = 400           # $5 per trade
+PROFIT_TARGET = 1             # +20% take profit
 MIN_EDGE = 0.05                  # 5% minimum edge
 SIGMA = 2.5
 
