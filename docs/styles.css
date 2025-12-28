@@ -1,7 +1,13 @@
-body { font-family: sans-serif; background: #0b0f1a; color: #fff; padding: 40px; text-align: center; }
-.container { max-width: 600px; margin: auto; }
-.badge { display: inline-block; padding: 5px 15px; border-radius: 20px; font-weight: bold; margin-bottom: 10px; }
-.card { background: #161b22; border: 1px solid #333; padding: 20px; border-radius: 12px; margin: 20px 0; }
-.big-text { font-size: 3rem; color: #38bdf8; }
-.trade-item { background: #1c2128; padding: 15px; margin: 10px 0; border-radius: 8px; display: flex; justify-content: space-between; border-left: 4px solid #00ff88; }
-.edge-pill { color: #00ff88; font-weight: bold; }
+:root { --bg: #0d1117; --card: #161b22; --border: #30363d; --text: #c9d1d9; --accent: #58a6ff; --profit: #238636; --warn: #d29922; }
+body { font-family: -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
+.container { max-width: 1000px; margin: auto; }
+header { margin-bottom: 30px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+.header-main { display: flex; justify-content: space-between; align-items: center; }
+.badge { padding: 5px 15px; border-radius: 20px; font-weight: bold; font-size: 0.8rem; }
+.top-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+.card { background: var(--card); border: 1px solid var(--border); padding: 25px; border-radius: 12px; }
+.temp-display { font-size: 4rem; font-weight: 800; color: var(--accent); margin: 10px 0; }
+.action-highlight { font-size: 1.5rem; font-weight: bold; color: var(--profit); margin: 10px 0; }
+.trade-item { background: #0d1117; border: 1px solid var(--border); padding: 15px; margin: 10px 0; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; }
+.edge-pill { background: rgba(35, 134, 54, 0.2); color: #3fb950; padding: 4px 10px; border-radius: 12px; font-weight: bold; }
+canvas { max-height: 300px; }
