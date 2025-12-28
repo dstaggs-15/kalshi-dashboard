@@ -1,53 +1,32 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <title>KLAX Weather Bot</title>
+    <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        body { background: #0d1117; color: #c9d1d9; font-family: sans-serif; text-align: center; padding: 20px; }
-        .card { background: #161b22; border: 1px solid #30363d; padding: 20px; border-radius: 12px; max-width: 600px; margin: 20px auto; }
-        h1 { color: #58a6ff; }
-        .profit { color: #3fb950; font-weight: bold; }
-    </style>
 </head>
 <body>
-    <h1>KLAX Weather Strategy</h1>
-    <div class="card">
-        <h2 id="predict">--°F</h2>
-        <p id="details">Waiting for bot pulse...</p>
-        <canvas id="probChart"></canvas>
+    <div class="container">
+        <h1>KLAX Weather Strategy</h1>
+        <div id="status-badge" class="badge">INITIALIZING</div>
+        <section class="top-row">
+            <div class="card">
+                <h3>Prediction</h3>
+                <div id="temp-val" class="big-text">--°F</div>
+                <p id="sigma-val">Uncertainty: --</p>
+            </div>
+            <div class="card">
+                <h3>Current Bet</h3>
+                <div id="bet-action" class="highlight">SCANNING...</div>
+                <p id="bet-details">Targeting +20% ROI</p>
+            </div>
+        </section>
+        <section class="card">
+            <h3>Probability Distribution</h3>
+            <canvas id="probChart"></canvas>
+        </section>
     </div>
-    <div class="card">
-        <h3>Current Best Bet</h3>
-        <div id="bet-info">Scanning markets...</div>
-    </div>
-
-    <script>
-        async function update() {
-            const res = await fetch('data/kalshi_summary.json?t=' + Date.now());
-            const data = await res.json();
-            
-            document.getElementById('predict').innerText = data.forecast.mu + "°F Forecast";
-            document.getElementById('details').innerText = "±" + data.forecast.sigma + " Uncertainty (Bell Curve)";
-            
-            if(data.recommendations.length > 0) {
-                const b = data.recommendations[0];
-                document.getElementById('bet-info').innerHTML = 
-                    `<strong>${b.ticker}</strong><br>Bought at: $${b.price} | <span class="profit">Target Sell: $${(b.price * 1.2).toFixed(2)}</span>`;
-            }
-            renderChart(data.forecast.mu, data.forecast.sigma);
-        }
-
-        function renderChart(mu, sigma) {
-            const ctx = document.getElementById('probChart').getContext('2d');
-            const labels = [], points = [];
-            for (let x = mu-10; x <= mu+10; x+=0.5) {
-                labels.push(x);
-                points.push((1/(sigma*Math.sqrt(2*Math.PI)))*Math.exp(-0.5*Math.pow((x-mu)/sigma,2)));
-            }
-            new Chart(ctx, { type: 'line', data: { labels, datasets: [{ data: points, borderColor: '#58a6ff', fill: true, backgroundColor: 'rgba(88,166,255,0.1)' }] }, options: { scales: { y: { display: false } }, plugins: { legend: { display: false } } } });
-        }
-        update();
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
