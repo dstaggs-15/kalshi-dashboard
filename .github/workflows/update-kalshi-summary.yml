@@ -1,34 +1,46 @@
 name: Kalshi Sniper Bot
+
 on:
   schedule:
-    # Runs at 10:00, 10:05, and 10:15 AM EST (15:00 UTC) to catch market open
+    # 15:00 UTC is exactly 10:00 AM EST.
+    # We run at :00, :05, and :15 to ensure we catch the market launch immediately.
     - cron: '0,5,15 15 * * *'
-    # Runs every hour to check for the 25% profit target exit
+    # Runs once an hour for the rest of the day to check for the 25% profit target
     - cron: '30 * * * *'
-  workflow_dispatch:
+  workflow_dispatch: # Allows you to trigger the bet manually from the Actions tab
 
 permissions:
-  contents: write
+  contents: write # Crucial for the bot to save my_positions.json and your website data
 
 jobs:
   trade:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
           python-version: '3.10'
+
       - name: Install Dependencies
-        run: pip install kalshi-python requests
+        run: |
+          python -m pip install --upgrade pip
+          # Explicitly installing cryptography fixes the ModuleNotFoundError
+          pip install cryptography kalshi-python requests scipy numpy
+
       - name: Execute Live Trades
         env:
           KALSHI_API_KEY_ID: ${{ secrets.KALSHI_API_KEY_ID }}
           KALSHI_PRIVATE_KEY: ${{ secrets.KALSHI_PRIVATE_KEY }}
         run: python backend/kalshi_dashboard.py
-      - name: Save Tracking Data
+
+      - name: Save Tracking and Website Data
         run: |
           git config --global user.name "WeatherQuantBot"
           git config --global user.email "bot@github.com"
           git add .
-          git commit -m "Update positions and dashboard" || exit 0
+          # The '|| exit 0' prevents the workflow from failing if no files changed
+          git commit -m "Update positions and dashboard: $(date)" || exit 0
           git push
