@@ -1,47 +1,28 @@
-name: Kalshi Weather Quant Bot
+name: Kalshi Sniper Bot
 on:
   schedule:
-    # Runs at 10:00, 10:05, and 10:15 AM EST (15:00 UTC) 
-    - cron: '0,5,15 15 * * *'
-    # Also runs every hour to check for the 20% Profit Sell
-    - cron: '30 * * * *'
-  workflow_dispatch: # This allows you to click "Run workflow" manually for testing
-
-permissions:
-  contents: write # This gives the bot permission to save and push the JSON data back to your repo
+    - cron: '0,5,15 15 * * *' # 10 AM EST Snipe Window
+    - cron: '30 * * * *'     # Hourly Profit Check
+  workflow_dispatch:
 
 jobs:
-  run-and-deploy:
+  run-bot:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.10'
-
-      - name: Install Dependencies
-        run: |
-          python -m pip install --upgrade pip
-          # Explicitly installing cryptography to prevent the 'ModuleNotFoundError'
-          pip install cryptography 
-          pip install kalshi-python scipy numpy requests
-
-      - name: Execute Strategy
+      - name: Install
+        run: pip install kalshi-python requests
+      - name: Trade
         env:
-          # These link your GitHub Secrets to the Python script
           KALSHI_API_KEY_ID: ${{ secrets.KALSHI_API_KEY_ID }}
           KALSHI_PRIVATE_KEY: ${{ secrets.KALSHI_PRIVATE_KEY }}
         run: python backend/kalshi_dashboard.py
-
-      - name: Commit and Push Results
+      - name: Push
         run: |
-          git config --global user.name "WeatherQuantBot"
-          git config --global user.email "bot@github.com"
-          # This ensures the new data file is added to the repository
-          git add docs/data/kalshi_summary.json
-          # If nothing changed, the '|| exit 0' prevents the action from marking itself as 'failed'
-          git commit -m "Update quant data: $(date)" || exit 0
+          git config --global user.name "QuantBot"
+          git add .
+          git commit -m "Pulse update" || exit 0
           git push
