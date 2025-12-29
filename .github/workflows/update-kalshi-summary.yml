@@ -1,8 +1,8 @@
 name: Kalshi Sniper Bot
 on:
   schedule:
-    - cron: '0,5,15 15 * * *' # 10 AM EST Snipe
-    - cron: '30 * * * *'     # Hourly Profit Check
+    - cron: '0,10,20 15 * * *' # Snipes the 10 AM EST Open
+    - cron: '30 * * * *'      # Hourly Profit Check
   workflow_dispatch:
 
 permissions:
@@ -24,11 +24,14 @@ jobs:
         env:
           KALSHI_API_KEY_ID: ${{ secrets.KALSHI_API_KEY_ID }}
           KALSHI_PRIVATE_KEY: ${{ secrets.KALSHI_PRIVATE_KEY }}
-        run: python backend/kalshi_dashboard.py
-      - name: Save Tracking Data
+        # Adding a random sleep helps avoid IP-based flood protection
+        run: |
+          sleep $(( ( RANDOM % 20 )  + 5 ))
+          python backend/kalshi_dashboard.py
+      - name: Save Data
         run: |
           git config --global user.name "WeatherQuantBot"
           git config --global user.email "bot@github.com"
           git add .
-          git commit -m "Update positions and dashboard" || exit 0
+          git commit -m "Update dashboard" || exit 0
           git push
