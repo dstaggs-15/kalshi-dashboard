@@ -1,33 +1,21 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>KLAX Weather Bot</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>KLAX Sniper Dashboard</title>
+    <style>
+        body { background: #0d1117; color: #fff; font-family: sans-serif; text-align: center; padding: 50px; }
+        .card { background: #161b22; border: 1px solid #30363d; padding: 30px; border-radius: 15px; max-width: 500px; margin: auto; }
+        .target { font-size: 4rem; color: #58a6ff; margin: 10px 0; }
+        .status { color: #3fb950; font-weight: bold; }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>KLAX Weather Strategy</h1>
-            <div id="status-badge" class="badge">INITIALIZING</div>
-        </header>
-        <section class="top-row">
-            <div class="card">
-                <h3>Prediction</h3>
-                <div id="temp-val" class="big-text">--°F</div>
-                <p id="sigma-val">Uncertainty: --</p>
-            </div>
-            <div class="card">
-                <h3>Current Strategy</h3>
-                <div id="bet-action" class="highlight">SCANNING...</div>
-                <p id="bet-details">Targeting +20% ROI</p>
-            </div>
-        </section>
-        <section class="card">
-            <h3>Probability Distribution</h3>
-            <canvas id="probChart"></canvas>
-        </section>
+    <div class="card">
+        <h1>Tomorrow's KLAX Target</h1>
+        <div id="target-val" class="target">--°F</div>
+        <p>NOAA Official Forecast</p>
+        <hr style="border: 0; border-top: 1px solid #30363d; margin: 20px 0;">
+        <div id="bet-status">Scanning for market open...</div>
     </div>
     <script src="script.js"></script>
 </body>
