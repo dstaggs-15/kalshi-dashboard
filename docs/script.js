@@ -7,8 +7,8 @@ async function refresh() {
     
     if(data.recommendations.length > 0) {
         const best = data.recommendations[0];
-        document.getElementById('bet-action').innerText = `OWN: ${best.ticker}`;
-        document.getElementById('bet-details').innerText = `Bought at $${best.price.toFixed(2)} | Sell Target: $${(best.price * 1.2).toFixed(2)}`;
+        document.getElementById('bet-action').innerText = `BUY: ${best.ticker}`;
+        document.getElementById('bet-details').innerText = `Bought at $${best.price.toFixed(2)} | Target Sell: $${(best.price * 1.2).toFixed(2)}`;
     }
     renderGraph(data.forecast.mu, data.forecast.sigma);
 }
