@@ -1,65 +1,73 @@
 import os
 import json
+import uuid
 import requests
 from datetime import datetime, timedelta
-from meteostat import Point, Daily
 from kalshi_python import Configuration, KalshiClient
 from kalshi_python.models import CreateOrderRequest
 
 # --- SETTINGS ---
-STATION_ID = "72295" # WMO ID for KLAX
-DRY_RUN = False 
-BET_AMOUNT = 5.00
-PROFIT_TARGET = 1.25 # 25% Profit
+DRY_RUN = False  # Set to False to trade real money
+BET_AMOUNT_USD = 5.00
+PROFIT_TARGET = 1.25 # 25% Profit Goal
+DATA_FILE = "docs/data/kalshi_summary.json"
+POS_FILE = "backend/my_positions.json"
 
-def get_noaa_forecast():
-    """Gets the specific high temp for tomorrow from NWS."""
+def get_noaa_tomorrow_high():
+    """Gets specific high temp for KLAX tomorrow."""
     url = "https://api.weather.gov/gridpoints/LOX/154,44/forecast"
     res = requests.get(url, headers={'User-Agent': 'Bot'}).json()
-    # Find the first 'Daytime' period that isn't 'Today'
     for p in res['properties']['periods']:
         if p['isDaytime'] and "tomorrow" in p['name'].lower():
             return float(p['temperature'])
     return None
 
-def get_historic_normal():
-    """Gets the historical average high for tomorrow's date."""
-    tomorrow = datetime.now() + timedelta(days=1)
-    location = Point(33.94, -118.40) # KLAX Coordinates
-    # Fetch last 10 years of data for this specific day
-    data = Daily(location, tomorrow - timedelta(days=3650), tomorrow)
-    df = data.fetch()
-    # Filter for the same month and day across years
-    df['month'] = df.index.month
-    df['day'] = df.index.day
-    normal = df[(df.month == tomorrow.month) & (df.day == tomorrow.day)]['tmax'].mean()
-    return (normal * 9/5) + 32 # Convert C to F
-
 def main():
-    # Setup Kalshi
     config = Configuration(host="https://api.elections.kalshi.com/trade-api/v2")
     config.api_key_id = os.getenv("KALSHI_API_KEY_ID")
     config.private_key_pem = os.getenv("KALSHI_PRIVATE_KEY")
     client = KalshiClient(config)
 
-    forecast_temp = get_noaa_forecast()
-    historic_temp = get_historic_normal()
-    
-    # We prioritize the live NOAA forecast
-    target_temp = forecast_temp if forecast_temp else historic_temp
-    print(f"Targeting: {target_temp}°F (Forecast: {forecast_temp}, Normal: {historic_temp})")
+    target_temp = get_noaa_tomorrow_high()
+    if not target_temp: return
 
+    # Load positions to manage 25% profit sell
+    try:
+        with open(POS_FILE, 'r') as f: my_bets = json.load(f)
+    except: my_bets = {}
+
+    # 1. AUTO-SELL LOGIC
+    for ticker, entry_price in list(my_bets.items()):
+        m_data = client.get_market(ticker).market
+        current_bid = m_data.yes_bid / 100
+        if current_bid >= (entry_price * PROFIT_TARGET):
+            print(f"💰 TARGET HIT: Selling {ticker} for 25% profit")
+            if not DRY_RUN:
+                client.user_order_create(ticker=ticker, action="sell", side="yes", count=1, type="market", client_order_id=str(uuid.uuid4()))
+            del my_bets[ticker]
+
+    # 2. AUTO-BUY (SNIPE)
     markets = client.get_markets(series_ticker="KXHIGHLAX", status="open").markets
-    
+    best_m = None
     for m in markets:
-        # Check if our target_temp falls inside this bracket (e.g., '70-71')
         parts = m.subtitle.replace('°','').split('-')
         low = float(parts[0])
         high = float(parts[1]) if len(parts) > 1 else low + 1
-        
         if low <= target_temp <= high:
-            price = m.yes_ask / 100
-            if price < 0.80: # Only buy if payout is decent (at least 20% upside)
-                print(f"🎯 MATCH FOUND: Buying {m.ticker} at {price}")
-                # Place $5 Buy Order
-                # ... [client.user_order_create logic]
+            best_m = m
+            break
+
+    if best_m and best_m.ticker not in my_bets:
+        price = best_m.yes_ask / 100
+        count = int(BET_AMOUNT_USD / price)
+        print(f"🎯 SNIPING: NOAA says {target_temp}F. Buying {best_m.ticker} at {price}")
+        if not DRY_RUN:
+            client.user_order_create(CreateOrderRequest(ticker=best_m.ticker, action="buy", side="yes", count=count, type="limit", yes_price=best_m.yes_ask, client_order_id=str(uuid.uuid4())))
+            my_bets[best_m.ticker] = price
+
+    # Save tracking and dashboard summary
+    with open(POS_FILE, 'w') as f: json.dump(my_bets, f)
+    with open(DATA_FILE, 'w') as f:
+        json.dump({"last_updated": str(datetime.now()), "target_temp": target_temp, "active_bet": best_m.ticker if best_m else None}, f)
+
+if __name__ == "__main__": main()
