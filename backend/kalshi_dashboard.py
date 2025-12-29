@@ -1,6 +1,7 @@
 import os
 import json
 import uuid
+import time
 import requests
 from datetime import datetime
 from kalshi_python import Configuration, KalshiClient
@@ -17,23 +18,27 @@ DATA_FILE = "docs/data/kalshi_summary.json"
 POS_FILE = "backend/my_positions.json"
 
 def get_noaa_tomorrow_high():
-    """Fetch the NOAA high temp for tomorrow with required User-Agent."""
+    """Fetch NOAA high temp with mandatory User-Agent and retry logic."""
     url = "https://api.weather.gov/gridpoints/LOX/154,44/forecast"
-    # NWS API requires a unique User-Agent or it returns a 403 error
+    # NWS requires a unique User-Agent identifier
     headers = {
-        'User-Agent': 'KLAXWeatherSniper/1.0 (contact@yourdomain.com)',
+        'User-Agent': 'KLAXWeatherSniper/1.0 (dstaggs@github.com)',
         'Accept': 'application/geo+json'
     }
-    try:
-        response = requests.get(url, headers=headers, timeout=15)
-        response.raise_for_status() # This will catch 403, 404, or 503 errors
-        res = response.json()
-        
-        for p in res['properties']['periods']:
-            if p['isDaytime'] and "tomorrow" in p['name'].lower():
-                return float(p['temperature'])
-    except Exception as e:
-        print(f"❌ NOAA API Error: {e}")
+    
+    # Try up to 3 times to bypass temporary IP-based blocking
+    for attempt in range(3):
+        try:
+            response = requests.get(url, headers=headers, timeout=15)
+            response.raise_for_status() # Catch 403, 404, or 503 errors
+            res = response.json()
+            
+            for p in res['properties']['periods']:
+                if p['isDaytime'] and "tomorrow" in p['name'].lower():
+                    return float(p['temperature'])
+        except Exception as e:
+            print(f"⚠️ Attempt {attempt+1} Failed: {e}")
+            time.sleep(2) # Brief wait before retry
     return None
 
 def main():
@@ -49,7 +54,7 @@ def main():
     target_temp = get_noaa_tomorrow_high()
     
     if target_temp is None:
-        print("❌ ERROR: Could not retrieve NOAA forecast")
+        print("❌ ERROR: Could not retrieve NOAA forecast after retries")
         return
 
     # Load positions
@@ -78,12 +83,13 @@ def main():
                 price = m.yes_ask / 100
                 count = int(BET_AMOUNT_USD / price)
                 print(f"🎯 BUYING: {count}x {m.ticker} @ {price}")
-                client.user_order_create(CreateOrderRequest(
-                    ticker=m.ticker, action="buy", side="yes", 
-                    count=count, type="limit", yes_price=m.yes_ask, 
-                    client_order_id=str(uuid.uuid4())
-                ))
-                my_bets[m.ticker] = price
+                if not DRY_RUN:
+                    client.user_order_create(CreateOrderRequest(
+                        ticker=m.ticker, action="buy", side="yes", 
+                        count=count, type="limit", yes_price=m.yes_ask, 
+                        client_order_id=str(uuid.uuid4())
+                    ))
+                    my_bets[m.ticker] = price
                 break
 
     # SAVE DATA
@@ -91,7 +97,11 @@ def main():
     with open(POS_FILE, 'w') as f: json.dump(my_bets, f)
     os.makedirs('docs/data', exist_ok=True)
     with open(DATA_FILE, 'w') as f:
-        json.dump({"last_updated": str(datetime.now()), "target_temp": target_temp, "active_bet": list(my_bets.keys())[0] if my_bets else None}, f)
+        json.dump({
+            "last_updated": str(datetime.now()), 
+            "target_temp": target_temp, 
+            "active_bet": list(my_bets.keys())[0] if my_bets else None
+        }, f)
 
 if __name__ == "__main__":
     main()
