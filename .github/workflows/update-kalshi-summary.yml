@@ -1,28 +1,34 @@
 name: Kalshi Sniper Bot
 on:
   schedule:
-    - cron: '0,5,15 15 * * *' # 10 AM EST Snipe Window
-    - cron: '30 * * * *'     # Hourly Profit Check
+    # Runs at 10:00, 10:05, and 10:15 AM EST (15:00 UTC) to catch market open
+    - cron: '0,5,15 15 * * *'
+    # Runs every hour to check for the 25% profit target exit
+    - cron: '30 * * * *'
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
-  run-bot:
+  trade:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.10'
-      - name: Install
+      - name: Install Dependencies
         run: pip install kalshi-python requests
-      - name: Trade
+      - name: Execute Live Trades
         env:
           KALSHI_API_KEY_ID: ${{ secrets.KALSHI_API_KEY_ID }}
           KALSHI_PRIVATE_KEY: ${{ secrets.KALSHI_PRIVATE_KEY }}
         run: python backend/kalshi_dashboard.py
-      - name: Push
+      - name: Save Tracking Data
         run: |
-          git config --global user.name "QuantBot"
+          git config --global user.name "WeatherQuantBot"
+          git config --global user.email "bot@github.com"
           git add .
-          git commit -m "Pulse update" || exit 0
+          git commit -m "Update positions and dashboard" || exit 0
           git push
