@@ -1,8 +1,8 @@
 name: Kalshi Sniper Bot
 on:
   schedule:
-    - cron: '5,15,25 15 * * *' # Staggered 10 AM EST open
-    - cron: '45 * * * *'      # Hourly profit check
+    - cron: '5,15,25 15 * * *' 
+    - cron: '45 * * * *'      
   workflow_dispatch:
 
 permissions:
@@ -18,19 +18,15 @@ jobs:
           python-version: '3.10'
       - name: Install Dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install cryptography kalshi-python requests scipy numpy
+          pip install cryptography kalshi-python requests beautifulsoup4
       - name: Execute Live Trades
         env:
           KALSHI_API_KEY_ID: ${{ secrets.KALSHI_API_KEY_ID }}
           KALSHI_PRIVATE_KEY: ${{ secrets.KALSHI_PRIVATE_KEY }}
-        run: |
-          sleep $(( ( RANDOM % 30 )  + 10 ))
-          python backend/kalshi_dashboard.py
+        run: python backend/kalshi_dashboard.py
       - name: Save Tracking Data
         run: |
           git config --global user.name "WeatherQuantBot"
-          git config --global user.email "bot@github.com"
           git add .
-          git commit -m "Pulse update" || exit 0
+          git commit -m "Web Scrape update" || exit 0
           git push
